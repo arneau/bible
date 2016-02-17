@@ -1,7 +1,7 @@
 # The Bible App
 
 ### Installing Composer
-1. Create composer.json
+###### Create composer.json
 	{
 		"require": {
 			"propel/propel": "~2.0@dev"
