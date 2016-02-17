@@ -1,0 +1,10 @@
+<?php
+
+return [
+	'propel' => [
+		'paths' => [
+			'schemaDir' => '/Users/arneau/Documents/bible/app/database/',
+			'phpDir' => '/Users/arneau/Documents/bible/app/models/',
+		],
+	],
+];
