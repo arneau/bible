@@ -1,70 +1,51 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<? xml encoding="UTF-8" version="1.0" ?>
 <database name="default" defaultIdMethod="native">
 	<behavior name="auto_add_pk" />
 	<table name="bible">
-		<column name="code" type="varchar" size="255" required="true" />
-		<column name="name" type="varchar" size="255" required="true" />
+		<column name="code" required="true" size="255" type="varchar" />
+		<column name="name" required="true" size="255" type="varchar" />
 	</table>
 	<table name="book">
-		<behavior id="number_of_chapters_aggregate" name="aggregate_column">
-			<parameter name="name" value="number_of_chapters" />
-			<parameter name="foreign_table" value="verse" />
-			<parameter name="expression" value="COUNT(DISTINCT(chapter_number))" />
-		</behavior>
-		<behavior id="number_of_verses_aggregate" name="aggregate_column">
-			<parameter name="name" value="number_of_verses" />
-			<parameter name="foreign_table" value="verse" />
-			<parameter name="expression" value="COUNT(verse_number)" />
-		</behavior>
-		<column name="name" type="varchar" size="255" required="true" />
+		<column name="name" required="true" size="255" type="varchar" />
 	</table>
 	<table name="keyword">
-		<column name="value" type="varchar" size="255" required="true" />
+		<column name="value" required="true" size="255" type="varchar" />
 	</table>
 	<table name="keyword_synonym">
-		<column name="keyword_id" type="integer" required="true"/>
-		<column name="value" type="varchar" size="255" required="true" />
+		<column name="keyword_id" required="true" type="integer" />
+		<column name="value" required="true" size="255" type="varchar" />
 		<foreign-key foreignTable="keyword" onDelete="cascade">
-			<reference local="keyword_id" foreign="id"/>
-		</foreign-key>
-	</table>
-	<table name="passage">
-		<behavior name="delegate">
-			<parameter name="to" value="verse" />
-		</behavior>
-		<column name="bible_id" type="integer" required="true"/>
-		<column name="text" type="varchar" size="1000" required="true" />
-		<column name="verse_id" type="integer" required="true"/>
-		<foreign-key foreignTable="bible">
-			<reference local="bible_id" foreign="id"/>
-		</foreign-key>
-		<foreign-key foreignTable="verse">
-			<reference local="verse_id" foreign="id"/>
+			<reference foreign="id" local="keyword_id" />
 		</foreign-key>
 	</table>
 	<table name="tag">
-		<column name="keyword_id" type="integer" required="true"/>
-		<column name="type_id" type="integer" required="true"/>
-		<column name="verse_id" type="integer" required="true"/>
+		<column name="keyword_id" required="true" type="integer" />
+		<column name="verse_id" required="true" type="integer" />
 		<foreign-key foreignTable="keyword">
-			<reference local="keyword_id" foreign="id"/>
-		</foreign-key>
-		<foreign-key foreignTable="tag_type">
-			<reference local="type_id" foreign="id"/>
+			<reference foreign="id" local="keyword_id" />
 		</foreign-key>
 		<foreign-key foreignTable="verse">
-			<reference local="verse_id" foreign="id"/>
+			<reference foreign="id" local="verse_id" />
 		</foreign-key>
 	</table>
-	<table name="tag_type">
-		<column name="value" type="varchar" size="255" required="true" />
+	<table name="tag_word">
+		<column name="tag_id" required="true" type="integer" />
+		<column name="word_number" required="true" type="integer" />
+		<foreign-key foreignTable="tag">
+			<reference foreign="id" local="tag_id" />
+		</foreign-key>
 	</table>
 	<table name="verse">
-		<column name="book_id" type="integer" required="true"/>
-		<column name="chapter_number" type="integer" required="true"/>
-		<column name="verse_number" type="integer" required="true" />
+		<column name="bible_id" required="true" type="integer" />
+		<column name="book_id" required="true" type="integer" />
+		<column name="chapter_number" required="true" type="integer" />
+		<column name="text" required="true" size="1000" type="varchar" />
+		<column name="verse_number" required="true" type="integer" />
+		<foreign-key foreignTable="bible">
+			<reference foreign="id" local="bible_id" />
+		</foreign-key>
 		<foreign-key foreignTable="book">
-			<reference local="book_id" foreign="id"/>
+			<reference foreign="id" local="book_id" />
 		</foreign-key>
 	</table>
 </database>
