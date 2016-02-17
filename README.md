@@ -1,7 +1,7 @@
 # The Bible App
 
 ### Installing Composer
-###### Create composer.json
+###### 1) Create composer.json
 	{
 		"require": {
 			"propel/propel": "~2.0@dev"
@@ -12,30 +12,30 @@
 			]
 		}
 	}
-###### Download composer.phar
+###### 2) Download composer.phar
 	wget http://getcomposer.org/composer.phar
-###### Install Composer
+###### 3) Install Composer
 	php composer.phar install
 
 ### Setup Propel
-###### Open bashrc file
+###### 1) Open bashrc file
 	vim ~/.bashrc
-###### Add Propel to bash (as per example) and save
+###### 2) Add Propel to bash (as per example) and save
 	export PATH=$PATH:~/Documents/bible/vendor/bin/
-###### If necessary, read bashrc file
+###### 3) If necessary, read bashrc file
 	source ~/.bashrc
-###### Initialise project
+###### 4) Initialise project
 	propel init
-###### Convert config to .php file
+###### 5) Convert config to .php file
 	propel config:convert
 
 ### Build database and models
-###### Generate SQL (adding --overwrite if necessary)
+###### 1) Generate SQL (adding --overwrite if necessary)
 	propel sql:build
 	propel sql:build --overwrite
-###### Run SQL
+###### 2) Run SQL
 	propel sql:insert
-###### Build models
+###### 3) Build models
 	propel model:build
-###### Populate Composer autoloader
+###### 4) Populate Composer autoloader
 	php composer.phar dump-autoload
