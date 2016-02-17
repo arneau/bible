@@ -8,6 +8,10 @@ $bible = BibleQuery::create()
 	->filterByName('King James (Authorized Version)')
 	->findOneOrCreate();
 
+if ($bible->isNew()) {
+	$bible->save();
+}
+
 var_dump($bible->toArray());
 
 $bibles = BibleQuery::create()
