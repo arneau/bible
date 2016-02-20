@@ -16,7 +16,7 @@ if ($keyword_object->isNew()) {
 
 	$keyword_synonym_object = new KeywordSynonym();
 	$keyword_synonym_object->setKeyword($keyword_object)
-		->setValue('Creation')
+		->setValue($keyword_object->getValue())
 		->save();
 
 }

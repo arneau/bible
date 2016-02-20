@@ -27,6 +27,7 @@
 		</behavior>
 		<column name="keyword_id" required="true" type="integer" />
 		<column name="verse_id" required="true" type="integer" />
+		<column defaultValue="0" name="vote_count" type="integer" />
 		<foreign-key foreignTable="keyword">
 			<reference foreign="id" local="keyword_id" />
 		</foreign-key>

@@ -85,6 +85,7 @@ abstract class Tag implements ActiveRecordInterface
     /**
      * The value for the vote_count field.
      *
+     * Note: this column has a database default value of: 0
      * @var        int
      */
     protected $vote_count;
@@ -127,10 +128,23 @@ abstract class Tag implements ActiveRecordInterface
     protected $tagVotesScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->vote_count = 0;
+    }
+
+    /**
      * Initializes internal state of Base\Tag object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -489,6 +503,10 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->vote_count !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -1602,6 +1620,7 @@ abstract class Tag implements ActiveRecordInterface
         $this->id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

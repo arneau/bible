@@ -71,13 +71,38 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 			'number' => $reference_data['chapter'],
 		],
 	];
+
+	# Define verses data
 	foreach ($verses_array as $verse_object) {
+
+		$verse_tags_objects = TagQuery::create()
+			->filterByVerse($verse_object)
+			->orderByVoteCount('DESC')
+			->find();
+
+		$verse_tags_array = [];
+
+		foreach ($verse_tags_objects as $verse_tag_object) {
+
+			$verse_tag_keyword_object = $verse_tag_object->getKeyword();
+
+			$verse_tags_array[] = [
+				'id' => $verse_tag_object->getId(),
+				'keyword_id' => $verse_tag_keyword_object->getId(),
+				'value' => $verse_tag_keyword_object->getValue(),
+				'vote_count' => $verse_tag_object->getVoteCount()
+			];
+
+		}
+
 		$passage_data['verses'][] = [
 			'id' => $verse_object->getId(),
 			'number' => $verse_object->getVerseNumber(),
+			'tags' => $verse_tags_array,
 			'text' => $verse_object->getText(),
 			'word_count' => $verse_object->getWordCount(),
 		];
+
 	}
 
 	# Return passage data

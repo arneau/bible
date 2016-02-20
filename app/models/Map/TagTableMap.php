@@ -143,7 +143,7 @@ class TagTableMap extends TableMap
         // columns
         $this->addForeignKey('keyword_id', 'KeywordId', 'INTEGER', 'keyword', 'id', true, null, null);
         $this->addForeignKey('verse_id', 'VerseId', 'INTEGER', 'verse', 'id', true, null, null);
-        $this->addColumn('vote_count', 'VoteCount', 'INTEGER', false, null, null);
+        $this->addColumn('vote_count', 'VoteCount', 'INTEGER', false, null, 0);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
     } // initialize()
 
