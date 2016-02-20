@@ -65,6 +65,13 @@ abstract class Book implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
+     * The value for the chapter_count field.
+     *
+     * @var        int
+     */
+    protected $chapter_count;
+
+    /**
      * The value for the name field.
      *
      * @var        string
@@ -324,6 +331,16 @@ abstract class Book implements ActiveRecordInterface
     }
 
     /**
+     * Get the [chapter_count] column value.
+     *
+     * @return int
+     */
+    public function getChapterCount()
+    {
+        return $this->chapter_count;
+    }
+
+    /**
      * Get the [name] column value.
      *
      * @return string
@@ -342,6 +359,26 @@ abstract class Book implements ActiveRecordInterface
     {
         return $this->id;
     }
+
+    /**
+     * Set the value of [chapter_count] column.
+     *
+     * @param int $v new value
+     * @return $this|\Book The current object (for fluent API support)
+     */
+    public function setChapterCount($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->chapter_count !== $v) {
+            $this->chapter_count = $v;
+            $this->modifiedColumns[BookTableMap::COL_CHAPTER_COUNT] = true;
+        }
+
+        return $this;
+    } // setChapterCount()
 
     /**
      * Set the value of [name] column.
@@ -419,10 +456,13 @@ abstract class Book implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : BookTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : BookTableMap::translateFieldName('ChapterCount', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->chapter_count = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : BookTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : BookTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : BookTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -432,7 +472,7 @@ abstract class Book implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 2; // 2 = BookTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = BookTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Book'), 0, $e);
@@ -648,6 +688,9 @@ abstract class Book implements ActiveRecordInterface
         }
 
          // check the columns in natural order for more readable SQL queries
+        if ($this->isColumnModified(BookTableMap::COL_CHAPTER_COUNT)) {
+            $modifiedColumns[':p' . $index++]  = 'chapter_count';
+        }
         if ($this->isColumnModified(BookTableMap::COL_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'name';
         }
@@ -665,6 +708,9 @@ abstract class Book implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
+                    case 'chapter_count':
+                        $stmt->bindValue($identifier, $this->chapter_count, PDO::PARAM_INT);
+                        break;
                     case 'name':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
@@ -734,9 +780,12 @@ abstract class Book implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getName();
+                return $this->getChapterCount();
                 break;
             case 1:
+                return $this->getName();
+                break;
+            case 2:
                 return $this->getId();
                 break;
             default:
@@ -769,8 +818,9 @@ abstract class Book implements ActiveRecordInterface
         $alreadyDumpedObjects['Book'][$this->hashCode()] = true;
         $keys = BookTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getName(),
-            $keys[1] => $this->getId(),
+            $keys[0] => $this->getChapterCount(),
+            $keys[1] => $this->getName(),
+            $keys[2] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -828,9 +878,12 @@ abstract class Book implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setName($value);
+                $this->setChapterCount($value);
                 break;
             case 1:
+                $this->setName($value);
+                break;
+            case 2:
                 $this->setId($value);
                 break;
         } // switch()
@@ -860,10 +913,13 @@ abstract class Book implements ActiveRecordInterface
         $keys = BookTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setName($arr[$keys[0]]);
+            $this->setChapterCount($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setId($arr[$keys[1]]);
+            $this->setName($arr[$keys[1]]);
+        }
+        if (array_key_exists($keys[2], $arr)) {
+            $this->setId($arr[$keys[2]]);
         }
     }
 
@@ -906,6 +962,9 @@ abstract class Book implements ActiveRecordInterface
     {
         $criteria = new Criteria(BookTableMap::DATABASE_NAME);
 
+        if ($this->isColumnModified(BookTableMap::COL_CHAPTER_COUNT)) {
+            $criteria->add(BookTableMap::COL_CHAPTER_COUNT, $this->chapter_count);
+        }
         if ($this->isColumnModified(BookTableMap::COL_NAME)) {
             $criteria->add(BookTableMap::COL_NAME, $this->name);
         }
@@ -998,6 +1057,7 @@ abstract class Book implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setChapterCount($this->getChapterCount());
         $copyObj->setName($this->getName());
 
         if ($deepCopy) {
@@ -1314,6 +1374,7 @@ abstract class Book implements ActiveRecordInterface
      */
     public function clear()
     {
+        $this->chapter_count = null;
         $this->name = null;
         $this->id = null;
         $this->alreadyInSave = false;

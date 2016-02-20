@@ -6,6 +6,7 @@
 		<column name="name" required="true" size="255" type="varchar" />
 	</table>
 	<table name="book">
+		<column name="chapter_count" required="true" type="integer" />
 		<column name="name" required="true" size="255" type="varchar" />
 	</table>
 	<table name="keyword">
@@ -19,6 +20,11 @@
 		</foreign-key>
 	</table>
 	<table name="tag">
+		<behavior id="vote_count_aggregate" name="aggregate_column">
+			<parameter name="name" value="vote_count" />
+			<parameter name="foreign_table" value="tag_vote" />
+			<parameter name="expression" value="COUNT(tag_id)" />
+		</behavior>
 		<column name="keyword_id" required="true" type="integer" />
 		<column name="verse_id" required="true" type="integer" />
 		<foreign-key foreignTable="keyword">
@@ -28,9 +34,8 @@
 			<reference foreign="id" local="verse_id" />
 		</foreign-key>
 	</table>
-	<table name="tag_word">
+	<table name="tag_vote">
 		<column name="tag_id" required="true" type="integer" />
-		<column name="word_number" required="true" type="integer" />
 		<foreign-key foreignTable="tag">
 			<reference foreign="id" local="tag_id" />
 		</foreign-key>
@@ -41,6 +46,7 @@
 		<column name="chapter_number" required="true" type="integer" />
 		<column name="text" required="true" size="1000" type="varchar" />
 		<column name="verse_number" required="true" type="integer" />
+		<column name="word_count" required="true" type="integer" />
 		<foreign-key foreignTable="bible">
 			<reference foreign="id" local="bible_id" />
 		</foreign-key>

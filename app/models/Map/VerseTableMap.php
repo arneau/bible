@@ -59,7 +59,7 @@ class VerseTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class VerseTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the bible_id field
@@ -97,6 +97,11 @@ class VerseTableMap extends TableMap
     const COL_VERSE_NUMBER = 'verse.verse_number';
 
     /**
+     * the column name for the word_count field
+     */
+    const COL_WORD_COUNT = 'verse.word_count';
+
+    /**
      * the column name for the id field
      */
     const COL_ID = 'verse.id';
@@ -113,11 +118,11 @@ class VerseTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('BibleId', 'BookId', 'ChapterNumber', 'Text', 'VerseNumber', 'Id', ),
-        self::TYPE_CAMELNAME     => array('bibleId', 'bookId', 'chapterNumber', 'text', 'verseNumber', 'id', ),
-        self::TYPE_COLNAME       => array(VerseTableMap::COL_BIBLE_ID, VerseTableMap::COL_BOOK_ID, VerseTableMap::COL_CHAPTER_NUMBER, VerseTableMap::COL_TEXT, VerseTableMap::COL_VERSE_NUMBER, VerseTableMap::COL_ID, ),
-        self::TYPE_FIELDNAME     => array('bible_id', 'book_id', 'chapter_number', 'text', 'verse_number', 'id', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('BibleId', 'BookId', 'ChapterNumber', 'Text', 'VerseNumber', 'WordCount', 'Id', ),
+        self::TYPE_CAMELNAME     => array('bibleId', 'bookId', 'chapterNumber', 'text', 'verseNumber', 'wordCount', 'id', ),
+        self::TYPE_COLNAME       => array(VerseTableMap::COL_BIBLE_ID, VerseTableMap::COL_BOOK_ID, VerseTableMap::COL_CHAPTER_NUMBER, VerseTableMap::COL_TEXT, VerseTableMap::COL_VERSE_NUMBER, VerseTableMap::COL_WORD_COUNT, VerseTableMap::COL_ID, ),
+        self::TYPE_FIELDNAME     => array('bible_id', 'book_id', 'chapter_number', 'text', 'verse_number', 'word_count', 'id', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -127,11 +132,11 @@ class VerseTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('BibleId' => 0, 'BookId' => 1, 'ChapterNumber' => 2, 'Text' => 3, 'VerseNumber' => 4, 'Id' => 5, ),
-        self::TYPE_CAMELNAME     => array('bibleId' => 0, 'bookId' => 1, 'chapterNumber' => 2, 'text' => 3, 'verseNumber' => 4, 'id' => 5, ),
-        self::TYPE_COLNAME       => array(VerseTableMap::COL_BIBLE_ID => 0, VerseTableMap::COL_BOOK_ID => 1, VerseTableMap::COL_CHAPTER_NUMBER => 2, VerseTableMap::COL_TEXT => 3, VerseTableMap::COL_VERSE_NUMBER => 4, VerseTableMap::COL_ID => 5, ),
-        self::TYPE_FIELDNAME     => array('bible_id' => 0, 'book_id' => 1, 'chapter_number' => 2, 'text' => 3, 'verse_number' => 4, 'id' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('BibleId' => 0, 'BookId' => 1, 'ChapterNumber' => 2, 'Text' => 3, 'VerseNumber' => 4, 'WordCount' => 5, 'Id' => 6, ),
+        self::TYPE_CAMELNAME     => array('bibleId' => 0, 'bookId' => 1, 'chapterNumber' => 2, 'text' => 3, 'verseNumber' => 4, 'wordCount' => 5, 'id' => 6, ),
+        self::TYPE_COLNAME       => array(VerseTableMap::COL_BIBLE_ID => 0, VerseTableMap::COL_BOOK_ID => 1, VerseTableMap::COL_CHAPTER_NUMBER => 2, VerseTableMap::COL_TEXT => 3, VerseTableMap::COL_VERSE_NUMBER => 4, VerseTableMap::COL_WORD_COUNT => 5, VerseTableMap::COL_ID => 6, ),
+        self::TYPE_FIELDNAME     => array('bible_id' => 0, 'book_id' => 1, 'chapter_number' => 2, 'text' => 3, 'verse_number' => 4, 'word_count' => 5, 'id' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -156,6 +161,7 @@ class VerseTableMap extends TableMap
         $this->addColumn('chapter_number', 'ChapterNumber', 'INTEGER', true, null, null);
         $this->addColumn('text', 'Text', 'VARCHAR', true, 1000, null);
         $this->addColumn('verse_number', 'VerseNumber', 'INTEGER', true, null, null);
+        $this->addColumn('word_count', 'WordCount', 'INTEGER', true, null, null);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
     } // initialize()
 
@@ -216,11 +222,11 @@ class VerseTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return null === $row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -239,7 +245,7 @@ class VerseTableMap extends TableMap
     {
         return (int) $row[
             $indexType == TableMap::TYPE_NUM
-                ? 5 + $offset
+                ? 6 + $offset
                 : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
@@ -346,6 +352,7 @@ class VerseTableMap extends TableMap
             $criteria->addSelectColumn(VerseTableMap::COL_CHAPTER_NUMBER);
             $criteria->addSelectColumn(VerseTableMap::COL_TEXT);
             $criteria->addSelectColumn(VerseTableMap::COL_VERSE_NUMBER);
+            $criteria->addSelectColumn(VerseTableMap::COL_WORD_COUNT);
             $criteria->addSelectColumn(VerseTableMap::COL_ID);
         } else {
             $criteria->addSelectColumn($alias . '.bible_id');
@@ -353,6 +360,7 @@ class VerseTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.chapter_number');
             $criteria->addSelectColumn($alias . '.text');
             $criteria->addSelectColumn($alias . '.verse_number');
+            $criteria->addSelectColumn($alias . '.word_count');
             $criteria->addSelectColumn($alias . '.id');
         }
     }

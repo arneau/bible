@@ -76,6 +76,7 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 			'id' => $verse_object->getId(),
 			'number' => $verse_object->getVerseNumber(),
 			'text' => $verse_object->getText(),
+			'word_count' => $verse_object->getWordCount(),
 		];
 	}
 

@@ -20,9 +20,11 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  *
+ * @method     ChildBookQuery orderByChapterCount($order = Criteria::ASC) Order by the chapter_count column
  * @method     ChildBookQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildBookQuery orderById($order = Criteria::ASC) Order by the id column
  *
+ * @method     ChildBookQuery groupByChapterCount() Group by the chapter_count column
  * @method     ChildBookQuery groupByName() Group by the name column
  * @method     ChildBookQuery groupById() Group by the id column
  *
@@ -49,16 +51,19 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildBook findOne(ConnectionInterface $con = null) Return the first ChildBook matching the query
  * @method     ChildBook findOneOrCreate(ConnectionInterface $con = null) Return the first ChildBook matching the query, or a new ChildBook object populated from the query conditions when no match is found
  *
+ * @method     ChildBook findOneByChapterCount(int $chapter_count) Return the first ChildBook filtered by the chapter_count column
  * @method     ChildBook findOneByName(string $name) Return the first ChildBook filtered by the name column
  * @method     ChildBook findOneById(int $id) Return the first ChildBook filtered by the id column *
 
  * @method     ChildBook requirePk($key, ConnectionInterface $con = null) Return the ChildBook by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildBook requireOne(ConnectionInterface $con = null) Return the first ChildBook matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
+ * @method     ChildBook requireOneByChapterCount(int $chapter_count) Return the first ChildBook filtered by the chapter_count column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildBook requireOneByName(string $name) Return the first ChildBook filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildBook requireOneById(int $id) Return the first ChildBook filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildBook[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildBook objects based on current ModelCriteria
+ * @method     ChildBook[]|ObjectCollection findByChapterCount(int $chapter_count) Return ChildBook objects filtered by the chapter_count column
  * @method     ChildBook[]|ObjectCollection findByName(string $name) Return ChildBook objects filtered by the name column
  * @method     ChildBook[]|ObjectCollection findById(int $id) Return ChildBook objects filtered by the id column
  * @method     ChildBook[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -153,7 +158,7 @@ abstract class BookQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT name, id FROM book WHERE id = :p0';
+        $sql = 'SELECT chapter_count, name, id FROM book WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -241,6 +246,47 @@ abstract class BookQuery extends ModelCriteria
     {
 
         return $this->addUsingAlias(BookTableMap::COL_ID, $keys, Criteria::IN);
+    }
+
+    /**
+     * Filter the query on the chapter_count column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByChapterCount(1234); // WHERE chapter_count = 1234
+     * $query->filterByChapterCount(array(12, 34)); // WHERE chapter_count IN (12, 34)
+     * $query->filterByChapterCount(array('min' => 12)); // WHERE chapter_count > 12
+     * </code>
+     *
+     * @param     mixed $chapterCount The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildBookQuery The current query, for fluid interface
+     */
+    public function filterByChapterCount($chapterCount = null, $comparison = null)
+    {
+        if (is_array($chapterCount)) {
+            $useMinMax = false;
+            if (isset($chapterCount['min'])) {
+                $this->addUsingAlias(BookTableMap::COL_CHAPTER_COUNT, $chapterCount['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($chapterCount['max'])) {
+                $this->addUsingAlias(BookTableMap::COL_CHAPTER_COUNT, $chapterCount['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(BookTableMap::COL_CHAPTER_COUNT, $chapterCount, $comparison);
     }
 
     /**

@@ -104,6 +104,13 @@ abstract class Verse implements ActiveRecordInterface
     protected $verse_number;
 
     /**
+     * The value for the word_count field.
+     *
+     * @var        int
+     */
+    protected $word_count;
+
+    /**
      * The value for the id field.
      *
      * @var        int
@@ -416,6 +423,16 @@ abstract class Verse implements ActiveRecordInterface
     }
 
     /**
+     * Get the [word_count] column value.
+     *
+     * @return int
+     */
+    public function getWordCount()
+    {
+        return $this->word_count;
+    }
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -534,6 +551,26 @@ abstract class Verse implements ActiveRecordInterface
     } // setVerseNumber()
 
     /**
+     * Set the value of [word_count] column.
+     *
+     * @param int $v new value
+     * @return $this|\Verse The current object (for fluent API support)
+     */
+    public function setWordCount($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->word_count !== $v) {
+            $this->word_count = $v;
+            $this->modifiedColumns[VerseTableMap::COL_WORD_COUNT] = true;
+        }
+
+        return $this;
+    } // setWordCount()
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -604,7 +641,10 @@ abstract class Verse implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : VerseTableMap::translateFieldName('VerseNumber', TableMap::TYPE_PHPNAME, $indexType)];
             $this->verse_number = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : VerseTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : VerseTableMap::translateFieldName('WordCount', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->word_count = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : VerseTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -614,7 +654,7 @@ abstract class Verse implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = VerseTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = VerseTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Verse'), 0, $e);
@@ -872,6 +912,9 @@ abstract class Verse implements ActiveRecordInterface
         if ($this->isColumnModified(VerseTableMap::COL_VERSE_NUMBER)) {
             $modifiedColumns[':p' . $index++]  = 'verse_number';
         }
+        if ($this->isColumnModified(VerseTableMap::COL_WORD_COUNT)) {
+            $modifiedColumns[':p' . $index++]  = 'word_count';
+        }
         if ($this->isColumnModified(VerseTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
@@ -900,6 +943,9 @@ abstract class Verse implements ActiveRecordInterface
                         break;
                     case 'verse_number':
                         $stmt->bindValue($identifier, $this->verse_number, PDO::PARAM_INT);
+                        break;
+                    case 'word_count':
+                        $stmt->bindValue($identifier, $this->word_count, PDO::PARAM_INT);
                         break;
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
@@ -982,6 +1028,9 @@ abstract class Verse implements ActiveRecordInterface
                 return $this->getVerseNumber();
                 break;
             case 5:
+                return $this->getWordCount();
+                break;
+            case 6:
                 return $this->getId();
                 break;
             default:
@@ -1019,7 +1068,8 @@ abstract class Verse implements ActiveRecordInterface
             $keys[2] => $this->getChapterNumber(),
             $keys[3] => $this->getText(),
             $keys[4] => $this->getVerseNumber(),
-            $keys[5] => $this->getId(),
+            $keys[5] => $this->getWordCount(),
+            $keys[6] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1122,6 +1172,9 @@ abstract class Verse implements ActiveRecordInterface
                 $this->setVerseNumber($value);
                 break;
             case 5:
+                $this->setWordCount($value);
+                break;
+            case 6:
                 $this->setId($value);
                 break;
         } // switch()
@@ -1166,7 +1219,10 @@ abstract class Verse implements ActiveRecordInterface
             $this->setVerseNumber($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setId($arr[$keys[5]]);
+            $this->setWordCount($arr[$keys[5]]);
+        }
+        if (array_key_exists($keys[6], $arr)) {
+            $this->setId($arr[$keys[6]]);
         }
     }
 
@@ -1223,6 +1279,9 @@ abstract class Verse implements ActiveRecordInterface
         }
         if ($this->isColumnModified(VerseTableMap::COL_VERSE_NUMBER)) {
             $criteria->add(VerseTableMap::COL_VERSE_NUMBER, $this->verse_number);
+        }
+        if ($this->isColumnModified(VerseTableMap::COL_WORD_COUNT)) {
+            $criteria->add(VerseTableMap::COL_WORD_COUNT, $this->word_count);
         }
         if ($this->isColumnModified(VerseTableMap::COL_ID)) {
             $criteria->add(VerseTableMap::COL_ID, $this->id);
@@ -1318,6 +1377,7 @@ abstract class Verse implements ActiveRecordInterface
         $copyObj->setChapterNumber($this->getChapterNumber());
         $copyObj->setText($this->getText());
         $copyObj->setVerseNumber($this->getVerseNumber());
+        $copyObj->setWordCount($this->getWordCount());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1746,6 +1806,7 @@ abstract class Verse implements ActiveRecordInterface
         $this->chapter_number = null;
         $this->text = null;
         $this->verse_number = null;
+        $this->word_count = null;
         $this->id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();

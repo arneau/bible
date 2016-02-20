@@ -25,6 +25,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildVerseQuery orderByChapterNumber($order = Criteria::ASC) Order by the chapter_number column
  * @method     ChildVerseQuery orderByText($order = Criteria::ASC) Order by the text column
  * @method     ChildVerseQuery orderByVerseNumber($order = Criteria::ASC) Order by the verse_number column
+ * @method     ChildVerseQuery orderByWordCount($order = Criteria::ASC) Order by the word_count column
  * @method     ChildVerseQuery orderById($order = Criteria::ASC) Order by the id column
  *
  * @method     ChildVerseQuery groupByBibleId() Group by the bible_id column
@@ -32,6 +33,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildVerseQuery groupByChapterNumber() Group by the chapter_number column
  * @method     ChildVerseQuery groupByText() Group by the text column
  * @method     ChildVerseQuery groupByVerseNumber() Group by the verse_number column
+ * @method     ChildVerseQuery groupByWordCount() Group by the word_count column
  * @method     ChildVerseQuery groupById() Group by the id column
  *
  * @method     ChildVerseQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -82,6 +84,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildVerse findOneByChapterNumber(int $chapter_number) Return the first ChildVerse filtered by the chapter_number column
  * @method     ChildVerse findOneByText(string $text) Return the first ChildVerse filtered by the text column
  * @method     ChildVerse findOneByVerseNumber(int $verse_number) Return the first ChildVerse filtered by the verse_number column
+ * @method     ChildVerse findOneByWordCount(int $word_count) Return the first ChildVerse filtered by the word_count column
  * @method     ChildVerse findOneById(int $id) Return the first ChildVerse filtered by the id column *
 
  * @method     ChildVerse requirePk($key, ConnectionInterface $con = null) Return the ChildVerse by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -92,6 +95,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildVerse requireOneByChapterNumber(int $chapter_number) Return the first ChildVerse filtered by the chapter_number column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildVerse requireOneByText(string $text) Return the first ChildVerse filtered by the text column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildVerse requireOneByVerseNumber(int $verse_number) Return the first ChildVerse filtered by the verse_number column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildVerse requireOneByWordCount(int $word_count) Return the first ChildVerse filtered by the word_count column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildVerse requireOneById(int $id) Return the first ChildVerse filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildVerse[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildVerse objects based on current ModelCriteria
@@ -100,6 +104,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildVerse[]|ObjectCollection findByChapterNumber(int $chapter_number) Return ChildVerse objects filtered by the chapter_number column
  * @method     ChildVerse[]|ObjectCollection findByText(string $text) Return ChildVerse objects filtered by the text column
  * @method     ChildVerse[]|ObjectCollection findByVerseNumber(int $verse_number) Return ChildVerse objects filtered by the verse_number column
+ * @method     ChildVerse[]|ObjectCollection findByWordCount(int $word_count) Return ChildVerse objects filtered by the word_count column
  * @method     ChildVerse[]|ObjectCollection findById(int $id) Return ChildVerse objects filtered by the id column
  * @method     ChildVerse[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
@@ -193,7 +198,7 @@ abstract class VerseQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT bible_id, book_id, chapter_number, text, verse_number, id FROM verse WHERE id = :p0';
+        $sql = 'SELECT bible_id, book_id, chapter_number, text, verse_number, word_count, id FROM verse WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -478,6 +483,47 @@ abstract class VerseQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(VerseTableMap::COL_VERSE_NUMBER, $verseNumber, $comparison);
+    }
+
+    /**
+     * Filter the query on the word_count column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByWordCount(1234); // WHERE word_count = 1234
+     * $query->filterByWordCount(array(12, 34)); // WHERE word_count IN (12, 34)
+     * $query->filterByWordCount(array('min' => 12)); // WHERE word_count > 12
+     * </code>
+     *
+     * @param     mixed $wordCount The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildVerseQuery The current query, for fluid interface
+     */
+    public function filterByWordCount($wordCount = null, $comparison = null)
+    {
+        if (is_array($wordCount)) {
+            $useMinMax = false;
+            if (isset($wordCount['min'])) {
+                $this->addUsingAlias(VerseTableMap::COL_WORD_COUNT, $wordCount['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($wordCount['max'])) {
+                $this->addUsingAlias(VerseTableMap::COL_WORD_COUNT, $wordCount['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(VerseTableMap::COL_WORD_COUNT, $wordCount, $comparison);
     }
 
     /**

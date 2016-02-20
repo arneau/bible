@@ -22,10 +22,12 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildTagQuery orderByKeywordId($order = Criteria::ASC) Order by the keyword_id column
  * @method     ChildTagQuery orderByVerseId($order = Criteria::ASC) Order by the verse_id column
+ * @method     ChildTagQuery orderByVoteCount($order = Criteria::ASC) Order by the vote_count column
  * @method     ChildTagQuery orderById($order = Criteria::ASC) Order by the id column
  *
  * @method     ChildTagQuery groupByKeywordId() Group by the keyword_id column
  * @method     ChildTagQuery groupByVerseId() Group by the verse_id column
+ * @method     ChildTagQuery groupByVoteCount() Group by the vote_count column
  * @method     ChildTagQuery groupById() Group by the id column
  *
  * @method     ChildTagQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -56,23 +58,24 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTagQuery rightJoinWithVerse() Adds a RIGHT JOIN clause and with to the query using the Verse relation
  * @method     ChildTagQuery innerJoinWithVerse() Adds a INNER JOIN clause and with to the query using the Verse relation
  *
- * @method     ChildTagQuery leftJoinTagWord($relationAlias = null) Adds a LEFT JOIN clause to the query using the TagWord relation
- * @method     ChildTagQuery rightJoinTagWord($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TagWord relation
- * @method     ChildTagQuery innerJoinTagWord($relationAlias = null) Adds a INNER JOIN clause to the query using the TagWord relation
+ * @method     ChildTagQuery leftJoinTagVote($relationAlias = null) Adds a LEFT JOIN clause to the query using the TagVote relation
+ * @method     ChildTagQuery rightJoinTagVote($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TagVote relation
+ * @method     ChildTagQuery innerJoinTagVote($relationAlias = null) Adds a INNER JOIN clause to the query using the TagVote relation
  *
- * @method     ChildTagQuery joinWithTagWord($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the TagWord relation
+ * @method     ChildTagQuery joinWithTagVote($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the TagVote relation
  *
- * @method     ChildTagQuery leftJoinWithTagWord() Adds a LEFT JOIN clause and with to the query using the TagWord relation
- * @method     ChildTagQuery rightJoinWithTagWord() Adds a RIGHT JOIN clause and with to the query using the TagWord relation
- * @method     ChildTagQuery innerJoinWithTagWord() Adds a INNER JOIN clause and with to the query using the TagWord relation
+ * @method     ChildTagQuery leftJoinWithTagVote() Adds a LEFT JOIN clause and with to the query using the TagVote relation
+ * @method     ChildTagQuery rightJoinWithTagVote() Adds a RIGHT JOIN clause and with to the query using the TagVote relation
+ * @method     ChildTagQuery innerJoinWithTagVote() Adds a INNER JOIN clause and with to the query using the TagVote relation
  *
- * @method     \KeywordQuery|\VerseQuery|\TagWordQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \KeywordQuery|\VerseQuery|\TagVoteQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildTag findOne(ConnectionInterface $con = null) Return the first ChildTag matching the query
  * @method     ChildTag findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTag matching the query, or a new ChildTag object populated from the query conditions when no match is found
  *
  * @method     ChildTag findOneByKeywordId(int $keyword_id) Return the first ChildTag filtered by the keyword_id column
  * @method     ChildTag findOneByVerseId(int $verse_id) Return the first ChildTag filtered by the verse_id column
+ * @method     ChildTag findOneByVoteCount(int $vote_count) Return the first ChildTag filtered by the vote_count column
  * @method     ChildTag findOneById(int $id) Return the first ChildTag filtered by the id column *
 
  * @method     ChildTag requirePk($key, ConnectionInterface $con = null) Return the ChildTag by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -80,11 +83,13 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildTag requireOneByKeywordId(int $keyword_id) Return the first ChildTag filtered by the keyword_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTag requireOneByVerseId(int $verse_id) Return the first ChildTag filtered by the verse_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTag requireOneByVoteCount(int $vote_count) Return the first ChildTag filtered by the vote_count column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTag requireOneById(int $id) Return the first ChildTag filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildTag[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTag objects based on current ModelCriteria
  * @method     ChildTag[]|ObjectCollection findByKeywordId(int $keyword_id) Return ChildTag objects filtered by the keyword_id column
  * @method     ChildTag[]|ObjectCollection findByVerseId(int $verse_id) Return ChildTag objects filtered by the verse_id column
+ * @method     ChildTag[]|ObjectCollection findByVoteCount(int $vote_count) Return ChildTag objects filtered by the vote_count column
  * @method     ChildTag[]|ObjectCollection findById(int $id) Return ChildTag objects filtered by the id column
  * @method     ChildTag[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
@@ -178,7 +183,7 @@ abstract class TagQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT keyword_id, verse_id, id FROM tag WHERE id = :p0';
+        $sql = 'SELECT keyword_id, verse_id, vote_count, id FROM tag WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -352,6 +357,47 @@ abstract class TagQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TagTableMap::COL_VERSE_ID, $verseId, $comparison);
+    }
+
+    /**
+     * Filter the query on the vote_count column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVoteCount(1234); // WHERE vote_count = 1234
+     * $query->filterByVoteCount(array(12, 34)); // WHERE vote_count IN (12, 34)
+     * $query->filterByVoteCount(array('min' => 12)); // WHERE vote_count > 12
+     * </code>
+     *
+     * @param     mixed $voteCount The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildTagQuery The current query, for fluid interface
+     */
+    public function filterByVoteCount($voteCount = null, $comparison = null)
+    {
+        if (is_array($voteCount)) {
+            $useMinMax = false;
+            if (isset($voteCount['min'])) {
+                $this->addUsingAlias(TagTableMap::COL_VOTE_COUNT, $voteCount['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($voteCount['max'])) {
+                $this->addUsingAlias(TagTableMap::COL_VOTE_COUNT, $voteCount['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(TagTableMap::COL_VOTE_COUNT, $voteCount, $comparison);
     }
 
     /**
@@ -550,40 +596,40 @@ abstract class TagQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \TagWord object
+     * Filter the query by a related \TagVote object
      *
-     * @param \TagWord|ObjectCollection $tagWord the related object to use as filter
+     * @param \TagVote|ObjectCollection $tagVote the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildTagQuery The current query, for fluid interface
      */
-    public function filterByTagWord($tagWord, $comparison = null)
+    public function filterByTagVote($tagVote, $comparison = null)
     {
-        if ($tagWord instanceof \TagWord) {
+        if ($tagVote instanceof \TagVote) {
             return $this
-                ->addUsingAlias(TagTableMap::COL_ID, $tagWord->getTagId(), $comparison);
-        } elseif ($tagWord instanceof ObjectCollection) {
+                ->addUsingAlias(TagTableMap::COL_ID, $tagVote->getTagId(), $comparison);
+        } elseif ($tagVote instanceof ObjectCollection) {
             return $this
-                ->useTagWordQuery()
-                ->filterByPrimaryKeys($tagWord->getPrimaryKeys())
+                ->useTagVoteQuery()
+                ->filterByPrimaryKeys($tagVote->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByTagWord() only accepts arguments of type \TagWord or Collection');
+            throw new PropelException('filterByTagVote() only accepts arguments of type \TagVote or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the TagWord relation
+     * Adds a JOIN clause to the query using the TagVote relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return $this|ChildTagQuery The current query, for fluid interface
      */
-    public function joinTagWord($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinTagVote($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('TagWord');
+        $relationMap = $tableMap->getRelation('TagVote');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -598,14 +644,14 @@ abstract class TagQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'TagWord');
+            $this->addJoinObject($join, 'TagVote');
         }
 
         return $this;
     }
 
     /**
-     * Use the TagWord relation TagWord object
+     * Use the TagVote relation TagVote object
      *
      * @see useQuery()
      *
@@ -613,13 +659,13 @@ abstract class TagQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \TagWordQuery A secondary query class using the current class as primary query
+     * @return \TagVoteQuery A secondary query class using the current class as primary query
      */
-    public function useTagWordQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useTagVoteQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinTagWord($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'TagWord', '\TagWordQuery');
+            ->joinTagVote($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'TagVote', '\TagVoteQuery');
     }
 
     /**
