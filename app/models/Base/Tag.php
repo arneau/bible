@@ -28,7 +28,7 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
 /**
- * Base class that represents a row from the 'tag' table.
+ * Base class that represents a row from the 'defender_tag' table.
  *
  *
  *
@@ -74,6 +74,13 @@ abstract class Tag implements ActiveRecordInterface
      * @var        int
      */
     protected $keyword_id;
+
+    /**
+     * The value for the relevant_words field.
+     *
+     * @var        string
+     */
+    protected $relevant_words;
 
     /**
      * The value for the verse_id field.
@@ -376,6 +383,16 @@ abstract class Tag implements ActiveRecordInterface
     }
 
     /**
+     * Get the [relevant_words] column value.
+     *
+     * @return string
+     */
+    public function getRelevantWords()
+    {
+        return $this->relevant_words;
+    }
+
+    /**
      * Get the [verse_id] column value.
      *
      * @return int
@@ -428,6 +445,26 @@ abstract class Tag implements ActiveRecordInterface
 
         return $this;
     } // setKeywordId()
+
+    /**
+     * Set the value of [relevant_words] column.
+     *
+     * @param string $v new value
+     * @return $this|\Tag The current object (for fluent API support)
+     */
+    public function setRelevantWords($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->relevant_words !== $v) {
+            $this->relevant_words = $v;
+            $this->modifiedColumns[TagTableMap::COL_RELEVANT_WORDS] = true;
+        }
+
+        return $this;
+    } // setRelevantWords()
 
     /**
      * Set the value of [verse_id] column.
@@ -536,13 +573,16 @@ abstract class Tag implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TagTableMap::translateFieldName('KeywordId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->keyword_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TagTableMap::translateFieldName('VerseId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TagTableMap::translateFieldName('RelevantWords', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->relevant_words = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TagTableMap::translateFieldName('VerseId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->verse_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TagTableMap::translateFieldName('VoteCount', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TagTableMap::translateFieldName('VoteCount', TableMap::TYPE_PHPNAME, $indexType)];
             $this->vote_count = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TagTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TagTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -552,7 +592,7 @@ abstract class Tag implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = TagTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = TagTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Tag'), 0, $e);
@@ -798,6 +838,9 @@ abstract class Tag implements ActiveRecordInterface
         if ($this->isColumnModified(TagTableMap::COL_KEYWORD_ID)) {
             $modifiedColumns[':p' . $index++]  = 'keyword_id';
         }
+        if ($this->isColumnModified(TagTableMap::COL_RELEVANT_WORDS)) {
+            $modifiedColumns[':p' . $index++]  = 'relevant_words';
+        }
         if ($this->isColumnModified(TagTableMap::COL_VERSE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'verse_id';
         }
@@ -809,7 +852,7 @@ abstract class Tag implements ActiveRecordInterface
         }
 
         $sql = sprintf(
-            'INSERT INTO tag (%s) VALUES (%s)',
+            'INSERT INTO defender_tag (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -820,6 +863,9 @@ abstract class Tag implements ActiveRecordInterface
                 switch ($columnName) {
                     case 'keyword_id':
                         $stmt->bindValue($identifier, $this->keyword_id, PDO::PARAM_INT);
+                        break;
+                    case 'relevant_words':
+                        $stmt->bindValue($identifier, $this->relevant_words, PDO::PARAM_STR);
                         break;
                     case 'verse_id':
                         $stmt->bindValue($identifier, $this->verse_id, PDO::PARAM_INT);
@@ -896,12 +942,15 @@ abstract class Tag implements ActiveRecordInterface
                 return $this->getKeywordId();
                 break;
             case 1:
-                return $this->getVerseId();
+                return $this->getRelevantWords();
                 break;
             case 2:
-                return $this->getVoteCount();
+                return $this->getVerseId();
                 break;
             case 3:
+                return $this->getVoteCount();
+                break;
+            case 4:
                 return $this->getId();
                 break;
             default:
@@ -935,9 +984,10 @@ abstract class Tag implements ActiveRecordInterface
         $keys = TagTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getKeywordId(),
-            $keys[1] => $this->getVerseId(),
-            $keys[2] => $this->getVoteCount(),
-            $keys[3] => $this->getId(),
+            $keys[1] => $this->getRelevantWords(),
+            $keys[2] => $this->getVerseId(),
+            $keys[3] => $this->getVoteCount(),
+            $keys[4] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -952,7 +1002,7 @@ abstract class Tag implements ActiveRecordInterface
                         $key = 'keyword';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'keyword';
+                        $key = 'defender_keyword';
                         break;
                     default:
                         $key = 'Keyword';
@@ -967,7 +1017,7 @@ abstract class Tag implements ActiveRecordInterface
                         $key = 'verse';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'verse';
+                        $key = 'defender_verse';
                         break;
                     default:
                         $key = 'Verse';
@@ -982,7 +1032,7 @@ abstract class Tag implements ActiveRecordInterface
                         $key = 'tagVotes';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'tag_votes';
+                        $key = 'defender_tag_votes';
                         break;
                     default:
                         $key = 'TagVotes';
@@ -1028,12 +1078,15 @@ abstract class Tag implements ActiveRecordInterface
                 $this->setKeywordId($value);
                 break;
             case 1:
-                $this->setVerseId($value);
+                $this->setRelevantWords($value);
                 break;
             case 2:
-                $this->setVoteCount($value);
+                $this->setVerseId($value);
                 break;
             case 3:
+                $this->setVoteCount($value);
+                break;
+            case 4:
                 $this->setId($value);
                 break;
         } // switch()
@@ -1066,13 +1119,16 @@ abstract class Tag implements ActiveRecordInterface
             $this->setKeywordId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setVerseId($arr[$keys[1]]);
+            $this->setRelevantWords($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setVoteCount($arr[$keys[2]]);
+            $this->setVerseId($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setId($arr[$keys[3]]);
+            $this->setVoteCount($arr[$keys[3]]);
+        }
+        if (array_key_exists($keys[4], $arr)) {
+            $this->setId($arr[$keys[4]]);
         }
     }
 
@@ -1117,6 +1173,9 @@ abstract class Tag implements ActiveRecordInterface
 
         if ($this->isColumnModified(TagTableMap::COL_KEYWORD_ID)) {
             $criteria->add(TagTableMap::COL_KEYWORD_ID, $this->keyword_id);
+        }
+        if ($this->isColumnModified(TagTableMap::COL_RELEVANT_WORDS)) {
+            $criteria->add(TagTableMap::COL_RELEVANT_WORDS, $this->relevant_words);
         }
         if ($this->isColumnModified(TagTableMap::COL_VERSE_ID)) {
             $criteria->add(TagTableMap::COL_VERSE_ID, $this->verse_id);
@@ -1214,6 +1273,7 @@ abstract class Tag implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setKeywordId($this->getKeywordId());
+        $copyObj->setRelevantWords($this->getRelevantWords());
         $copyObj->setVerseId($this->getVerseId());
         $copyObj->setVoteCount($this->getVoteCount());
 
@@ -1615,6 +1675,7 @@ abstract class Tag implements ActiveRecordInterface
             $this->aVerse->removeTag($this);
         }
         $this->keyword_id = null;
+        $this->relevant_words = null;
         $this->verse_id = null;
         $this->vote_count = null;
         $this->id = null;
@@ -1669,7 +1730,7 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function computeVoteCount(ConnectionInterface $con)
     {
-        $stmt = $con->prepare('SELECT COUNT(tag_id) FROM tag_vote WHERE tag_vote.TAG_ID = :p1');
+        $stmt = $con->prepare('SELECT COUNT(tag_id) FROM defender_tag_vote WHERE defender_tag_vote.TAG_ID = :p1');
         $stmt->bindValue(':p1', $this->getId());
         $stmt->execute();
 

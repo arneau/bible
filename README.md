@@ -1,6 +1,6 @@
 # The Bible App
 
-### Installing Composer
+### Install Composer
 ###### 1) Create composer.json
 	{
 		"require": {

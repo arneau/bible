@@ -2,11 +2,11 @@
 
 namespace Base;
 
-use \Book as ChildBook;
-use \BookQuery as ChildBookQuery;
+use \AnswerType as ChildAnswerType;
+use \AnswerTypeQuery as ChildAnswerTypeQuery;
 use \Exception;
 use \PDO;
-use Map\BookTableMap;
+use Map\AnswerTypeTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -16,89 +16,89 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 
 /**
- * Base class that represents a query for the 'defender_book' table.
+ * Base class that represents a query for the 'defender_answer_type' table.
  *
  *
  *
- * @method     ChildBookQuery orderByChapterCount($order = Criteria::ASC) Order by the chapter_count column
- * @method     ChildBookQuery orderByName($order = Criteria::ASC) Order by the name column
- * @method     ChildBookQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildAnswerTypeQuery orderByName($order = Criteria::ASC) Order by the name column
+ * @method     ChildAnswerTypeQuery orderByValue($order = Criteria::ASC) Order by the value column
+ * @method     ChildAnswerTypeQuery orderById($order = Criteria::ASC) Order by the id column
  *
- * @method     ChildBookQuery groupByChapterCount() Group by the chapter_count column
- * @method     ChildBookQuery groupByName() Group by the name column
- * @method     ChildBookQuery groupById() Group by the id column
+ * @method     ChildAnswerTypeQuery groupByName() Group by the name column
+ * @method     ChildAnswerTypeQuery groupByValue() Group by the value column
+ * @method     ChildAnswerTypeQuery groupById() Group by the id column
  *
- * @method     ChildBookQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildBookQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildBookQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildAnswerTypeQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildAnswerTypeQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildAnswerTypeQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildBookQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
- * @method     ChildBookQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
- * @method     ChildBookQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
+ * @method     ChildAnswerTypeQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
+ * @method     ChildAnswerTypeQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
+ * @method     ChildAnswerTypeQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
- * @method     ChildBookQuery leftJoinVerse($relationAlias = null) Adds a LEFT JOIN clause to the query using the Verse relation
- * @method     ChildBookQuery rightJoinVerse($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Verse relation
- * @method     ChildBookQuery innerJoinVerse($relationAlias = null) Adds a INNER JOIN clause to the query using the Verse relation
+ * @method     ChildAnswerTypeQuery leftJoinAnswer($relationAlias = null) Adds a LEFT JOIN clause to the query using the Answer relation
+ * @method     ChildAnswerTypeQuery rightJoinAnswer($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Answer relation
+ * @method     ChildAnswerTypeQuery innerJoinAnswer($relationAlias = null) Adds a INNER JOIN clause to the query using the Answer relation
  *
- * @method     ChildBookQuery joinWithVerse($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Verse relation
+ * @method     ChildAnswerTypeQuery joinWithAnswer($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Answer relation
  *
- * @method     ChildBookQuery leftJoinWithVerse() Adds a LEFT JOIN clause and with to the query using the Verse relation
- * @method     ChildBookQuery rightJoinWithVerse() Adds a RIGHT JOIN clause and with to the query using the Verse relation
- * @method     ChildBookQuery innerJoinWithVerse() Adds a INNER JOIN clause and with to the query using the Verse relation
+ * @method     ChildAnswerTypeQuery leftJoinWithAnswer() Adds a LEFT JOIN clause and with to the query using the Answer relation
+ * @method     ChildAnswerTypeQuery rightJoinWithAnswer() Adds a RIGHT JOIN clause and with to the query using the Answer relation
+ * @method     ChildAnswerTypeQuery innerJoinWithAnswer() Adds a INNER JOIN clause and with to the query using the Answer relation
  *
- * @method     \VerseQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \AnswerQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
- * @method     ChildBook findOne(ConnectionInterface $con = null) Return the first ChildBook matching the query
- * @method     ChildBook findOneOrCreate(ConnectionInterface $con = null) Return the first ChildBook matching the query, or a new ChildBook object populated from the query conditions when no match is found
+ * @method     ChildAnswerType findOne(ConnectionInterface $con = null) Return the first ChildAnswerType matching the query
+ * @method     ChildAnswerType findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAnswerType matching the query, or a new ChildAnswerType object populated from the query conditions when no match is found
  *
- * @method     ChildBook findOneByChapterCount(int $chapter_count) Return the first ChildBook filtered by the chapter_count column
- * @method     ChildBook findOneByName(string $name) Return the first ChildBook filtered by the name column
- * @method     ChildBook findOneById(int $id) Return the first ChildBook filtered by the id column *
+ * @method     ChildAnswerType findOneByName(string $name) Return the first ChildAnswerType filtered by the name column
+ * @method     ChildAnswerType findOneByValue(string $value) Return the first ChildAnswerType filtered by the value column
+ * @method     ChildAnswerType findOneById(int $id) Return the first ChildAnswerType filtered by the id column *
 
- * @method     ChildBook requirePk($key, ConnectionInterface $con = null) Return the ChildBook by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildBook requireOne(ConnectionInterface $con = null) Return the first ChildBook matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAnswerType requirePk($key, ConnectionInterface $con = null) Return the ChildAnswerType by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAnswerType requireOne(ConnectionInterface $con = null) Return the first ChildAnswerType matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildBook requireOneByChapterCount(int $chapter_count) Return the first ChildBook filtered by the chapter_count column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildBook requireOneByName(string $name) Return the first ChildBook filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildBook requireOneById(int $id) Return the first ChildBook filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAnswerType requireOneByName(string $name) Return the first ChildAnswerType filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAnswerType requireOneByValue(string $value) Return the first ChildAnswerType filtered by the value column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildAnswerType requireOneById(int $id) Return the first ChildAnswerType filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildBook[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildBook objects based on current ModelCriteria
- * @method     ChildBook[]|ObjectCollection findByChapterCount(int $chapter_count) Return ChildBook objects filtered by the chapter_count column
- * @method     ChildBook[]|ObjectCollection findByName(string $name) Return ChildBook objects filtered by the name column
- * @method     ChildBook[]|ObjectCollection findById(int $id) Return ChildBook objects filtered by the id column
- * @method     ChildBook[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
+ * @method     ChildAnswerType[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildAnswerType objects based on current ModelCriteria
+ * @method     ChildAnswerType[]|ObjectCollection findByName(string $name) Return ChildAnswerType objects filtered by the name column
+ * @method     ChildAnswerType[]|ObjectCollection findByValue(string $value) Return ChildAnswerType objects filtered by the value column
+ * @method     ChildAnswerType[]|ObjectCollection findById(int $id) Return ChildAnswerType objects filtered by the id column
+ * @method     ChildAnswerType[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
-abstract class BookQuery extends ModelCriteria
+abstract class AnswerTypeQuery extends ModelCriteria
 {
     protected $entityNotFoundExceptionClass = '\\Propel\\Runtime\\Exception\\EntityNotFoundException';
 
     /**
-     * Initializes internal state of \Base\BookQuery object.
+     * Initializes internal state of \Base\AnswerTypeQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'default', $modelName = '\\Book', $modelAlias = null)
+    public function __construct($dbName = 'default', $modelName = '\\AnswerType', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildBookQuery object.
+     * Returns a new ChildAnswerTypeQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildBookQuery
+     * @return ChildAnswerTypeQuery
      */
     public static function create($modelAlias = null, Criteria $criteria = null)
     {
-        if ($criteria instanceof ChildBookQuery) {
+        if ($criteria instanceof ChildAnswerTypeQuery) {
             return $criteria;
         }
-        $query = new ChildBookQuery();
+        $query = new ChildAnswerTypeQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -121,19 +121,19 @@ abstract class BookQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildBook|array|mixed the result, formatted by the current formatter
+     * @return ChildAnswerType|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, ConnectionInterface $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = BookTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key))) && !$this->formatter) {
+        if ((null !== ($obj = AnswerTypeTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(BookTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(AnswerTypeTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -154,11 +154,11 @@ abstract class BookQuery extends ModelCriteria
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
-     * @return ChildBook A model object, or null if the key is not found
+     * @return ChildAnswerType A model object, or null if the key is not found
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT chapter_count, name, id FROM defender_book WHERE id = :p0';
+        $sql = 'SELECT name, value, id FROM defender_answer_type WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -169,10 +169,10 @@ abstract class BookQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            /** @var ChildBook $obj */
-            $obj = new ChildBook();
+            /** @var ChildAnswerType $obj */
+            $obj = new ChildAnswerType();
             $obj->hydrate($row);
-            BookTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
+            AnswerTypeTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
         }
         $stmt->closeCursor();
 
@@ -185,7 +185,7 @@ abstract class BookQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildBook|array|mixed the result, formatted by the current formatter
+     * @return ChildAnswerType|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, ConnectionInterface $con)
     {
@@ -227,12 +227,12 @@ abstract class BookQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return $this|ChildBookQuery The current query, for fluid interface
+     * @return $this|ChildAnswerTypeQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(BookTableMap::COL_ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(AnswerTypeTableMap::COL_ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -240,53 +240,12 @@ abstract class BookQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return $this|ChildBookQuery The current query, for fluid interface
+     * @return $this|ChildAnswerTypeQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(BookTableMap::COL_ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the chapter_count column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByChapterCount(1234); // WHERE chapter_count = 1234
-     * $query->filterByChapterCount(array(12, 34)); // WHERE chapter_count IN (12, 34)
-     * $query->filterByChapterCount(array('min' => 12)); // WHERE chapter_count > 12
-     * </code>
-     *
-     * @param     mixed $chapterCount The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildBookQuery The current query, for fluid interface
-     */
-    public function filterByChapterCount($chapterCount = null, $comparison = null)
-    {
-        if (is_array($chapterCount)) {
-            $useMinMax = false;
-            if (isset($chapterCount['min'])) {
-                $this->addUsingAlias(BookTableMap::COL_CHAPTER_COUNT, $chapterCount['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($chapterCount['max'])) {
-                $this->addUsingAlias(BookTableMap::COL_CHAPTER_COUNT, $chapterCount['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(BookTableMap::COL_CHAPTER_COUNT, $chapterCount, $comparison);
+        return $this->addUsingAlias(AnswerTypeTableMap::COL_ID, $keys, Criteria::IN);
     }
 
     /**
@@ -302,7 +261,7 @@ abstract class BookQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildBookQuery The current query, for fluid interface
+     * @return $this|ChildAnswerTypeQuery The current query, for fluid interface
      */
     public function filterByName($name = null, $comparison = null)
     {
@@ -315,7 +274,36 @@ abstract class BookQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(BookTableMap::COL_NAME, $name, $comparison);
+        return $this->addUsingAlias(AnswerTypeTableMap::COL_NAME, $name, $comparison);
+    }
+
+    /**
+     * Filter the query on the value column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByValue('fooValue');   // WHERE value = 'fooValue'
+     * $query->filterByValue('%fooValue%'); // WHERE value LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $value The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildAnswerTypeQuery The current query, for fluid interface
+     */
+    public function filterByValue($value = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($value)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $value)) {
+                $value = str_replace('*', '%', $value);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(AnswerTypeTableMap::COL_VALUE, $value, $comparison);
     }
 
     /**
@@ -334,18 +322,18 @@ abstract class BookQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildBookQuery The current query, for fluid interface
+     * @return $this|ChildAnswerTypeQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(BookTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(AnswerTypeTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(BookTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(AnswerTypeTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -356,44 +344,44 @@ abstract class BookQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(BookTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(AnswerTypeTableMap::COL_ID, $id, $comparison);
     }
 
     /**
-     * Filter the query by a related \Verse object
+     * Filter the query by a related \Answer object
      *
-     * @param \Verse|ObjectCollection $verse the related object to use as filter
+     * @param \Answer|ObjectCollection $answer the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildBookQuery The current query, for fluid interface
+     * @return ChildAnswerTypeQuery The current query, for fluid interface
      */
-    public function filterByVerse($verse, $comparison = null)
+    public function filterByAnswer($answer, $comparison = null)
     {
-        if ($verse instanceof \Verse) {
+        if ($answer instanceof \Answer) {
             return $this
-                ->addUsingAlias(BookTableMap::COL_ID, $verse->getBookId(), $comparison);
-        } elseif ($verse instanceof ObjectCollection) {
+                ->addUsingAlias(AnswerTypeTableMap::COL_ID, $answer->getAnswerTypeId(), $comparison);
+        } elseif ($answer instanceof ObjectCollection) {
             return $this
-                ->useVerseQuery()
-                ->filterByPrimaryKeys($verse->getPrimaryKeys())
+                ->useAnswerQuery()
+                ->filterByPrimaryKeys($answer->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByVerse() only accepts arguments of type \Verse or Collection');
+            throw new PropelException('filterByAnswer() only accepts arguments of type \Answer or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Verse relation
+     * Adds a JOIN clause to the query using the Answer relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildBookQuery The current query, for fluid interface
+     * @return $this|ChildAnswerTypeQuery The current query, for fluid interface
      */
-    public function joinVerse($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinAnswer($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Verse');
+        $relationMap = $tableMap->getRelation('Answer');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -408,14 +396,14 @@ abstract class BookQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Verse');
+            $this->addJoinObject($join, 'Answer');
         }
 
         return $this;
     }
 
     /**
-     * Use the Verse relation Verse object
+     * Use the Answer relation Answer object
      *
      * @see useQuery()
      *
@@ -423,33 +411,33 @@ abstract class BookQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \VerseQuery A secondary query class using the current class as primary query
+     * @return \AnswerQuery A secondary query class using the current class as primary query
      */
-    public function useVerseQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useAnswerQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinVerse($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Verse', '\VerseQuery');
+            ->joinAnswer($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Answer', '\AnswerQuery');
     }
 
     /**
      * Exclude object from result
      *
-     * @param   ChildBook $book Object to remove from the list of results
+     * @param   ChildAnswerType $answerType Object to remove from the list of results
      *
-     * @return $this|ChildBookQuery The current query, for fluid interface
+     * @return $this|ChildAnswerTypeQuery The current query, for fluid interface
      */
-    public function prune($book = null)
+    public function prune($answerType = null)
     {
-        if ($book) {
-            $this->addUsingAlias(BookTableMap::COL_ID, $book->getId(), Criteria::NOT_EQUAL);
+        if ($answerType) {
+            $this->addUsingAlias(AnswerTypeTableMap::COL_ID, $answerType->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the defender_book table.
+     * Deletes all rows from the defender_answer_type table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -457,7 +445,7 @@ abstract class BookQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(BookTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AnswerTypeTableMap::DATABASE_NAME);
         }
 
         // use transaction because $criteria could contain info
@@ -468,8 +456,8 @@ abstract class BookQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            BookTableMap::clearInstancePool();
-            BookTableMap::clearRelatedInstancePool();
+            AnswerTypeTableMap::clearInstancePool();
+            AnswerTypeTableMap::clearRelatedInstancePool();
 
             return $affectedRows;
         });
@@ -487,26 +475,26 @@ abstract class BookQuery extends ModelCriteria
     public function delete(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(BookTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AnswerTypeTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(BookTableMap::DATABASE_NAME);
+        $criteria->setDbName(AnswerTypeTableMap::DATABASE_NAME);
 
         // use transaction because $criteria could contain info
         // for more than one table or we could emulating ON DELETE CASCADE, etc.
         return $con->transaction(function () use ($con, $criteria) {
             $affectedRows = 0; // initialize var to track total num of affected rows
 
-            BookTableMap::removeInstanceFromPool($criteria);
+            AnswerTypeTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            BookTableMap::clearRelatedInstancePool();
+            AnswerTypeTableMap::clearRelatedInstancePool();
 
             return $affectedRows;
         });
     }
 
-} // BookQuery
+} // AnswerTypeQuery

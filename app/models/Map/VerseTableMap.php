@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'verse' table.
+ * This class defines the structure of the 'defender_verse' table.
  *
  *
  *
@@ -44,7 +44,7 @@ class VerseTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'verse';
+    const TABLE_NAME = 'defender_verse';
 
     /**
      * The related Propel class for this table
@@ -74,37 +74,37 @@ class VerseTableMap extends TableMap
     /**
      * the column name for the bible_id field
      */
-    const COL_BIBLE_ID = 'verse.bible_id';
+    const COL_BIBLE_ID = 'defender_verse.bible_id';
 
     /**
      * the column name for the book_id field
      */
-    const COL_BOOK_ID = 'verse.book_id';
+    const COL_BOOK_ID = 'defender_verse.book_id';
 
     /**
      * the column name for the chapter_number field
      */
-    const COL_CHAPTER_NUMBER = 'verse.chapter_number';
+    const COL_CHAPTER_NUMBER = 'defender_verse.chapter_number';
 
     /**
      * the column name for the text field
      */
-    const COL_TEXT = 'verse.text';
+    const COL_TEXT = 'defender_verse.text';
 
     /**
      * the column name for the verse_number field
      */
-    const COL_VERSE_NUMBER = 'verse.verse_number';
+    const COL_VERSE_NUMBER = 'defender_verse.verse_number';
 
     /**
      * the column name for the word_count field
      */
-    const COL_WORD_COUNT = 'verse.word_count';
+    const COL_WORD_COUNT = 'defender_verse.word_count';
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'verse.id';
+    const COL_ID = 'defender_verse.id';
 
     /**
      * The default string format for model objects of the related table
@@ -149,15 +149,15 @@ class VerseTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('verse');
+        $this->setName('defender_verse');
         $this->setPhpName('Verse');
         $this->setIdentifierQuoting(false);
         $this->setClassName('\\Verse');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignKey('bible_id', 'BibleId', 'INTEGER', 'bible', 'id', true, null, null);
-        $this->addForeignKey('book_id', 'BookId', 'INTEGER', 'book', 'id', true, null, null);
+        $this->addForeignKey('bible_id', 'BibleId', 'INTEGER', 'defender_bible', 'id', true, null, null);
+        $this->addForeignKey('book_id', 'BookId', 'INTEGER', 'defender_book', 'id', true, null, null);
         $this->addColumn('chapter_number', 'ChapterNumber', 'INTEGER', true, null, null);
         $this->addColumn('text', 'Text', 'VARCHAR', true, 1000, null);
         $this->addColumn('verse_number', 'VerseNumber', 'INTEGER', true, null, null);
@@ -430,7 +430,7 @@ class VerseTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the verse table.
+     * Deletes all rows from the defender_verse table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).

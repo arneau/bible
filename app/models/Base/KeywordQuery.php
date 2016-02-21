@@ -16,7 +16,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 
 /**
- * Base class that represents a query for the 'keyword' table.
+ * Base class that represents a query for the 'defender_keyword' table.
  *
  *
  *
@@ -163,7 +163,7 @@ abstract class KeywordQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT value, id FROM keyword WHERE id = :p0';
+        $sql = 'SELECT value, id FROM defender_keyword WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -486,7 +486,7 @@ abstract class KeywordQuery extends ModelCriteria
     }
 
     /**
-     * Deletes all rows from the keyword table.
+     * Deletes all rows from the defender_keyword table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).

@@ -25,6 +25,7 @@ foreach ($passage_data['verses'] as $verse_data) {
 
 	$tag_object = new Tag();
 	$tag_object->setKeyword($keyword_object)
+		->setRelevantWords('1-' . $verse_data['word_count'])
 		->setVerseId($verse_data['id'])
 		->save();
 

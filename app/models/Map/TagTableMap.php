@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'tag' table.
+ * This class defines the structure of the 'defender_tag' table.
  *
  *
  *
@@ -44,7 +44,7 @@ class TagTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'tag';
+    const TABLE_NAME = 'defender_tag';
 
     /**
      * The related Propel class for this table
@@ -59,7 +59,7 @@ class TagTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -69,27 +69,32 @@ class TagTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the keyword_id field
      */
-    const COL_KEYWORD_ID = 'tag.keyword_id';
+    const COL_KEYWORD_ID = 'defender_tag.keyword_id';
+
+    /**
+     * the column name for the relevant_words field
+     */
+    const COL_RELEVANT_WORDS = 'defender_tag.relevant_words';
 
     /**
      * the column name for the verse_id field
      */
-    const COL_VERSE_ID = 'tag.verse_id';
+    const COL_VERSE_ID = 'defender_tag.verse_id';
 
     /**
      * the column name for the vote_count field
      */
-    const COL_VOTE_COUNT = 'tag.vote_count';
+    const COL_VOTE_COUNT = 'defender_tag.vote_count';
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'tag.id';
+    const COL_ID = 'defender_tag.id';
 
     /**
      * The default string format for model objects of the related table
@@ -103,11 +108,11 @@ class TagTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('KeywordId', 'VerseId', 'VoteCount', 'Id', ),
-        self::TYPE_CAMELNAME     => array('keywordId', 'verseId', 'voteCount', 'id', ),
-        self::TYPE_COLNAME       => array(TagTableMap::COL_KEYWORD_ID, TagTableMap::COL_VERSE_ID, TagTableMap::COL_VOTE_COUNT, TagTableMap::COL_ID, ),
-        self::TYPE_FIELDNAME     => array('keyword_id', 'verse_id', 'vote_count', 'id', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('KeywordId', 'RelevantWords', 'VerseId', 'VoteCount', 'Id', ),
+        self::TYPE_CAMELNAME     => array('keywordId', 'relevantWords', 'verseId', 'voteCount', 'id', ),
+        self::TYPE_COLNAME       => array(TagTableMap::COL_KEYWORD_ID, TagTableMap::COL_RELEVANT_WORDS, TagTableMap::COL_VERSE_ID, TagTableMap::COL_VOTE_COUNT, TagTableMap::COL_ID, ),
+        self::TYPE_FIELDNAME     => array('keyword_id', 'relevant_words', 'verse_id', 'vote_count', 'id', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -117,11 +122,11 @@ class TagTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('KeywordId' => 0, 'VerseId' => 1, 'VoteCount' => 2, 'Id' => 3, ),
-        self::TYPE_CAMELNAME     => array('keywordId' => 0, 'verseId' => 1, 'voteCount' => 2, 'id' => 3, ),
-        self::TYPE_COLNAME       => array(TagTableMap::COL_KEYWORD_ID => 0, TagTableMap::COL_VERSE_ID => 1, TagTableMap::COL_VOTE_COUNT => 2, TagTableMap::COL_ID => 3, ),
-        self::TYPE_FIELDNAME     => array('keyword_id' => 0, 'verse_id' => 1, 'vote_count' => 2, 'id' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('KeywordId' => 0, 'RelevantWords' => 1, 'VerseId' => 2, 'VoteCount' => 3, 'Id' => 4, ),
+        self::TYPE_CAMELNAME     => array('keywordId' => 0, 'relevantWords' => 1, 'verseId' => 2, 'voteCount' => 3, 'id' => 4, ),
+        self::TYPE_COLNAME       => array(TagTableMap::COL_KEYWORD_ID => 0, TagTableMap::COL_RELEVANT_WORDS => 1, TagTableMap::COL_VERSE_ID => 2, TagTableMap::COL_VOTE_COUNT => 3, TagTableMap::COL_ID => 4, ),
+        self::TYPE_FIELDNAME     => array('keyword_id' => 0, 'relevant_words' => 1, 'verse_id' => 2, 'vote_count' => 3, 'id' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -134,15 +139,16 @@ class TagTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('tag');
+        $this->setName('defender_tag');
         $this->setPhpName('Tag');
         $this->setIdentifierQuoting(false);
         $this->setClassName('\\Tag');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignKey('keyword_id', 'KeywordId', 'INTEGER', 'keyword', 'id', true, null, null);
-        $this->addForeignKey('verse_id', 'VerseId', 'INTEGER', 'verse', 'id', true, null, null);
+        $this->addForeignKey('keyword_id', 'KeywordId', 'INTEGER', 'defender_keyword', 'id', true, null, null);
+        $this->addColumn('relevant_words', 'RelevantWords', 'VARCHAR', true, 255, null);
+        $this->addForeignKey('verse_id', 'VerseId', 'INTEGER', 'defender_verse', 'id', true, null, null);
         $this->addColumn('vote_count', 'VoteCount', 'INTEGER', false, null, 0);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
     } // initialize()
@@ -205,11 +211,11 @@ class TagTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return null === $row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -228,7 +234,7 @@ class TagTableMap extends TableMap
     {
         return (int) $row[
             $indexType == TableMap::TYPE_NUM
-                ? 3 + $offset
+                ? 4 + $offset
                 : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
@@ -331,11 +337,13 @@ class TagTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(TagTableMap::COL_KEYWORD_ID);
+            $criteria->addSelectColumn(TagTableMap::COL_RELEVANT_WORDS);
             $criteria->addSelectColumn(TagTableMap::COL_VERSE_ID);
             $criteria->addSelectColumn(TagTableMap::COL_VOTE_COUNT);
             $criteria->addSelectColumn(TagTableMap::COL_ID);
         } else {
             $criteria->addSelectColumn($alias . '.keyword_id');
+            $criteria->addSelectColumn($alias . '.relevant_words');
             $criteria->addSelectColumn($alias . '.verse_id');
             $criteria->addSelectColumn($alias . '.vote_count');
             $criteria->addSelectColumn($alias . '.id');
@@ -407,7 +415,7 @@ class TagTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the tag table.
+     * Deletes all rows from the defender_tag table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).

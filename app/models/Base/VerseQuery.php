@@ -16,7 +16,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 
 /**
- * Base class that represents a query for the 'verse' table.
+ * Base class that represents a query for the 'defender_verse' table.
  *
  *
  *
@@ -198,7 +198,7 @@ abstract class VerseQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT bible_id, book_id, chapter_number, text, verse_number, word_count, id FROM verse WHERE id = :p0';
+        $sql = 'SELECT bible_id, book_id, chapter_number, text, verse_number, word_count, id FROM defender_verse WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -811,7 +811,7 @@ abstract class VerseQuery extends ModelCriteria
     }
 
     /**
-     * Deletes all rows from the verse table.
+     * Deletes all rows from the defender_verse table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).

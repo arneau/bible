@@ -16,7 +16,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 
 /**
- * Base class that represents a query for the 'keyword_synonym' table.
+ * Base class that represents a query for the 'defender_keyword_synonym' table.
  *
  *
  *
@@ -158,7 +158,7 @@ abstract class KeywordSynonymQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT keyword_id, value, id FROM keyword_synonym WHERE id = :p0';
+        $sql = 'SELECT keyword_id, value, id FROM defender_keyword_synonym WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -455,7 +455,7 @@ abstract class KeywordSynonymQuery extends ModelCriteria
     }
 
     /**
-     * Deletes all rows from the keyword_synonym table.
+     * Deletes all rows from the defender_keyword_synonym table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).

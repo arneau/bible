@@ -28,7 +28,7 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
 /**
- * Base class that represents a row from the 'verse' table.
+ * Base class that represents a row from the 'defender_verse' table.
  *
  *
  *
@@ -920,7 +920,7 @@ abstract class Verse implements ActiveRecordInterface
         }
 
         $sql = sprintf(
-            'INSERT INTO verse (%s) VALUES (%s)',
+            'INSERT INTO defender_verse (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1084,7 +1084,7 @@ abstract class Verse implements ActiveRecordInterface
                         $key = 'bible';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'bible';
+                        $key = 'defender_bible';
                         break;
                     default:
                         $key = 'Bible';
@@ -1099,7 +1099,7 @@ abstract class Verse implements ActiveRecordInterface
                         $key = 'book';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'book';
+                        $key = 'defender_book';
                         break;
                     default:
                         $key = 'Book';
@@ -1114,7 +1114,7 @@ abstract class Verse implements ActiveRecordInterface
                         $key = 'tags';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'tags';
+                        $key = 'defender_tags';
                         break;
                     default:
                         $key = 'Tags';

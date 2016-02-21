@@ -16,16 +16,18 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 
 /**
- * Base class that represents a query for the 'tag' table.
+ * Base class that represents a query for the 'defender_tag' table.
  *
  *
  *
  * @method     ChildTagQuery orderByKeywordId($order = Criteria::ASC) Order by the keyword_id column
+ * @method     ChildTagQuery orderByRelevantWords($order = Criteria::ASC) Order by the relevant_words column
  * @method     ChildTagQuery orderByVerseId($order = Criteria::ASC) Order by the verse_id column
  * @method     ChildTagQuery orderByVoteCount($order = Criteria::ASC) Order by the vote_count column
  * @method     ChildTagQuery orderById($order = Criteria::ASC) Order by the id column
  *
  * @method     ChildTagQuery groupByKeywordId() Group by the keyword_id column
+ * @method     ChildTagQuery groupByRelevantWords() Group by the relevant_words column
  * @method     ChildTagQuery groupByVerseId() Group by the verse_id column
  * @method     ChildTagQuery groupByVoteCount() Group by the vote_count column
  * @method     ChildTagQuery groupById() Group by the id column
@@ -74,6 +76,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTag findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTag matching the query, or a new ChildTag object populated from the query conditions when no match is found
  *
  * @method     ChildTag findOneByKeywordId(int $keyword_id) Return the first ChildTag filtered by the keyword_id column
+ * @method     ChildTag findOneByRelevantWords(string $relevant_words) Return the first ChildTag filtered by the relevant_words column
  * @method     ChildTag findOneByVerseId(int $verse_id) Return the first ChildTag filtered by the verse_id column
  * @method     ChildTag findOneByVoteCount(int $vote_count) Return the first ChildTag filtered by the vote_count column
  * @method     ChildTag findOneById(int $id) Return the first ChildTag filtered by the id column *
@@ -82,12 +85,14 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTag requireOne(ConnectionInterface $con = null) Return the first ChildTag matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildTag requireOneByKeywordId(int $keyword_id) Return the first ChildTag filtered by the keyword_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTag requireOneByRelevantWords(string $relevant_words) Return the first ChildTag filtered by the relevant_words column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTag requireOneByVerseId(int $verse_id) Return the first ChildTag filtered by the verse_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTag requireOneByVoteCount(int $vote_count) Return the first ChildTag filtered by the vote_count column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTag requireOneById(int $id) Return the first ChildTag filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildTag[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTag objects based on current ModelCriteria
  * @method     ChildTag[]|ObjectCollection findByKeywordId(int $keyword_id) Return ChildTag objects filtered by the keyword_id column
+ * @method     ChildTag[]|ObjectCollection findByRelevantWords(string $relevant_words) Return ChildTag objects filtered by the relevant_words column
  * @method     ChildTag[]|ObjectCollection findByVerseId(int $verse_id) Return ChildTag objects filtered by the verse_id column
  * @method     ChildTag[]|ObjectCollection findByVoteCount(int $vote_count) Return ChildTag objects filtered by the vote_count column
  * @method     ChildTag[]|ObjectCollection findById(int $id) Return ChildTag objects filtered by the id column
@@ -183,7 +188,7 @@ abstract class TagQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT keyword_id, verse_id, vote_count, id FROM tag WHERE id = :p0';
+        $sql = 'SELECT keyword_id, relevant_words, verse_id, vote_count, id FROM defender_tag WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -314,6 +319,35 @@ abstract class TagQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TagTableMap::COL_KEYWORD_ID, $keywordId, $comparison);
+    }
+
+    /**
+     * Filter the query on the relevant_words column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByRelevantWords('fooValue');   // WHERE relevant_words = 'fooValue'
+     * $query->filterByRelevantWords('%fooValue%'); // WHERE relevant_words LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $relevantWords The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildTagQuery The current query, for fluid interface
+     */
+    public function filterByRelevantWords($relevantWords = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($relevantWords)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $relevantWords)) {
+                $relevantWords = str_replace('*', '%', $relevantWords);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(TagTableMap::COL_RELEVANT_WORDS, $relevantWords, $comparison);
     }
 
     /**
@@ -685,7 +719,7 @@ abstract class TagQuery extends ModelCriteria
     }
 
     /**
-     * Deletes all rows from the tag table.
+     * Deletes all rows from the defender_tag table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).

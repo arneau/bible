@@ -21,7 +21,7 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
 /**
- * Base class that represents a row from the 'keyword_synonym' table.
+ * Base class that represents a row from the 'defender_keyword_synonym' table.
  *
  *
  *
@@ -690,7 +690,7 @@ abstract class KeywordSynonym implements ActiveRecordInterface
         }
 
         $sql = sprintf(
-            'INSERT INTO keyword_synonym (%s) VALUES (%s)',
+            'INSERT INTO defender_keyword_synonym (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -826,7 +826,7 @@ abstract class KeywordSynonym implements ActiveRecordInterface
                         $key = 'keyword';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'keyword';
+                        $key = 'defender_keyword';
                         break;
                     default:
                         $key = 'Keyword';

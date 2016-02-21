@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'keyword_synonym' table.
+ * This class defines the structure of the 'defender_keyword_synonym' table.
  *
  *
  *
@@ -44,7 +44,7 @@ class KeywordSynonymTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'keyword_synonym';
+    const TABLE_NAME = 'defender_keyword_synonym';
 
     /**
      * The related Propel class for this table
@@ -74,17 +74,17 @@ class KeywordSynonymTableMap extends TableMap
     /**
      * the column name for the keyword_id field
      */
-    const COL_KEYWORD_ID = 'keyword_synonym.keyword_id';
+    const COL_KEYWORD_ID = 'defender_keyword_synonym.keyword_id';
 
     /**
      * the column name for the value field
      */
-    const COL_VALUE = 'keyword_synonym.value';
+    const COL_VALUE = 'defender_keyword_synonym.value';
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'keyword_synonym.id';
+    const COL_ID = 'defender_keyword_synonym.id';
 
     /**
      * The default string format for model objects of the related table
@@ -129,14 +129,14 @@ class KeywordSynonymTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('keyword_synonym');
+        $this->setName('defender_keyword_synonym');
         $this->setPhpName('KeywordSynonym');
         $this->setIdentifierQuoting(false);
         $this->setClassName('\\KeywordSynonym');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignKey('keyword_id', 'KeywordId', 'INTEGER', 'keyword', 'id', true, null, null);
+        $this->addForeignKey('keyword_id', 'KeywordId', 'INTEGER', 'defender_keyword', 'id', true, null, null);
         $this->addColumn('value', 'Value', 'VARCHAR', true, 255, null);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
     } // initialize()
@@ -384,7 +384,7 @@ class KeywordSynonymTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the keyword_synonym table.
+     * Deletes all rows from the defender_keyword_synonym table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).

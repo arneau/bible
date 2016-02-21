@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'book' table.
+ * This class defines the structure of the 'defender_book' table.
  *
  *
  *
@@ -44,7 +44,7 @@ class BookTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'book';
+    const TABLE_NAME = 'defender_book';
 
     /**
      * The related Propel class for this table
@@ -74,17 +74,17 @@ class BookTableMap extends TableMap
     /**
      * the column name for the chapter_count field
      */
-    const COL_CHAPTER_COUNT = 'book.chapter_count';
+    const COL_CHAPTER_COUNT = 'defender_book.chapter_count';
 
     /**
      * the column name for the name field
      */
-    const COL_NAME = 'book.name';
+    const COL_NAME = 'defender_book.name';
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'book.id';
+    const COL_ID = 'defender_book.id';
 
     /**
      * The default string format for model objects of the related table
@@ -129,7 +129,7 @@ class BookTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('book');
+        $this->setName('defender_book');
         $this->setPhpName('Book');
         $this->setIdentifierQuoting(false);
         $this->setClassName('\\Book');
@@ -384,7 +384,7 @@ class BookTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the book table.
+     * Deletes all rows from the defender_book table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).

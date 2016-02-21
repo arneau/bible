@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'bible' table.
+ * This class defines the structure of the 'defender_bible' table.
  *
  *
  *
@@ -44,7 +44,7 @@ class BibleTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'bible';
+    const TABLE_NAME = 'defender_bible';
 
     /**
      * The related Propel class for this table
@@ -74,17 +74,17 @@ class BibleTableMap extends TableMap
     /**
      * the column name for the code field
      */
-    const COL_CODE = 'bible.code';
+    const COL_CODE = 'defender_bible.code';
 
     /**
      * the column name for the name field
      */
-    const COL_NAME = 'bible.name';
+    const COL_NAME = 'defender_bible.name';
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'bible.id';
+    const COL_ID = 'defender_bible.id';
 
     /**
      * The default string format for model objects of the related table
@@ -129,7 +129,7 @@ class BibleTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('bible');
+        $this->setName('defender_bible');
         $this->setPhpName('Bible');
         $this->setIdentifierQuoting(false);
         $this->setClassName('\\Bible');
@@ -384,7 +384,7 @@ class BibleTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the bible table.
+     * Deletes all rows from the defender_bible table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).

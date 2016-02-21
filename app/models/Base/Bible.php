@@ -24,7 +24,7 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
 /**
- * Base class that represents a row from the 'bible' table.
+ * Base class that represents a row from the 'defender_bible' table.
  *
  *
  *
@@ -699,7 +699,7 @@ abstract class Bible implements ActiveRecordInterface
         }
 
         $sql = sprintf(
-            'INSERT INTO bible (%s) VALUES (%s)',
+            'INSERT INTO defender_bible (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -835,7 +835,7 @@ abstract class Bible implements ActiveRecordInterface
                         $key = 'verses';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'verses';
+                        $key = 'defender_verses';
                         break;
                     default:
                         $key = 'Verses';

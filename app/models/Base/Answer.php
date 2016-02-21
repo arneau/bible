@@ -2,20 +2,19 @@
 
 namespace Base;
 
-use \Book as ChildBook;
-use \BookQuery as ChildBookQuery;
-use \Verse as ChildVerse;
-use \VerseQuery as ChildVerseQuery;
+use \AnswerQuery as ChildAnswerQuery;
+use \AnswerType as ChildAnswerType;
+use \AnswerTypeQuery as ChildAnswerTypeQuery;
+use \Response as ChildResponse;
+use \ResponseQuery as ChildResponseQuery;
 use \Exception;
 use \PDO;
-use Map\BookTableMap;
-use Map\VerseTableMap;
+use Map\AnswerTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -24,18 +23,18 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
 /**
- * Base class that represents a row from the 'defender_book' table.
+ * Base class that represents a row from the 'defender_answer' table.
  *
  *
  *
 * @package    propel.generator..Base
 */
-abstract class Book implements ActiveRecordInterface
+abstract class Answer implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Map\\BookTableMap';
+    const TABLE_MAP = '\\Map\\AnswerTableMap';
 
 
     /**
@@ -65,18 +64,25 @@ abstract class Book implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the chapter_count field.
+     * The value for the answer_type_id field.
      *
      * @var        int
      */
-    protected $chapter_count;
+    protected $answer_type_id;
 
     /**
-     * The value for the name field.
+     * The value for the response_id field.
+     *
+     * @var        int
+     */
+    protected $response_id;
+
+    /**
+     * The value for the text field.
      *
      * @var        string
      */
-    protected $name;
+    protected $text;
 
     /**
      * The value for the id field.
@@ -86,10 +92,14 @@ abstract class Book implements ActiveRecordInterface
     protected $id;
 
     /**
-     * @var        ObjectCollection|ChildVerse[] Collection to store aggregation of ChildVerse objects.
+     * @var        ChildAnswerType
      */
-    protected $collVerses;
-    protected $collVersesPartial;
+    protected $aAnswerType;
+
+    /**
+     * @var        ChildResponse
+     */
+    protected $aResponse;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -100,13 +110,7 @@ abstract class Book implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildVerse[]
-     */
-    protected $versesScheduledForDeletion = null;
-
-    /**
-     * Initializes internal state of Base\Book object.
+     * Initializes internal state of Base\Answer object.
      */
     public function __construct()
     {
@@ -201,9 +205,9 @@ abstract class Book implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Book</code> instance.  If
-     * <code>obj</code> is an instance of <code>Book</code>, delegates to
-     * <code>equals(Book)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>Answer</code> instance.  If
+     * <code>obj</code> is an instance of <code>Answer</code>, delegates to
+     * <code>equals(Answer)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -269,7 +273,7 @@ abstract class Book implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|Book The current object, for fluid interface
+     * @return $this|Answer The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -331,23 +335,33 @@ abstract class Book implements ActiveRecordInterface
     }
 
     /**
-     * Get the [chapter_count] column value.
+     * Get the [answer_type_id] column value.
      *
      * @return int
      */
-    public function getChapterCount()
+    public function getAnswerTypeId()
     {
-        return $this->chapter_count;
+        return $this->answer_type_id;
     }
 
     /**
-     * Get the [name] column value.
+     * Get the [response_id] column value.
+     *
+     * @return int
+     */
+    public function getResponseId()
+    {
+        return $this->response_id;
+    }
+
+    /**
+     * Get the [text] column value.
      *
      * @return string
      */
-    public function getName()
+    public function getText()
     {
-        return $this->name;
+        return $this->text;
     }
 
     /**
@@ -361,50 +375,78 @@ abstract class Book implements ActiveRecordInterface
     }
 
     /**
-     * Set the value of [chapter_count] column.
+     * Set the value of [answer_type_id] column.
      *
      * @param int $v new value
-     * @return $this|\Book The current object (for fluent API support)
+     * @return $this|\Answer The current object (for fluent API support)
      */
-    public function setChapterCount($v)
+    public function setAnswerTypeId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->chapter_count !== $v) {
-            $this->chapter_count = $v;
-            $this->modifiedColumns[BookTableMap::COL_CHAPTER_COUNT] = true;
+        if ($this->answer_type_id !== $v) {
+            $this->answer_type_id = $v;
+            $this->modifiedColumns[AnswerTableMap::COL_ANSWER_TYPE_ID] = true;
+        }
+
+        if ($this->aAnswerType !== null && $this->aAnswerType->getId() !== $v) {
+            $this->aAnswerType = null;
         }
 
         return $this;
-    } // setChapterCount()
+    } // setAnswerTypeId()
 
     /**
-     * Set the value of [name] column.
+     * Set the value of [response_id] column.
+     *
+     * @param int $v new value
+     * @return $this|\Answer The current object (for fluent API support)
+     */
+    public function setResponseId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->response_id !== $v) {
+            $this->response_id = $v;
+            $this->modifiedColumns[AnswerTableMap::COL_RESPONSE_ID] = true;
+        }
+
+        if ($this->aResponse !== null && $this->aResponse->getId() !== $v) {
+            $this->aResponse = null;
+        }
+
+        return $this;
+    } // setResponseId()
+
+    /**
+     * Set the value of [text] column.
      *
      * @param string $v new value
-     * @return $this|\Book The current object (for fluent API support)
+     * @return $this|\Answer The current object (for fluent API support)
      */
-    public function setName($v)
+    public function setText($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->name !== $v) {
-            $this->name = $v;
-            $this->modifiedColumns[BookTableMap::COL_NAME] = true;
+        if ($this->text !== $v) {
+            $this->text = $v;
+            $this->modifiedColumns[AnswerTableMap::COL_TEXT] = true;
         }
 
         return $this;
-    } // setName()
+    } // setText()
 
     /**
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return $this|\Book The current object (for fluent API support)
+     * @return $this|\Answer The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -414,7 +456,7 @@ abstract class Book implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[BookTableMap::COL_ID] = true;
+            $this->modifiedColumns[AnswerTableMap::COL_ID] = true;
         }
 
         return $this;
@@ -456,13 +498,16 @@ abstract class Book implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : BookTableMap::translateFieldName('ChapterCount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->chapter_count = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AnswerTableMap::translateFieldName('AnswerTypeId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->answer_type_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : BookTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->name = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AnswerTableMap::translateFieldName('ResponseId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->response_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : BookTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AnswerTableMap::translateFieldName('Text', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->text = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AnswerTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -472,10 +517,10 @@ abstract class Book implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 3; // 3 = BookTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = AnswerTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\Book'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\Answer'), 0, $e);
         }
     }
 
@@ -494,6 +539,12 @@ abstract class Book implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aAnswerType !== null && $this->answer_type_id !== $this->aAnswerType->getId()) {
+            $this->aAnswerType = null;
+        }
+        if ($this->aResponse !== null && $this->response_id !== $this->aResponse->getId()) {
+            $this->aResponse = null;
+        }
     } // ensureConsistency
 
     /**
@@ -517,13 +568,13 @@ abstract class Book implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(BookTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(AnswerTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildBookQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildAnswerQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -533,8 +584,8 @@ abstract class Book implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collVerses = null;
-
+            $this->aAnswerType = null;
+            $this->aResponse = null;
         } // if (deep)
     }
 
@@ -544,8 +595,8 @@ abstract class Book implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Book::setDeleted()
-     * @see Book::isDeleted()
+     * @see Answer::setDeleted()
+     * @see Answer::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -554,11 +605,11 @@ abstract class Book implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(BookTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AnswerTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildBookQuery::create()
+            $deleteQuery = ChildAnswerQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -589,7 +640,7 @@ abstract class Book implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(BookTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AnswerTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -608,7 +659,7 @@ abstract class Book implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                BookTableMap::addInstanceToPool($this);
+                AnswerTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -634,6 +685,25 @@ abstract class Book implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aAnswerType !== null) {
+                if ($this->aAnswerType->isModified() || $this->aAnswerType->isNew()) {
+                    $affectedRows += $this->aAnswerType->save($con);
+                }
+                $this->setAnswerType($this->aAnswerType);
+            }
+
+            if ($this->aResponse !== null) {
+                if ($this->aResponse->isModified() || $this->aResponse->isNew()) {
+                    $affectedRows += $this->aResponse->save($con);
+                }
+                $this->setResponse($this->aResponse);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -643,23 +713,6 @@ abstract class Book implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
-            }
-
-            if ($this->versesScheduledForDeletion !== null) {
-                if (!$this->versesScheduledForDeletion->isEmpty()) {
-                    \VerseQuery::create()
-                        ->filterByPrimaryKeys($this->versesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->versesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collVerses !== null) {
-                foreach ($this->collVerses as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
             }
 
             $this->alreadyInSave = false;
@@ -682,24 +735,27 @@ abstract class Book implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[BookTableMap::COL_ID] = true;
+        $this->modifiedColumns[AnswerTableMap::COL_ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . BookTableMap::COL_ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . AnswerTableMap::COL_ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(BookTableMap::COL_CHAPTER_COUNT)) {
-            $modifiedColumns[':p' . $index++]  = 'chapter_count';
+        if ($this->isColumnModified(AnswerTableMap::COL_ANSWER_TYPE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'answer_type_id';
         }
-        if ($this->isColumnModified(BookTableMap::COL_NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'name';
+        if ($this->isColumnModified(AnswerTableMap::COL_RESPONSE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'response_id';
         }
-        if ($this->isColumnModified(BookTableMap::COL_ID)) {
+        if ($this->isColumnModified(AnswerTableMap::COL_TEXT)) {
+            $modifiedColumns[':p' . $index++]  = 'text';
+        }
+        if ($this->isColumnModified(AnswerTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
 
         $sql = sprintf(
-            'INSERT INTO defender_book (%s) VALUES (%s)',
+            'INSERT INTO defender_answer (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -708,11 +764,14 @@ abstract class Book implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'chapter_count':
-                        $stmt->bindValue($identifier, $this->chapter_count, PDO::PARAM_INT);
+                    case 'answer_type_id':
+                        $stmt->bindValue($identifier, $this->answer_type_id, PDO::PARAM_INT);
                         break;
-                    case 'name':
-                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                    case 'response_id':
+                        $stmt->bindValue($identifier, $this->response_id, PDO::PARAM_INT);
+                        break;
+                    case 'text':
+                        $stmt->bindValue($identifier, $this->text, PDO::PARAM_STR);
                         break;
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
@@ -763,7 +822,7 @@ abstract class Book implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = BookTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = AnswerTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -780,12 +839,15 @@ abstract class Book implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getChapterCount();
+                return $this->getAnswerTypeId();
                 break;
             case 1:
-                return $this->getName();
+                return $this->getResponseId();
                 break;
             case 2:
+                return $this->getText();
+                break;
+            case 3:
                 return $this->getId();
                 break;
             default:
@@ -812,15 +874,16 @@ abstract class Book implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['Book'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['Answer'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Book'][$this->hashCode()] = true;
-        $keys = BookTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['Answer'][$this->hashCode()] = true;
+        $keys = AnswerTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getChapterCount(),
-            $keys[1] => $this->getName(),
-            $keys[2] => $this->getId(),
+            $keys[0] => $this->getAnswerTypeId(),
+            $keys[1] => $this->getResponseId(),
+            $keys[2] => $this->getText(),
+            $keys[3] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -828,20 +891,35 @@ abstract class Book implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collVerses) {
+            if (null !== $this->aAnswerType) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'verses';
+                        $key = 'answerType';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'defender_verses';
+                        $key = 'defender_answer_type';
                         break;
                     default:
-                        $key = 'Verses';
+                        $key = 'AnswerType';
                 }
 
-                $result[$key] = $this->collVerses->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->aAnswerType->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aResponse) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'response';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'defender_response';
+                        break;
+                    default:
+                        $key = 'Response';
+                }
+
+                $result[$key] = $this->aResponse->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -857,11 +935,11 @@ abstract class Book implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\Book
+     * @return $this|\Answer
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = BookTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = AnswerTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -872,18 +950,21 @@ abstract class Book implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\Book
+     * @return $this|\Answer
      */
     public function setByPosition($pos, $value)
     {
         switch ($pos) {
             case 0:
-                $this->setChapterCount($value);
+                $this->setAnswerTypeId($value);
                 break;
             case 1:
-                $this->setName($value);
+                $this->setResponseId($value);
                 break;
             case 2:
+                $this->setText($value);
+                break;
+            case 3:
                 $this->setId($value);
                 break;
         } // switch()
@@ -910,16 +991,19 @@ abstract class Book implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = BookTableMap::getFieldNames($keyType);
+        $keys = AnswerTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setChapterCount($arr[$keys[0]]);
+            $this->setAnswerTypeId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setName($arr[$keys[1]]);
+            $this->setResponseId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setId($arr[$keys[2]]);
+            $this->setText($arr[$keys[2]]);
+        }
+        if (array_key_exists($keys[3], $arr)) {
+            $this->setId($arr[$keys[3]]);
         }
     }
 
@@ -940,7 +1024,7 @@ abstract class Book implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\Book The current object, for fluid interface
+     * @return $this|\Answer The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -960,16 +1044,19 @@ abstract class Book implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(BookTableMap::DATABASE_NAME);
+        $criteria = new Criteria(AnswerTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(BookTableMap::COL_CHAPTER_COUNT)) {
-            $criteria->add(BookTableMap::COL_CHAPTER_COUNT, $this->chapter_count);
+        if ($this->isColumnModified(AnswerTableMap::COL_ANSWER_TYPE_ID)) {
+            $criteria->add(AnswerTableMap::COL_ANSWER_TYPE_ID, $this->answer_type_id);
         }
-        if ($this->isColumnModified(BookTableMap::COL_NAME)) {
-            $criteria->add(BookTableMap::COL_NAME, $this->name);
+        if ($this->isColumnModified(AnswerTableMap::COL_RESPONSE_ID)) {
+            $criteria->add(AnswerTableMap::COL_RESPONSE_ID, $this->response_id);
         }
-        if ($this->isColumnModified(BookTableMap::COL_ID)) {
-            $criteria->add(BookTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(AnswerTableMap::COL_TEXT)) {
+            $criteria->add(AnswerTableMap::COL_TEXT, $this->text);
+        }
+        if ($this->isColumnModified(AnswerTableMap::COL_ID)) {
+            $criteria->add(AnswerTableMap::COL_ID, $this->id);
         }
 
         return $criteria;
@@ -987,8 +1074,8 @@ abstract class Book implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildBookQuery::create();
-        $criteria->add(BookTableMap::COL_ID, $this->id);
+        $criteria = ChildAnswerQuery::create();
+        $criteria->add(AnswerTableMap::COL_ID, $this->id);
 
         return $criteria;
     }
@@ -1050,29 +1137,16 @@ abstract class Book implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Book (or compatible) type.
+     * @param      object $copyObj An object of \Answer (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setChapterCount($this->getChapterCount());
-        $copyObj->setName($this->getName());
-
-        if ($deepCopy) {
-            // important: temporarily setNew(false) because this affects the behavior of
-            // the getter/setter methods for fkey referrer objects.
-            $copyObj->setNew(false);
-
-            foreach ($this->getVerses() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addVerse($relObj->copy($deepCopy));
-                }
-            }
-
-        } // if ($deepCopy)
-
+        $copyObj->setAnswerTypeId($this->getAnswerTypeId());
+        $copyObj->setResponseId($this->getResponseId());
+        $copyObj->setText($this->getText());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1088,7 +1162,7 @@ abstract class Book implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Book Clone of current object.
+     * @return \Answer Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1101,270 +1175,106 @@ abstract class Book implements ActiveRecordInterface
         return $copyObj;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a ChildAnswerType object.
      *
-     * @param      string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-        if ('Verse' == $relationName) {
-            return $this->initVerses();
-        }
-    }
-
-    /**
-     * Clears out the collVerses collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addVerses()
-     */
-    public function clearVerses()
-    {
-        $this->collVerses = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collVerses collection loaded partially.
-     */
-    public function resetPartialVerses($v = true)
-    {
-        $this->collVersesPartial = $v;
-    }
-
-    /**
-     * Initializes the collVerses collection.
-     *
-     * By default this just sets the collVerses collection to an empty array (like clearcollVerses());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initVerses($overrideExisting = true)
-    {
-        if (null !== $this->collVerses && !$overrideExisting) {
-            return;
-        }
-
-        $collectionClassName = VerseTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collVerses = new $collectionClassName;
-        $this->collVerses->setModel('\Verse');
-    }
-
-    /**
-     * Gets an array of ChildVerse objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildBook is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildVerse[] List of ChildVerse objects
+     * @param  ChildAnswerType $v
+     * @return $this|\Answer The current object (for fluent API support)
      * @throws PropelException
      */
-    public function getVerses(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function setAnswerType(ChildAnswerType $v = null)
     {
-        $partial = $this->collVersesPartial && !$this->isNew();
-        if (null === $this->collVerses || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collVerses) {
-                // return empty collection
-                $this->initVerses();
-            } else {
-                $collVerses = ChildVerseQuery::create(null, $criteria)
-                    ->filterByBook($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collVersesPartial && count($collVerses)) {
-                        $this->initVerses(false);
-
-                        foreach ($collVerses as $obj) {
-                            if (false == $this->collVerses->contains($obj)) {
-                                $this->collVerses->append($obj);
-                            }
-                        }
-
-                        $this->collVersesPartial = true;
-                    }
-
-                    return $collVerses;
-                }
-
-                if ($partial && $this->collVerses) {
-                    foreach ($this->collVerses as $obj) {
-                        if ($obj->isNew()) {
-                            $collVerses[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collVerses = $collVerses;
-                $this->collVersesPartial = false;
-            }
+        if ($v === null) {
+            $this->setAnswerTypeId(NULL);
+        } else {
+            $this->setAnswerTypeId($v->getId());
         }
 
-        return $this->collVerses;
-    }
+        $this->aAnswerType = $v;
 
-    /**
-     * Sets a collection of ChildVerse objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $verses A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildBook The current object (for fluent API support)
-     */
-    public function setVerses(Collection $verses, ConnectionInterface $con = null)
-    {
-        /** @var ChildVerse[] $versesToDelete */
-        $versesToDelete = $this->getVerses(new Criteria(), $con)->diff($verses);
-
-
-        $this->versesScheduledForDeletion = $versesToDelete;
-
-        foreach ($versesToDelete as $verseRemoved) {
-            $verseRemoved->setBook(null);
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildAnswerType object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAnswer($this);
         }
 
-        $this->collVerses = null;
-        foreach ($verses as $verse) {
-            $this->addVerse($verse);
-        }
-
-        $this->collVerses = $verses;
-        $this->collVersesPartial = false;
 
         return $this;
     }
 
+
     /**
-     * Returns the number of related Verse objects.
+     * Get the associated ChildAnswerType object
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Verse objects.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildAnswerType The associated ChildAnswerType object.
      * @throws PropelException
      */
-    public function countVerses(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function getAnswerType(ConnectionInterface $con = null)
     {
-        $partial = $this->collVersesPartial && !$this->isNew();
-        if (null === $this->collVerses || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collVerses) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getVerses());
-            }
-
-            $query = ChildVerseQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByBook($this)
-                ->count($con);
+        if ($this->aAnswerType === null && ($this->answer_type_id !== null)) {
+            $this->aAnswerType = ChildAnswerTypeQuery::create()->findPk($this->answer_type_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aAnswerType->addAnswers($this);
+             */
         }
 
-        return count($this->collVerses);
+        return $this->aAnswerType;
     }
 
     /**
-     * Method called to associate a ChildVerse object to this object
-     * through the ChildVerse foreign key attribute.
+     * Declares an association between this object and a ChildResponse object.
      *
-     * @param  ChildVerse $l ChildVerse
-     * @return $this|\Book The current object (for fluent API support)
+     * @param  ChildResponse $v
+     * @return $this|\Answer The current object (for fluent API support)
+     * @throws PropelException
      */
-    public function addVerse(ChildVerse $l)
+    public function setResponse(ChildResponse $v = null)
     {
-        if ($this->collVerses === null) {
-            $this->initVerses();
-            $this->collVersesPartial = true;
+        if ($v === null) {
+            $this->setResponseId(NULL);
+        } else {
+            $this->setResponseId($v->getId());
         }
 
-        if (!$this->collVerses->contains($l)) {
-            $this->doAddVerse($l);
+        $this->aResponse = $v;
 
-            if ($this->versesScheduledForDeletion and $this->versesScheduledForDeletion->contains($l)) {
-                $this->versesScheduledForDeletion->remove($this->versesScheduledForDeletion->search($l));
-            }
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildResponse object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAnswer($this);
         }
 
-        return $this;
-    }
-
-    /**
-     * @param ChildVerse $verse The ChildVerse object to add.
-     */
-    protected function doAddVerse(ChildVerse $verse)
-    {
-        $this->collVerses[]= $verse;
-        $verse->setBook($this);
-    }
-
-    /**
-     * @param  ChildVerse $verse The ChildVerse object to remove.
-     * @return $this|ChildBook The current object (for fluent API support)
-     */
-    public function removeVerse(ChildVerse $verse)
-    {
-        if ($this->getVerses()->contains($verse)) {
-            $pos = $this->collVerses->search($verse);
-            $this->collVerses->remove($pos);
-            if (null === $this->versesScheduledForDeletion) {
-                $this->versesScheduledForDeletion = clone $this->collVerses;
-                $this->versesScheduledForDeletion->clear();
-            }
-            $this->versesScheduledForDeletion[]= clone $verse;
-            $verse->setBook(null);
-        }
 
         return $this;
     }
 
 
     /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Book is new, it will return
-     * an empty collection; or if this Book has previously
-     * been saved, it will retrieve related Verses from storage.
+     * Get the associated ChildResponse object
      *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Book.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildVerse[] List of ChildVerse objects
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildResponse The associated ChildResponse object.
+     * @throws PropelException
      */
-    public function getVersesJoinBible(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getResponse(ConnectionInterface $con = null)
     {
-        $query = ChildVerseQuery::create(null, $criteria);
-        $query->joinWith('Bible', $joinBehavior);
+        if ($this->aResponse === null && ($this->response_id !== null)) {
+            $this->aResponse = ChildResponseQuery::create()->findPk($this->response_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aResponse->addAnswers($this);
+             */
+        }
 
-        return $this->getVerses($query, $con);
+        return $this->aResponse;
     }
 
     /**
@@ -1374,8 +1284,15 @@ abstract class Book implements ActiveRecordInterface
      */
     public function clear()
     {
-        $this->chapter_count = null;
-        $this->name = null;
+        if (null !== $this->aAnswerType) {
+            $this->aAnswerType->removeAnswer($this);
+        }
+        if (null !== $this->aResponse) {
+            $this->aResponse->removeAnswer($this);
+        }
+        $this->answer_type_id = null;
+        $this->response_id = null;
+        $this->text = null;
         $this->id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
@@ -1395,14 +1312,10 @@ abstract class Book implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collVerses) {
-                foreach ($this->collVerses as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
         } // if ($deep)
 
-        $this->collVerses = null;
+        $this->aAnswerType = null;
+        $this->aResponse = null;
     }
 
     /**
@@ -1412,7 +1325,7 @@ abstract class Book implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(BookTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(AnswerTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**
