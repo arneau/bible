@@ -3,8 +3,8 @@
 return [
 	'propel' => [
 		'paths' => [
-			'schemaDir' => '/Users/arneau/Documents/bible/app/database/',
-			'phpDir' => '/Users/arneau/Documents/bible/app/models/',
+			'schemaDir' => '/Users/arneau/Documents/defender-app/app/database/',
+			'phpDir' => '/Users/arneau/Documents/defender-app/app/models/',
 		],
 	],
 ];

@@ -136,7 +136,7 @@ class ResponseTableMap extends TableMap
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addColumn('explanation', 'Explanation', 'VARCHAR', true, 255, null);
+        $this->addColumn('explanation', 'Explanation', 'VARCHAR', false, 255, null);
         $this->addColumn('text', 'Text', 'VARCHAR', true, 255, null);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
     } // initialize()

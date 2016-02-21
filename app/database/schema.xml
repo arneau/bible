@@ -74,11 +74,10 @@
 		</foreign-key>
 	</table>
 	<table name="answer_type">
-		<column name="name" required="true" size="255" type="varchar" />
 		<column name="value" required="true" size="255" type="varchar" />
 	</table>
 	<table name="response">
-		<column name="explanation" required="true" size="255" type="varchar" />
+		<column name="explanation" size="255" type="varchar" />
 		<column name="text" required="true" size="255" type="varchar" />
 	</table>
 	<table name="statement">

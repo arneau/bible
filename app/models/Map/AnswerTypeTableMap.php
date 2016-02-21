@@ -59,7 +59,7 @@ class AnswerTypeTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 2;
 
     /**
      * The number of lazy-loaded columns
@@ -69,12 +69,7 @@ class AnswerTypeTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
-
-    /**
-     * the column name for the name field
-     */
-    const COL_NAME = 'defender_answer_type.name';
+    const NUM_HYDRATE_COLUMNS = 2;
 
     /**
      * the column name for the value field
@@ -98,11 +93,11 @@ class AnswerTypeTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Name', 'Value', 'Id', ),
-        self::TYPE_CAMELNAME     => array('name', 'value', 'id', ),
-        self::TYPE_COLNAME       => array(AnswerTypeTableMap::COL_NAME, AnswerTypeTableMap::COL_VALUE, AnswerTypeTableMap::COL_ID, ),
-        self::TYPE_FIELDNAME     => array('name', 'value', 'id', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Value', 'Id', ),
+        self::TYPE_CAMELNAME     => array('value', 'id', ),
+        self::TYPE_COLNAME       => array(AnswerTypeTableMap::COL_VALUE, AnswerTypeTableMap::COL_ID, ),
+        self::TYPE_FIELDNAME     => array('value', 'id', ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -112,11 +107,11 @@ class AnswerTypeTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Name' => 0, 'Value' => 1, 'Id' => 2, ),
-        self::TYPE_CAMELNAME     => array('name' => 0, 'value' => 1, 'id' => 2, ),
-        self::TYPE_COLNAME       => array(AnswerTypeTableMap::COL_NAME => 0, AnswerTypeTableMap::COL_VALUE => 1, AnswerTypeTableMap::COL_ID => 2, ),
-        self::TYPE_FIELDNAME     => array('name' => 0, 'value' => 1, 'id' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Value' => 0, 'Id' => 1, ),
+        self::TYPE_CAMELNAME     => array('value' => 0, 'id' => 1, ),
+        self::TYPE_COLNAME       => array(AnswerTypeTableMap::COL_VALUE => 0, AnswerTypeTableMap::COL_ID => 1, ),
+        self::TYPE_FIELDNAME     => array('value' => 0, 'id' => 1, ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -136,7 +131,6 @@ class AnswerTypeTableMap extends TableMap
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
         $this->addColumn('value', 'Value', 'VARCHAR', true, 255, null);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
     } // initialize()
@@ -184,11 +178,11 @@ class AnswerTypeTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return null === $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -207,7 +201,7 @@ class AnswerTypeTableMap extends TableMap
     {
         return (int) $row[
             $indexType == TableMap::TYPE_NUM
-                ? 2 + $offset
+                ? 1 + $offset
                 : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
@@ -309,11 +303,9 @@ class AnswerTypeTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(AnswerTypeTableMap::COL_NAME);
             $criteria->addSelectColumn(AnswerTypeTableMap::COL_VALUE);
             $criteria->addSelectColumn(AnswerTypeTableMap::COL_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.value');
             $criteria->addSelectColumn($alias . '.id');
         }

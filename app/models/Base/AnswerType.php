@@ -65,13 +65,6 @@ abstract class AnswerType implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the name field.
-     *
-     * @var        string
-     */
-    protected $name;
-
-    /**
      * The value for the value field.
      *
      * @var        string
@@ -331,16 +324,6 @@ abstract class AnswerType implements ActiveRecordInterface
     }
 
     /**
-     * Get the [name] column value.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
      * Get the [value] column value.
      *
      * @return string
@@ -359,26 +342,6 @@ abstract class AnswerType implements ActiveRecordInterface
     {
         return $this->id;
     }
-
-    /**
-     * Set the value of [name] column.
-     *
-     * @param string $v new value
-     * @return $this|\AnswerType The current object (for fluent API support)
-     */
-    public function setName($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->name !== $v) {
-            $this->name = $v;
-            $this->modifiedColumns[AnswerTypeTableMap::COL_NAME] = true;
-        }
-
-        return $this;
-    } // setName()
 
     /**
      * Set the value of [value] column.
@@ -456,13 +419,10 @@ abstract class AnswerType implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AnswerTypeTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->name = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AnswerTypeTableMap::translateFieldName('Value', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AnswerTypeTableMap::translateFieldName('Value', TableMap::TYPE_PHPNAME, $indexType)];
             $this->value = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AnswerTypeTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AnswerTypeTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -472,7 +432,7 @@ abstract class AnswerType implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 3; // 3 = AnswerTypeTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 2; // 2 = AnswerTypeTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\AnswerType'), 0, $e);
@@ -688,9 +648,6 @@ abstract class AnswerType implements ActiveRecordInterface
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(AnswerTypeTableMap::COL_NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'name';
-        }
         if ($this->isColumnModified(AnswerTypeTableMap::COL_VALUE)) {
             $modifiedColumns[':p' . $index++]  = 'value';
         }
@@ -708,9 +665,6 @@ abstract class AnswerType implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'name':
-                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
-                        break;
                     case 'value':
                         $stmt->bindValue($identifier, $this->value, PDO::PARAM_STR);
                         break;
@@ -780,12 +734,9 @@ abstract class AnswerType implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getName();
-                break;
-            case 1:
                 return $this->getValue();
                 break;
-            case 2:
+            case 1:
                 return $this->getId();
                 break;
             default:
@@ -818,9 +769,8 @@ abstract class AnswerType implements ActiveRecordInterface
         $alreadyDumpedObjects['AnswerType'][$this->hashCode()] = true;
         $keys = AnswerTypeTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getName(),
-            $keys[1] => $this->getValue(),
-            $keys[2] => $this->getId(),
+            $keys[0] => $this->getValue(),
+            $keys[1] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -878,12 +828,9 @@ abstract class AnswerType implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setName($value);
-                break;
-            case 1:
                 $this->setValue($value);
                 break;
-            case 2:
+            case 1:
                 $this->setId($value);
                 break;
         } // switch()
@@ -913,13 +860,10 @@ abstract class AnswerType implements ActiveRecordInterface
         $keys = AnswerTypeTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setName($arr[$keys[0]]);
+            $this->setValue($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setValue($arr[$keys[1]]);
-        }
-        if (array_key_exists($keys[2], $arr)) {
-            $this->setId($arr[$keys[2]]);
+            $this->setId($arr[$keys[1]]);
         }
     }
 
@@ -962,9 +906,6 @@ abstract class AnswerType implements ActiveRecordInterface
     {
         $criteria = new Criteria(AnswerTypeTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(AnswerTypeTableMap::COL_NAME)) {
-            $criteria->add(AnswerTypeTableMap::COL_NAME, $this->name);
-        }
         if ($this->isColumnModified(AnswerTypeTableMap::COL_VALUE)) {
             $criteria->add(AnswerTypeTableMap::COL_VALUE, $this->value);
         }
@@ -1057,7 +998,6 @@ abstract class AnswerType implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setName($this->getName());
         $copyObj->setValue($this->getValue());
 
         if ($deepCopy) {
@@ -1374,7 +1314,6 @@ abstract class AnswerType implements ActiveRecordInterface
      */
     public function clear()
     {
-        $this->name = null;
         $this->value = null;
         $this->id = null;
         $this->alreadyInSave = false;

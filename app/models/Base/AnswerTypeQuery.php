@@ -20,11 +20,9 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  *
- * @method     ChildAnswerTypeQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildAnswerTypeQuery orderByValue($order = Criteria::ASC) Order by the value column
  * @method     ChildAnswerTypeQuery orderById($order = Criteria::ASC) Order by the id column
  *
- * @method     ChildAnswerTypeQuery groupByName() Group by the name column
  * @method     ChildAnswerTypeQuery groupByValue() Group by the value column
  * @method     ChildAnswerTypeQuery groupById() Group by the id column
  *
@@ -51,19 +49,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildAnswerType findOne(ConnectionInterface $con = null) Return the first ChildAnswerType matching the query
  * @method     ChildAnswerType findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAnswerType matching the query, or a new ChildAnswerType object populated from the query conditions when no match is found
  *
- * @method     ChildAnswerType findOneByName(string $name) Return the first ChildAnswerType filtered by the name column
  * @method     ChildAnswerType findOneByValue(string $value) Return the first ChildAnswerType filtered by the value column
  * @method     ChildAnswerType findOneById(int $id) Return the first ChildAnswerType filtered by the id column *
 
  * @method     ChildAnswerType requirePk($key, ConnectionInterface $con = null) Return the ChildAnswerType by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAnswerType requireOne(ConnectionInterface $con = null) Return the first ChildAnswerType matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildAnswerType requireOneByName(string $name) Return the first ChildAnswerType filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAnswerType requireOneByValue(string $value) Return the first ChildAnswerType filtered by the value column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildAnswerType requireOneById(int $id) Return the first ChildAnswerType filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildAnswerType[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildAnswerType objects based on current ModelCriteria
- * @method     ChildAnswerType[]|ObjectCollection findByName(string $name) Return ChildAnswerType objects filtered by the name column
  * @method     ChildAnswerType[]|ObjectCollection findByValue(string $value) Return ChildAnswerType objects filtered by the value column
  * @method     ChildAnswerType[]|ObjectCollection findById(int $id) Return ChildAnswerType objects filtered by the id column
  * @method     ChildAnswerType[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -158,7 +153,7 @@ abstract class AnswerTypeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT name, value, id FROM defender_answer_type WHERE id = :p0';
+        $sql = 'SELECT value, id FROM defender_answer_type WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -246,35 +241,6 @@ abstract class AnswerTypeQuery extends ModelCriteria
     {
 
         return $this->addUsingAlias(AnswerTypeTableMap::COL_ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the name column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
-     * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $name The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildAnswerTypeQuery The current query, for fluid interface
-     */
-    public function filterByName($name = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($name)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $name)) {
-                $name = str_replace('*', '%', $name);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(AnswerTypeTableMap::COL_NAME, $name, $comparison);
     }
 
     /**
