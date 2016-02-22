@@ -1,9 +1,9 @@
 <?php
 
-use Base\KeywordQuery as BaseKeywordQuery;
+use Base\TopicSynonymQuery as BaseTopicSynonymQuery;
 
 /**
- * Skeleton subclass for performing query and update operations on the 'keyword' table.
+ * Skeleton subclass for performing query and update operations on the 'defender_topic_synonym' table.
  *
  *
  *
@@ -12,7 +12,7 @@ use Base\KeywordQuery as BaseKeywordQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class KeywordQuery extends BaseKeywordQuery
+class TopicSynonymQuery extends BaseTopicSynonymQuery
 {
 
 }

@@ -2,8 +2,8 @@
 
 namespace Map;
 
-use \KeywordSynonym;
-use \KeywordSynonymQuery;
+use \Topic;
+use \TopicQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'defender_keyword_synonym' table.
+ * This class defines the structure of the 'defender_topic' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class KeywordSynonymTableMap extends TableMap
+class TopicTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class KeywordSynonymTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = '.Map.KeywordSynonymTableMap';
+    const CLASS_NAME = '.Map.TopicTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class KeywordSynonymTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'defender_keyword_synonym';
+    const TABLE_NAME = 'defender_topic';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\KeywordSynonym';
+    const OM_CLASS = '\\Topic';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'KeywordSynonym';
+    const CLASS_DEFAULT = 'Topic';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -69,22 +69,32 @@ class KeywordSynonymTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
-     * the column name for the keyword_id field
+     * the column name for the name field
      */
-    const COL_KEYWORD_ID = 'defender_keyword_synonym.keyword_id';
+    const COL_NAME = 'defender_topic.name';
 
     /**
-     * the column name for the value field
+     * the column name for the tree_left field
      */
-    const COL_VALUE = 'defender_keyword_synonym.value';
+    const COL_TREE_LEFT = 'defender_topic.tree_left';
+
+    /**
+     * the column name for the tree_right field
+     */
+    const COL_TREE_RIGHT = 'defender_topic.tree_right';
+
+    /**
+     * the column name for the tree_level field
+     */
+    const COL_TREE_LEVEL = 'defender_topic.tree_level';
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'defender_keyword_synonym.id';
+    const COL_ID = 'defender_topic.id';
 
     /**
      * The default string format for model objects of the related table
@@ -98,11 +108,11 @@ class KeywordSynonymTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('KeywordId', 'Value', 'Id', ),
-        self::TYPE_CAMELNAME     => array('keywordId', 'value', 'id', ),
-        self::TYPE_COLNAME       => array(KeywordSynonymTableMap::COL_KEYWORD_ID, KeywordSynonymTableMap::COL_VALUE, KeywordSynonymTableMap::COL_ID, ),
-        self::TYPE_FIELDNAME     => array('keyword_id', 'value', 'id', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Name', 'TreeLeft', 'TreeRight', 'TreeLevel', 'Id', ),
+        self::TYPE_CAMELNAME     => array('name', 'treeLeft', 'treeRight', 'treeLevel', 'id', ),
+        self::TYPE_COLNAME       => array(TopicTableMap::COL_NAME, TopicTableMap::COL_TREE_LEFT, TopicTableMap::COL_TREE_RIGHT, TopicTableMap::COL_TREE_LEVEL, TopicTableMap::COL_ID, ),
+        self::TYPE_FIELDNAME     => array('name', 'tree_left', 'tree_right', 'tree_level', 'id', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -112,11 +122,11 @@ class KeywordSynonymTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('KeywordId' => 0, 'Value' => 1, 'Id' => 2, ),
-        self::TYPE_CAMELNAME     => array('keywordId' => 0, 'value' => 1, 'id' => 2, ),
-        self::TYPE_COLNAME       => array(KeywordSynonymTableMap::COL_KEYWORD_ID => 0, KeywordSynonymTableMap::COL_VALUE => 1, KeywordSynonymTableMap::COL_ID => 2, ),
-        self::TYPE_FIELDNAME     => array('keyword_id' => 0, 'value' => 1, 'id' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Name' => 0, 'TreeLeft' => 1, 'TreeRight' => 2, 'TreeLevel' => 3, 'Id' => 4, ),
+        self::TYPE_CAMELNAME     => array('name' => 0, 'treeLeft' => 1, 'treeRight' => 2, 'treeLevel' => 3, 'id' => 4, ),
+        self::TYPE_COLNAME       => array(TopicTableMap::COL_NAME => 0, TopicTableMap::COL_TREE_LEFT => 1, TopicTableMap::COL_TREE_RIGHT => 2, TopicTableMap::COL_TREE_LEVEL => 3, TopicTableMap::COL_ID => 4, ),
+        self::TYPE_FIELDNAME     => array('name' => 0, 'tree_left' => 1, 'tree_right' => 2, 'tree_level' => 3, 'id' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -129,15 +139,17 @@ class KeywordSynonymTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('defender_keyword_synonym');
-        $this->setPhpName('KeywordSynonym');
+        $this->setName('defender_topic');
+        $this->setPhpName('Topic');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\KeywordSynonym');
+        $this->setClassName('\\Topic');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignKey('keyword_id', 'KeywordId', 'INTEGER', 'defender_keyword', 'id', true, null, null);
-        $this->addColumn('value', 'Value', 'VARCHAR', true, 255, null);
+        $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
+        $this->addColumn('tree_left', 'TreeLeft', 'INTEGER', false, null, null);
+        $this->addColumn('tree_right', 'TreeRight', 'INTEGER', false, null, null);
+        $this->addColumn('tree_level', 'TreeLevel', 'INTEGER', false, null, null);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
     } // initialize()
 
@@ -146,13 +158,20 @@ class KeywordSynonymTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Keyword', '\\Keyword', RelationMap::MANY_TO_ONE, array (
+        $this->addRelation('Tag', '\\Tag', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
-    0 => ':keyword_id',
+    0 => ':topic_id',
     1 => ':id',
   ),
-), 'CASCADE', null, null, false);
+), null, null, 'Tags', false);
+        $this->addRelation('TopicSynonym', '\\TopicSynonym', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':topic_id',
+    1 => ':id',
+  ),
+), 'CASCADE', null, 'TopicSynonyms', false);
     } // buildRelations()
 
     /**
@@ -164,9 +183,19 @@ class KeywordSynonymTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
+            'nested_set' => array('left_column' => 'tree_left', 'right_column' => 'tree_right', 'level_column' => 'tree_level', 'use_scope' => 'false', 'scope_column' => 'tree_scope', 'method_proxies' => 'false', ),
             'auto_add_pk' => array('name' => 'id', 'autoIncrement' => 'true', 'type' => 'INTEGER', ),
         );
     } // getBehaviors()
+    /**
+     * Method to invalidate the instance pool of all tables related to defender_topic     * by a foreign key with ON DELETE CASCADE
+     */
+    public static function clearRelatedInstancePool()
+    {
+        // Invalidate objects in related instance pools,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        TopicSynonymTableMap::clearInstancePool();
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -184,11 +213,11 @@ class KeywordSynonymTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return null === $row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -207,7 +236,7 @@ class KeywordSynonymTableMap extends TableMap
     {
         return (int) $row[
             $indexType == TableMap::TYPE_NUM
-                ? 2 + $offset
+                ? 4 + $offset
                 : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
@@ -225,7 +254,7 @@ class KeywordSynonymTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? KeywordSynonymTableMap::CLASS_DEFAULT : KeywordSynonymTableMap::OM_CLASS;
+        return $withPrefix ? TopicTableMap::CLASS_DEFAULT : TopicTableMap::OM_CLASS;
     }
 
     /**
@@ -239,22 +268,22 @@ class KeywordSynonymTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (KeywordSynonym object, last column rank)
+     * @return array           (Topic object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = KeywordSynonymTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = KeywordSynonymTableMap::getInstanceFromPool($key))) {
+        $key = TopicTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = TopicTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + KeywordSynonymTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + TopicTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = KeywordSynonymTableMap::OM_CLASS;
-            /** @var KeywordSynonym $obj */
+            $cls = TopicTableMap::OM_CLASS;
+            /** @var Topic $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            KeywordSynonymTableMap::addInstanceToPool($obj, $key);
+            TopicTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -277,18 +306,18 @@ class KeywordSynonymTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = KeywordSynonymTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = KeywordSynonymTableMap::getInstanceFromPool($key))) {
+            $key = TopicTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = TopicTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var KeywordSynonym $obj */
+                /** @var Topic $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                KeywordSynonymTableMap::addInstanceToPool($obj, $key);
+                TopicTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -309,12 +338,16 @@ class KeywordSynonymTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(KeywordSynonymTableMap::COL_KEYWORD_ID);
-            $criteria->addSelectColumn(KeywordSynonymTableMap::COL_VALUE);
-            $criteria->addSelectColumn(KeywordSynonymTableMap::COL_ID);
+            $criteria->addSelectColumn(TopicTableMap::COL_NAME);
+            $criteria->addSelectColumn(TopicTableMap::COL_TREE_LEFT);
+            $criteria->addSelectColumn(TopicTableMap::COL_TREE_RIGHT);
+            $criteria->addSelectColumn(TopicTableMap::COL_TREE_LEVEL);
+            $criteria->addSelectColumn(TopicTableMap::COL_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.keyword_id');
-            $criteria->addSelectColumn($alias . '.value');
+            $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.tree_left');
+            $criteria->addSelectColumn($alias . '.tree_right');
+            $criteria->addSelectColumn($alias . '.tree_level');
             $criteria->addSelectColumn($alias . '.id');
         }
     }
@@ -328,7 +361,7 @@ class KeywordSynonymTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(KeywordSynonymTableMap::DATABASE_NAME)->getTable(KeywordSynonymTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(TopicTableMap::DATABASE_NAME)->getTable(TopicTableMap::TABLE_NAME);
     }
 
     /**
@@ -336,16 +369,16 @@ class KeywordSynonymTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(KeywordSynonymTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(KeywordSynonymTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new KeywordSynonymTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(TopicTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(TopicTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new TopicTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a KeywordSynonym or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a Topic or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or KeywordSynonym object or primary key or array of primary keys
+     * @param mixed               $values Criteria or Topic object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -356,27 +389,27 @@ class KeywordSynonymTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(KeywordSynonymTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TopicTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \KeywordSynonym) { // it's a model object
+        } elseif ($values instanceof \Topic) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(KeywordSynonymTableMap::DATABASE_NAME);
-            $criteria->add(KeywordSynonymTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(TopicTableMap::DATABASE_NAME);
+            $criteria->add(TopicTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = KeywordSynonymQuery::create()->mergeWith($criteria);
+        $query = TopicQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            KeywordSynonymTableMap::clearInstancePool();
+            TopicTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                KeywordSynonymTableMap::removeInstanceFromPool($singleval);
+                TopicTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -384,20 +417,20 @@ class KeywordSynonymTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the defender_keyword_synonym table.
+     * Deletes all rows from the defender_topic table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return KeywordSynonymQuery::create()->doDeleteAll($con);
+        return TopicQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a KeywordSynonym or Criteria object.
+     * Performs an INSERT on the database, given a Topic or Criteria object.
      *
-     * @param mixed               $criteria Criteria or KeywordSynonym object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or Topic object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -406,22 +439,22 @@ class KeywordSynonymTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(KeywordSynonymTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TopicTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from KeywordSynonym object
+            $criteria = $criteria->buildCriteria(); // build Criteria from Topic object
         }
 
-        if ($criteria->containsKey(KeywordSynonymTableMap::COL_ID) && $criteria->keyContainsValue(KeywordSynonymTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.KeywordSynonymTableMap::COL_ID.')');
+        if ($criteria->containsKey(TopicTableMap::COL_ID) && $criteria->keyContainsValue(TopicTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.TopicTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = KeywordSynonymQuery::create()->mergeWith($criteria);
+        $query = TopicQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -430,7 +463,7 @@ class KeywordSynonymTableMap extends TableMap
         });
     }
 
-} // KeywordSynonymTableMap
+} // TopicTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-KeywordSynonymTableMap::buildTableMap();
+TopicTableMap::buildTableMap();

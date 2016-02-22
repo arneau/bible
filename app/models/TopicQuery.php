@@ -1,9 +1,9 @@
 <?php
 
-use Base\TagWordQuery as BaseTagWordQuery;
+use Base\TopicQuery as BaseTopicQuery;
 
 /**
- * Skeleton subclass for performing query and update operations on the 'tag_word' table.
+ * Skeleton subclass for performing query and update operations on the 'defender_topic' table.
  *
  *
  *
@@ -12,7 +12,7 @@ use Base\TagWordQuery as BaseTagWordQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class TagWordQuery extends BaseTagWordQuery
+class TopicQuery extends BaseTopicQuery
 {
 
 }

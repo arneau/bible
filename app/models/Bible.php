@@ -3,7 +3,7 @@
 use Base\Bible as BaseBible;
 
 /**
- * Skeleton subclass for representing a row from the 'bible' table.
+ * Skeleton subclass for representing a row from the 'defender_bible' table.
  *
  *
  *

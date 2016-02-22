@@ -2,12 +2,12 @@
 
 namespace Base;
 
-use \Keyword as ChildKeyword;
-use \KeywordQuery as ChildKeywordQuery;
 use \Tag as ChildTag;
 use \TagQuery as ChildTagQuery;
 use \TagVote as ChildTagVote;
 use \TagVoteQuery as ChildTagVoteQuery;
+use \Topic as ChildTopic;
+use \TopicQuery as ChildTopicQuery;
 use \Verse as ChildVerse;
 use \VerseQuery as ChildVerseQuery;
 use \Exception;
@@ -69,18 +69,18 @@ abstract class Tag implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the keyword_id field.
-     *
-     * @var        int
-     */
-    protected $keyword_id;
-
-    /**
      * The value for the relevant_words field.
      *
      * @var        string
      */
     protected $relevant_words;
+
+    /**
+     * The value for the topic_id field.
+     *
+     * @var        int
+     */
+    protected $topic_id;
 
     /**
      * The value for the verse_id field.
@@ -105,9 +105,9 @@ abstract class Tag implements ActiveRecordInterface
     protected $id;
 
     /**
-     * @var        ChildKeyword
+     * @var        ChildTopic
      */
-    protected $aKeyword;
+    protected $aTopic;
 
     /**
      * @var        ChildVerse
@@ -373,16 +373,6 @@ abstract class Tag implements ActiveRecordInterface
     }
 
     /**
-     * Get the [keyword_id] column value.
-     *
-     * @return int
-     */
-    public function getKeywordId()
-    {
-        return $this->keyword_id;
-    }
-
-    /**
      * Get the [relevant_words] column value.
      *
      * @return string
@@ -390,6 +380,16 @@ abstract class Tag implements ActiveRecordInterface
     public function getRelevantWords()
     {
         return $this->relevant_words;
+    }
+
+    /**
+     * Get the [topic_id] column value.
+     *
+     * @return int
+     */
+    public function getTopicId()
+    {
+        return $this->topic_id;
     }
 
     /**
@@ -423,30 +423,6 @@ abstract class Tag implements ActiveRecordInterface
     }
 
     /**
-     * Set the value of [keyword_id] column.
-     *
-     * @param int $v new value
-     * @return $this|\Tag The current object (for fluent API support)
-     */
-    public function setKeywordId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->keyword_id !== $v) {
-            $this->keyword_id = $v;
-            $this->modifiedColumns[TagTableMap::COL_KEYWORD_ID] = true;
-        }
-
-        if ($this->aKeyword !== null && $this->aKeyword->getId() !== $v) {
-            $this->aKeyword = null;
-        }
-
-        return $this;
-    } // setKeywordId()
-
-    /**
      * Set the value of [relevant_words] column.
      *
      * @param string $v new value
@@ -465,6 +441,30 @@ abstract class Tag implements ActiveRecordInterface
 
         return $this;
     } // setRelevantWords()
+
+    /**
+     * Set the value of [topic_id] column.
+     *
+     * @param int $v new value
+     * @return $this|\Tag The current object (for fluent API support)
+     */
+    public function setTopicId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->topic_id !== $v) {
+            $this->topic_id = $v;
+            $this->modifiedColumns[TagTableMap::COL_TOPIC_ID] = true;
+        }
+
+        if ($this->aTopic !== null && $this->aTopic->getId() !== $v) {
+            $this->aTopic = null;
+        }
+
+        return $this;
+    } // setTopicId()
 
     /**
      * Set the value of [verse_id] column.
@@ -570,11 +570,11 @@ abstract class Tag implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TagTableMap::translateFieldName('KeywordId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->keyword_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TagTableMap::translateFieldName('RelevantWords', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TagTableMap::translateFieldName('RelevantWords', TableMap::TYPE_PHPNAME, $indexType)];
             $this->relevant_words = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TagTableMap::translateFieldName('TopicId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->topic_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TagTableMap::translateFieldName('VerseId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->verse_id = (null !== $col) ? (int) $col : null;
@@ -614,8 +614,8 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aKeyword !== null && $this->keyword_id !== $this->aKeyword->getId()) {
-            $this->aKeyword = null;
+        if ($this->aTopic !== null && $this->topic_id !== $this->aTopic->getId()) {
+            $this->aTopic = null;
         }
         if ($this->aVerse !== null && $this->verse_id !== $this->aVerse->getId()) {
             $this->aVerse = null;
@@ -659,7 +659,7 @@ abstract class Tag implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aKeyword = null;
+            $this->aTopic = null;
             $this->aVerse = null;
             $this->collTagVotes = null;
 
@@ -767,11 +767,11 @@ abstract class Tag implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aKeyword !== null) {
-                if ($this->aKeyword->isModified() || $this->aKeyword->isNew()) {
-                    $affectedRows += $this->aKeyword->save($con);
+            if ($this->aTopic !== null) {
+                if ($this->aTopic->isModified() || $this->aTopic->isNew()) {
+                    $affectedRows += $this->aTopic->save($con);
                 }
-                $this->setKeyword($this->aKeyword);
+                $this->setTopic($this->aTopic);
             }
 
             if ($this->aVerse !== null) {
@@ -835,11 +835,11 @@ abstract class Tag implements ActiveRecordInterface
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(TagTableMap::COL_KEYWORD_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'keyword_id';
-        }
         if ($this->isColumnModified(TagTableMap::COL_RELEVANT_WORDS)) {
             $modifiedColumns[':p' . $index++]  = 'relevant_words';
+        }
+        if ($this->isColumnModified(TagTableMap::COL_TOPIC_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'topic_id';
         }
         if ($this->isColumnModified(TagTableMap::COL_VERSE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'verse_id';
@@ -861,11 +861,11 @@ abstract class Tag implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'keyword_id':
-                        $stmt->bindValue($identifier, $this->keyword_id, PDO::PARAM_INT);
-                        break;
                     case 'relevant_words':
                         $stmt->bindValue($identifier, $this->relevant_words, PDO::PARAM_STR);
+                        break;
+                    case 'topic_id':
+                        $stmt->bindValue($identifier, $this->topic_id, PDO::PARAM_INT);
                         break;
                     case 'verse_id':
                         $stmt->bindValue($identifier, $this->verse_id, PDO::PARAM_INT);
@@ -939,10 +939,10 @@ abstract class Tag implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getKeywordId();
+                return $this->getRelevantWords();
                 break;
             case 1:
-                return $this->getRelevantWords();
+                return $this->getTopicId();
                 break;
             case 2:
                 return $this->getVerseId();
@@ -983,8 +983,8 @@ abstract class Tag implements ActiveRecordInterface
         $alreadyDumpedObjects['Tag'][$this->hashCode()] = true;
         $keys = TagTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getKeywordId(),
-            $keys[1] => $this->getRelevantWords(),
+            $keys[0] => $this->getRelevantWords(),
+            $keys[1] => $this->getTopicId(),
             $keys[2] => $this->getVerseId(),
             $keys[3] => $this->getVoteCount(),
             $keys[4] => $this->getId(),
@@ -995,20 +995,20 @@ abstract class Tag implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aKeyword) {
+            if (null !== $this->aTopic) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'keyword';
+                        $key = 'topic';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'defender_keyword';
+                        $key = 'defender_topic';
                         break;
                     default:
-                        $key = 'Keyword';
+                        $key = 'Topic';
                 }
 
-                $result[$key] = $this->aKeyword->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result[$key] = $this->aTopic->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aVerse) {
 
@@ -1075,10 +1075,10 @@ abstract class Tag implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setKeywordId($value);
+                $this->setRelevantWords($value);
                 break;
             case 1:
-                $this->setRelevantWords($value);
+                $this->setTopicId($value);
                 break;
             case 2:
                 $this->setVerseId($value);
@@ -1116,10 +1116,10 @@ abstract class Tag implements ActiveRecordInterface
         $keys = TagTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setKeywordId($arr[$keys[0]]);
+            $this->setRelevantWords($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setRelevantWords($arr[$keys[1]]);
+            $this->setTopicId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
             $this->setVerseId($arr[$keys[2]]);
@@ -1171,11 +1171,11 @@ abstract class Tag implements ActiveRecordInterface
     {
         $criteria = new Criteria(TagTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(TagTableMap::COL_KEYWORD_ID)) {
-            $criteria->add(TagTableMap::COL_KEYWORD_ID, $this->keyword_id);
-        }
         if ($this->isColumnModified(TagTableMap::COL_RELEVANT_WORDS)) {
             $criteria->add(TagTableMap::COL_RELEVANT_WORDS, $this->relevant_words);
+        }
+        if ($this->isColumnModified(TagTableMap::COL_TOPIC_ID)) {
+            $criteria->add(TagTableMap::COL_TOPIC_ID, $this->topic_id);
         }
         if ($this->isColumnModified(TagTableMap::COL_VERSE_ID)) {
             $criteria->add(TagTableMap::COL_VERSE_ID, $this->verse_id);
@@ -1272,8 +1272,8 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setKeywordId($this->getKeywordId());
         $copyObj->setRelevantWords($this->getRelevantWords());
+        $copyObj->setTopicId($this->getTopicId());
         $copyObj->setVerseId($this->getVerseId());
         $copyObj->setVoteCount($this->getVoteCount());
 
@@ -1319,24 +1319,24 @@ abstract class Tag implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildKeyword object.
+     * Declares an association between this object and a ChildTopic object.
      *
-     * @param  ChildKeyword $v
+     * @param  ChildTopic $v
      * @return $this|\Tag The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setKeyword(ChildKeyword $v = null)
+    public function setTopic(ChildTopic $v = null)
     {
         if ($v === null) {
-            $this->setKeywordId(NULL);
+            $this->setTopicId(NULL);
         } else {
-            $this->setKeywordId($v->getId());
+            $this->setTopicId($v->getId());
         }
 
-        $this->aKeyword = $v;
+        $this->aTopic = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildKeyword object, it will not be re-added.
+        // If this object has already been added to the ChildTopic object, it will not be re-added.
         if ($v !== null) {
             $v->addTag($this);
         }
@@ -1347,26 +1347,26 @@ abstract class Tag implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildKeyword object
+     * Get the associated ChildTopic object
      *
      * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildKeyword The associated ChildKeyword object.
+     * @return ChildTopic The associated ChildTopic object.
      * @throws PropelException
      */
-    public function getKeyword(ConnectionInterface $con = null)
+    public function getTopic(ConnectionInterface $con = null)
     {
-        if ($this->aKeyword === null && ($this->keyword_id !== null)) {
-            $this->aKeyword = ChildKeywordQuery::create()->findPk($this->keyword_id, $con);
+        if ($this->aTopic === null && ($this->topic_id !== null)) {
+            $this->aTopic = ChildTopicQuery::create()->findPk($this->topic_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aKeyword->addTags($this);
+                $this->aTopic->addTags($this);
              */
         }
 
-        return $this->aKeyword;
+        return $this->aTopic;
     }
 
     /**
@@ -1668,14 +1668,14 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->aKeyword) {
-            $this->aKeyword->removeTag($this);
+        if (null !== $this->aTopic) {
+            $this->aTopic->removeTag($this);
         }
         if (null !== $this->aVerse) {
             $this->aVerse->removeTag($this);
         }
-        $this->keyword_id = null;
         $this->relevant_words = null;
+        $this->topic_id = null;
         $this->verse_id = null;
         $this->vote_count = null;
         $this->id = null;
@@ -1706,7 +1706,7 @@ abstract class Tag implements ActiveRecordInterface
         } // if ($deep)
 
         $this->collTagVotes = null;
-        $this->aKeyword = null;
+        $this->aTopic = null;
         $this->aVerse = null;
     }
 

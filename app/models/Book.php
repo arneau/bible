@@ -3,7 +3,7 @@
 use Base\Book as BaseBook;
 
 /**
- * Skeleton subclass for representing a row from the 'book' table.
+ * Skeleton subclass for representing a row from the 'defender_book' table.
  *
  *
  *

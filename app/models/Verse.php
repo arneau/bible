@@ -3,7 +3,7 @@
 use Base\Verse as BaseVerse;
 
 /**
- * Skeleton subclass for representing a row from the 'verse' table.
+ * Skeleton subclass for representing a row from the 'defender_verse' table.
  *
  *
  *

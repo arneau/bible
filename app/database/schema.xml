@@ -27,28 +27,18 @@
 	</table>
 
 	<!-- Tagging tables -->
-	<table name="keyword">
-		<column name="value" required="true" size="255" type="varchar" />
-	</table>
-	<table name="keyword_synonym">
-		<column name="keyword_id" required="true" type="integer" />
-		<column name="value" required="true" size="255" type="varchar" />
-		<foreign-key foreignTable="keyword" onDelete="cascade">
-			<reference foreign="id" local="keyword_id" />
-		</foreign-key>
-	</table>
 	<table name="tag">
 		<behavior id="vote_count_aggregate" name="aggregate_column">
 			<parameter name="name" value="vote_count" />
 			<parameter name="foreign_table" value="tag_vote" />
 			<parameter name="expression" value="COUNT(tag_id)" />
 		</behavior>
-		<column name="keyword_id" required="true" type="integer" />
 		<column name="relevant_words" required="true" size="255" type="varchar" />
+		<column name="topic_id" required="true" type="integer" />
 		<column name="verse_id" required="true" type="integer" />
 		<column defaultValue="0" name="vote_count" type="integer" />
-		<foreign-key foreignTable="keyword">
-			<reference foreign="id" local="keyword_id" />
+		<foreign-key foreignTable="topic">
+			<reference foreign="id" local="topic_id" />
 		</foreign-key>
 		<foreign-key foreignTable="verse">
 			<reference foreign="id" local="verse_id" />
@@ -58,6 +48,17 @@
 		<column name="tag_id" required="true" type="integer" />
 		<foreign-key foreignTable="tag">
 			<reference foreign="id" local="tag_id" />
+		</foreign-key>
+	</table>
+	<table name="topic">
+		<behavior name="nested_set" />
+		<column name="name" required="true" size="255" type="varchar" />
+	</table>
+	<table name="topic_synonym">
+		<column name="topic_id" required="true" type="integer" />
+		<column name="name" required="true" size="255" type="varchar" />
+		<foreign-key foreignTable="topic" onDelete="cascade">
+			<reference foreign="id" local="topic_id" />
 		</foreign-key>
 	</table>
 

@@ -3,7 +3,7 @@
 use Base\Tag as BaseTag;
 
 /**
- * Skeleton subclass for representing a row from the 'tag' table.
+ * Skeleton subclass for representing a row from the 'defender_tag' table.
  *
  *
  *

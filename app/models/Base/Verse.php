@@ -1780,10 +1780,10 @@ abstract class Verse implements ActiveRecordInterface
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return ObjectCollection|ChildTag[] List of ChildTag objects
      */
-    public function getTagsJoinKeyword(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getTagsJoinTopic(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildTagQuery::create(null, $criteria);
-        $query->joinWith('Keyword', $joinBehavior);
+        $query->joinWith('Topic', $joinBehavior);
 
         return $this->getTags($query, $con);
     }

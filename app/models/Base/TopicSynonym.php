@@ -2,12 +2,12 @@
 
 namespace Base;
 
-use \Tag as ChildTag;
-use \TagQuery as ChildTagQuery;
-use \TagWordQuery as ChildTagWordQuery;
+use \Topic as ChildTopic;
+use \TopicQuery as ChildTopicQuery;
+use \TopicSynonymQuery as ChildTopicSynonymQuery;
 use \Exception;
 use \PDO;
-use Map\TagWordTableMap;
+use Map\TopicSynonymTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -21,18 +21,18 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
 /**
- * Base class that represents a row from the 'tag_word' table.
+ * Base class that represents a row from the 'defender_topic_synonym' table.
  *
  *
  *
 * @package    propel.generator..Base
 */
-abstract class TagWord implements ActiveRecordInterface
+abstract class TopicSynonym implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Map\\TagWordTableMap';
+    const TABLE_MAP = '\\Map\\TopicSynonymTableMap';
 
 
     /**
@@ -62,18 +62,18 @@ abstract class TagWord implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the tag_id field.
+     * The value for the topic_id field.
      *
      * @var        int
      */
-    protected $tag_id;
+    protected $topic_id;
 
     /**
-     * The value for the word_number field.
+     * The value for the name field.
      *
-     * @var        int
+     * @var        string
      */
-    protected $word_number;
+    protected $name;
 
     /**
      * The value for the id field.
@@ -83,9 +83,9 @@ abstract class TagWord implements ActiveRecordInterface
     protected $id;
 
     /**
-     * @var        ChildTag
+     * @var        ChildTopic
      */
-    protected $aTag;
+    protected $aTopic;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -96,7 +96,7 @@ abstract class TagWord implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Base\TagWord object.
+     * Initializes internal state of Base\TopicSynonym object.
      */
     public function __construct()
     {
@@ -191,9 +191,9 @@ abstract class TagWord implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>TagWord</code> instance.  If
-     * <code>obj</code> is an instance of <code>TagWord</code>, delegates to
-     * <code>equals(TagWord)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>TopicSynonym</code> instance.  If
+     * <code>obj</code> is an instance of <code>TopicSynonym</code>, delegates to
+     * <code>equals(TopicSynonym)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -259,7 +259,7 @@ abstract class TagWord implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|TagWord The current object, for fluid interface
+     * @return $this|TopicSynonym The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -321,23 +321,23 @@ abstract class TagWord implements ActiveRecordInterface
     }
 
     /**
-     * Get the [tag_id] column value.
+     * Get the [topic_id] column value.
      *
      * @return int
      */
-    public function getTagId()
+    public function getTopicId()
     {
-        return $this->tag_id;
+        return $this->topic_id;
     }
 
     /**
-     * Get the [word_number] column value.
+     * Get the [name] column value.
      *
-     * @return int
+     * @return string
      */
-    public function getWordNumber()
+    public function getName()
     {
-        return $this->word_number;
+        return $this->name;
     }
 
     /**
@@ -351,54 +351,54 @@ abstract class TagWord implements ActiveRecordInterface
     }
 
     /**
-     * Set the value of [tag_id] column.
+     * Set the value of [topic_id] column.
      *
      * @param int $v new value
-     * @return $this|\TagWord The current object (for fluent API support)
+     * @return $this|\TopicSynonym The current object (for fluent API support)
      */
-    public function setTagId($v)
+    public function setTopicId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->tag_id !== $v) {
-            $this->tag_id = $v;
-            $this->modifiedColumns[TagWordTableMap::COL_TAG_ID] = true;
+        if ($this->topic_id !== $v) {
+            $this->topic_id = $v;
+            $this->modifiedColumns[TopicSynonymTableMap::COL_TOPIC_ID] = true;
         }
 
-        if ($this->aTag !== null && $this->aTag->getId() !== $v) {
-            $this->aTag = null;
+        if ($this->aTopic !== null && $this->aTopic->getId() !== $v) {
+            $this->aTopic = null;
         }
 
         return $this;
-    } // setTagId()
+    } // setTopicId()
 
     /**
-     * Set the value of [word_number] column.
+     * Set the value of [name] column.
      *
-     * @param int $v new value
-     * @return $this|\TagWord The current object (for fluent API support)
+     * @param string $v new value
+     * @return $this|\TopicSynonym The current object (for fluent API support)
      */
-    public function setWordNumber($v)
+    public function setName($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->word_number !== $v) {
-            $this->word_number = $v;
-            $this->modifiedColumns[TagWordTableMap::COL_WORD_NUMBER] = true;
+        if ($this->name !== $v) {
+            $this->name = $v;
+            $this->modifiedColumns[TopicSynonymTableMap::COL_NAME] = true;
         }
 
         return $this;
-    } // setWordNumber()
+    } // setName()
 
     /**
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return $this|\TagWord The current object (for fluent API support)
+     * @return $this|\TopicSynonym The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -408,7 +408,7 @@ abstract class TagWord implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[TagWordTableMap::COL_ID] = true;
+            $this->modifiedColumns[TopicSynonymTableMap::COL_ID] = true;
         }
 
         return $this;
@@ -450,13 +450,13 @@ abstract class TagWord implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TagWordTableMap::translateFieldName('TagId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->tag_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TopicSynonymTableMap::translateFieldName('TopicId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->topic_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TagWordTableMap::translateFieldName('WordNumber', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->word_number = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TopicSynonymTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TagWordTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TopicSynonymTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -466,10 +466,10 @@ abstract class TagWord implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 3; // 3 = TagWordTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = TopicSynonymTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\TagWord'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\TopicSynonym'), 0, $e);
         }
     }
 
@@ -488,8 +488,8 @@ abstract class TagWord implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aTag !== null && $this->tag_id !== $this->aTag->getId()) {
-            $this->aTag = null;
+        if ($this->aTopic !== null && $this->topic_id !== $this->aTopic->getId()) {
+            $this->aTopic = null;
         }
     } // ensureConsistency
 
@@ -514,13 +514,13 @@ abstract class TagWord implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(TagWordTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(TopicSynonymTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildTagWordQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildTopicSynonymQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -530,7 +530,7 @@ abstract class TagWord implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aTag = null;
+            $this->aTopic = null;
         } // if (deep)
     }
 
@@ -540,8 +540,8 @@ abstract class TagWord implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see TagWord::setDeleted()
-     * @see TagWord::isDeleted()
+     * @see TopicSynonym::setDeleted()
+     * @see TopicSynonym::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -550,11 +550,11 @@ abstract class TagWord implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TagWordTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TopicSynonymTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildTagWordQuery::create()
+            $deleteQuery = ChildTopicSynonymQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -585,7 +585,7 @@ abstract class TagWord implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TagWordTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TopicSynonymTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -604,7 +604,7 @@ abstract class TagWord implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                TagWordTableMap::addInstanceToPool($this);
+                TopicSynonymTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -635,11 +635,11 @@ abstract class TagWord implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aTag !== null) {
-                if ($this->aTag->isModified() || $this->aTag->isNew()) {
-                    $affectedRows += $this->aTag->save($con);
+            if ($this->aTopic !== null) {
+                if ($this->aTopic->isModified() || $this->aTopic->isNew()) {
+                    $affectedRows += $this->aTopic->save($con);
                 }
-                $this->setTag($this->aTag);
+                $this->setTopic($this->aTopic);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -673,24 +673,24 @@ abstract class TagWord implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[TagWordTableMap::COL_ID] = true;
+        $this->modifiedColumns[TopicSynonymTableMap::COL_ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TagWordTableMap::COL_ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TopicSynonymTableMap::COL_ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(TagWordTableMap::COL_TAG_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'tag_id';
+        if ($this->isColumnModified(TopicSynonymTableMap::COL_TOPIC_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'topic_id';
         }
-        if ($this->isColumnModified(TagWordTableMap::COL_WORD_NUMBER)) {
-            $modifiedColumns[':p' . $index++]  = 'word_number';
+        if ($this->isColumnModified(TopicSynonymTableMap::COL_NAME)) {
+            $modifiedColumns[':p' . $index++]  = 'name';
         }
-        if ($this->isColumnModified(TagWordTableMap::COL_ID)) {
+        if ($this->isColumnModified(TopicSynonymTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
 
         $sql = sprintf(
-            'INSERT INTO tag_word (%s) VALUES (%s)',
+            'INSERT INTO defender_topic_synonym (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -699,11 +699,11 @@ abstract class TagWord implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'tag_id':
-                        $stmt->bindValue($identifier, $this->tag_id, PDO::PARAM_INT);
+                    case 'topic_id':
+                        $stmt->bindValue($identifier, $this->topic_id, PDO::PARAM_INT);
                         break;
-                    case 'word_number':
-                        $stmt->bindValue($identifier, $this->word_number, PDO::PARAM_INT);
+                    case 'name':
+                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
@@ -754,7 +754,7 @@ abstract class TagWord implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = TagWordTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = TopicSynonymTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -771,10 +771,10 @@ abstract class TagWord implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getTagId();
+                return $this->getTopicId();
                 break;
             case 1:
-                return $this->getWordNumber();
+                return $this->getName();
                 break;
             case 2:
                 return $this->getId();
@@ -803,14 +803,14 @@ abstract class TagWord implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['TagWord'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['TopicSynonym'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['TagWord'][$this->hashCode()] = true;
-        $keys = TagWordTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['TopicSynonym'][$this->hashCode()] = true;
+        $keys = TopicSynonymTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getTagId(),
-            $keys[1] => $this->getWordNumber(),
+            $keys[0] => $this->getTopicId(),
+            $keys[1] => $this->getName(),
             $keys[2] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
@@ -819,20 +819,20 @@ abstract class TagWord implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aTag) {
+            if (null !== $this->aTopic) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'tag';
+                        $key = 'topic';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'tag';
+                        $key = 'defender_topic';
                         break;
                     default:
-                        $key = 'Tag';
+                        $key = 'Topic';
                 }
 
-                $result[$key] = $this->aTag->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result[$key] = $this->aTopic->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -848,11 +848,11 @@ abstract class TagWord implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\TagWord
+     * @return $this|\TopicSynonym
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = TagWordTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = TopicSynonymTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -863,16 +863,16 @@ abstract class TagWord implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\TagWord
+     * @return $this|\TopicSynonym
      */
     public function setByPosition($pos, $value)
     {
         switch ($pos) {
             case 0:
-                $this->setTagId($value);
+                $this->setTopicId($value);
                 break;
             case 1:
-                $this->setWordNumber($value);
+                $this->setName($value);
                 break;
             case 2:
                 $this->setId($value);
@@ -901,13 +901,13 @@ abstract class TagWord implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = TagWordTableMap::getFieldNames($keyType);
+        $keys = TopicSynonymTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setTagId($arr[$keys[0]]);
+            $this->setTopicId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setWordNumber($arr[$keys[1]]);
+            $this->setName($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
             $this->setId($arr[$keys[2]]);
@@ -931,7 +931,7 @@ abstract class TagWord implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\TagWord The current object, for fluid interface
+     * @return $this|\TopicSynonym The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -951,16 +951,16 @@ abstract class TagWord implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(TagWordTableMap::DATABASE_NAME);
+        $criteria = new Criteria(TopicSynonymTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(TagWordTableMap::COL_TAG_ID)) {
-            $criteria->add(TagWordTableMap::COL_TAG_ID, $this->tag_id);
+        if ($this->isColumnModified(TopicSynonymTableMap::COL_TOPIC_ID)) {
+            $criteria->add(TopicSynonymTableMap::COL_TOPIC_ID, $this->topic_id);
         }
-        if ($this->isColumnModified(TagWordTableMap::COL_WORD_NUMBER)) {
-            $criteria->add(TagWordTableMap::COL_WORD_NUMBER, $this->word_number);
+        if ($this->isColumnModified(TopicSynonymTableMap::COL_NAME)) {
+            $criteria->add(TopicSynonymTableMap::COL_NAME, $this->name);
         }
-        if ($this->isColumnModified(TagWordTableMap::COL_ID)) {
-            $criteria->add(TagWordTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(TopicSynonymTableMap::COL_ID)) {
+            $criteria->add(TopicSynonymTableMap::COL_ID, $this->id);
         }
 
         return $criteria;
@@ -978,8 +978,8 @@ abstract class TagWord implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildTagWordQuery::create();
-        $criteria->add(TagWordTableMap::COL_ID, $this->id);
+        $criteria = ChildTopicSynonymQuery::create();
+        $criteria->add(TopicSynonymTableMap::COL_ID, $this->id);
 
         return $criteria;
     }
@@ -1041,15 +1041,15 @@ abstract class TagWord implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \TagWord (or compatible) type.
+     * @param      object $copyObj An object of \TopicSynonym (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setTagId($this->getTagId());
-        $copyObj->setWordNumber($this->getWordNumber());
+        $copyObj->setTopicId($this->getTopicId());
+        $copyObj->setName($this->getName());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1065,7 +1065,7 @@ abstract class TagWord implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \TagWord Clone of current object.
+     * @return \TopicSynonym Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1079,26 +1079,26 @@ abstract class TagWord implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildTag object.
+     * Declares an association between this object and a ChildTopic object.
      *
-     * @param  ChildTag $v
-     * @return $this|\TagWord The current object (for fluent API support)
+     * @param  ChildTopic $v
+     * @return $this|\TopicSynonym The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setTag(ChildTag $v = null)
+    public function setTopic(ChildTopic $v = null)
     {
         if ($v === null) {
-            $this->setTagId(NULL);
+            $this->setTopicId(NULL);
         } else {
-            $this->setTagId($v->getId());
+            $this->setTopicId($v->getId());
         }
 
-        $this->aTag = $v;
+        $this->aTopic = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildTag object, it will not be re-added.
+        // If this object has already been added to the ChildTopic object, it will not be re-added.
         if ($v !== null) {
-            $v->addTagWord($this);
+            $v->addTopicSynonym($this);
         }
 
 
@@ -1107,26 +1107,26 @@ abstract class TagWord implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildTag object
+     * Get the associated ChildTopic object
      *
      * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildTag The associated ChildTag object.
+     * @return ChildTopic The associated ChildTopic object.
      * @throws PropelException
      */
-    public function getTag(ConnectionInterface $con = null)
+    public function getTopic(ConnectionInterface $con = null)
     {
-        if ($this->aTag === null && ($this->tag_id !== null)) {
-            $this->aTag = ChildTagQuery::create()->findPk($this->tag_id, $con);
+        if ($this->aTopic === null && ($this->topic_id !== null)) {
+            $this->aTopic = ChildTopicQuery::create()->findPk($this->topic_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aTag->addTagWords($this);
+                $this->aTopic->addTopicSynonyms($this);
              */
         }
 
-        return $this->aTag;
+        return $this->aTopic;
     }
 
     /**
@@ -1136,11 +1136,11 @@ abstract class TagWord implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->aTag) {
-            $this->aTag->removeTagWord($this);
+        if (null !== $this->aTopic) {
+            $this->aTopic->removeTopicSynonym($this);
         }
-        $this->tag_id = null;
-        $this->word_number = null;
+        $this->topic_id = null;
+        $this->name = null;
         $this->id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
@@ -1162,7 +1162,7 @@ abstract class TagWord implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aTag = null;
+        $this->aTopic = null;
     }
 
     /**
@@ -1172,7 +1172,7 @@ abstract class TagWord implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(TagWordTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(TopicSynonymTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

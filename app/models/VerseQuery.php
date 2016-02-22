@@ -3,7 +3,7 @@
 use Base\VerseQuery as BaseVerseQuery;
 
 /**
- * Skeleton subclass for performing query and update operations on the 'verse' table.
+ * Skeleton subclass for performing query and update operations on the 'defender_verse' table.
  *
  *
  *

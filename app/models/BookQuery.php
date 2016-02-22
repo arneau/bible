@@ -3,7 +3,7 @@
 use Base\BookQuery as BaseBookQuery;
 
 /**
- * Skeleton subclass for performing query and update operations on the 'book' table.
+ * Skeleton subclass for performing query and update operations on the 'defender_book' table.
  *
  *
  *

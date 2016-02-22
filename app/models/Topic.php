@@ -1,9 +1,9 @@
 <?php
 
-use Base\KeywordSynonym as BaseKeywordSynonym;
+use Base\Topic as BaseTopic;
 
 /**
- * Skeleton subclass for representing a row from the 'keyword_synonym' table.
+ * Skeleton subclass for representing a row from the 'defender_topic' table.
  *
  *
  *
@@ -12,7 +12,7 @@ use Base\KeywordSynonym as BaseKeywordSynonym;
  * long as it does not already exist in the output directory.
  *
  */
-class KeywordSynonym extends BaseKeywordSynonym
+class Topic extends BaseTopic
 {
 
 }

@@ -3,7 +3,7 @@
 use Base\TagVoteQuery as BaseTagVoteQuery;
 
 /**
- * Skeleton subclass for performing query and update operations on the 'tag_vote' table.
+ * Skeleton subclass for performing query and update operations on the 'defender_tag_vote' table.
  *
  *
  *

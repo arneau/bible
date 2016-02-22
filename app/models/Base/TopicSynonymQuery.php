@@ -2,11 +2,11 @@
 
 namespace Base;
 
-use \TagWord as ChildTagWord;
-use \TagWordQuery as ChildTagWordQuery;
+use \TopicSynonym as ChildTopicSynonym;
+use \TopicSynonymQuery as ChildTopicSynonymQuery;
 use \Exception;
 use \PDO;
-use Map\TagWordTableMap;
+use Map\TopicSynonymTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -16,89 +16,89 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 
 /**
- * Base class that represents a query for the 'tag_word' table.
+ * Base class that represents a query for the 'defender_topic_synonym' table.
  *
  *
  *
- * @method     ChildTagWordQuery orderByTagId($order = Criteria::ASC) Order by the tag_id column
- * @method     ChildTagWordQuery orderByWordNumber($order = Criteria::ASC) Order by the word_number column
- * @method     ChildTagWordQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildTopicSynonymQuery orderByTopicId($order = Criteria::ASC) Order by the topic_id column
+ * @method     ChildTopicSynonymQuery orderByName($order = Criteria::ASC) Order by the name column
+ * @method     ChildTopicSynonymQuery orderById($order = Criteria::ASC) Order by the id column
  *
- * @method     ChildTagWordQuery groupByTagId() Group by the tag_id column
- * @method     ChildTagWordQuery groupByWordNumber() Group by the word_number column
- * @method     ChildTagWordQuery groupById() Group by the id column
+ * @method     ChildTopicSynonymQuery groupByTopicId() Group by the topic_id column
+ * @method     ChildTopicSynonymQuery groupByName() Group by the name column
+ * @method     ChildTopicSynonymQuery groupById() Group by the id column
  *
- * @method     ChildTagWordQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildTagWordQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildTagWordQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildTopicSynonymQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildTopicSynonymQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildTopicSynonymQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildTagWordQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
- * @method     ChildTagWordQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
- * @method     ChildTagWordQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
+ * @method     ChildTopicSynonymQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
+ * @method     ChildTopicSynonymQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
+ * @method     ChildTopicSynonymQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
- * @method     ChildTagWordQuery leftJoinTag($relationAlias = null) Adds a LEFT JOIN clause to the query using the Tag relation
- * @method     ChildTagWordQuery rightJoinTag($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Tag relation
- * @method     ChildTagWordQuery innerJoinTag($relationAlias = null) Adds a INNER JOIN clause to the query using the Tag relation
+ * @method     ChildTopicSynonymQuery leftJoinTopic($relationAlias = null) Adds a LEFT JOIN clause to the query using the Topic relation
+ * @method     ChildTopicSynonymQuery rightJoinTopic($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Topic relation
+ * @method     ChildTopicSynonymQuery innerJoinTopic($relationAlias = null) Adds a INNER JOIN clause to the query using the Topic relation
  *
- * @method     ChildTagWordQuery joinWithTag($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Tag relation
+ * @method     ChildTopicSynonymQuery joinWithTopic($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Topic relation
  *
- * @method     ChildTagWordQuery leftJoinWithTag() Adds a LEFT JOIN clause and with to the query using the Tag relation
- * @method     ChildTagWordQuery rightJoinWithTag() Adds a RIGHT JOIN clause and with to the query using the Tag relation
- * @method     ChildTagWordQuery innerJoinWithTag() Adds a INNER JOIN clause and with to the query using the Tag relation
+ * @method     ChildTopicSynonymQuery leftJoinWithTopic() Adds a LEFT JOIN clause and with to the query using the Topic relation
+ * @method     ChildTopicSynonymQuery rightJoinWithTopic() Adds a RIGHT JOIN clause and with to the query using the Topic relation
+ * @method     ChildTopicSynonymQuery innerJoinWithTopic() Adds a INNER JOIN clause and with to the query using the Topic relation
  *
- * @method     \TagQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \TopicQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
- * @method     ChildTagWord findOne(ConnectionInterface $con = null) Return the first ChildTagWord matching the query
- * @method     ChildTagWord findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTagWord matching the query, or a new ChildTagWord object populated from the query conditions when no match is found
+ * @method     ChildTopicSynonym findOne(ConnectionInterface $con = null) Return the first ChildTopicSynonym matching the query
+ * @method     ChildTopicSynonym findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTopicSynonym matching the query, or a new ChildTopicSynonym object populated from the query conditions when no match is found
  *
- * @method     ChildTagWord findOneByTagId(int $tag_id) Return the first ChildTagWord filtered by the tag_id column
- * @method     ChildTagWord findOneByWordNumber(int $word_number) Return the first ChildTagWord filtered by the word_number column
- * @method     ChildTagWord findOneById(int $id) Return the first ChildTagWord filtered by the id column *
+ * @method     ChildTopicSynonym findOneByTopicId(int $topic_id) Return the first ChildTopicSynonym filtered by the topic_id column
+ * @method     ChildTopicSynonym findOneByName(string $name) Return the first ChildTopicSynonym filtered by the name column
+ * @method     ChildTopicSynonym findOneById(int $id) Return the first ChildTopicSynonym filtered by the id column *
 
- * @method     ChildTagWord requirePk($key, ConnectionInterface $con = null) Return the ChildTagWord by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTagWord requireOne(ConnectionInterface $con = null) Return the first ChildTagWord matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTopicSynonym requirePk($key, ConnectionInterface $con = null) Return the ChildTopicSynonym by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTopicSynonym requireOne(ConnectionInterface $con = null) Return the first ChildTopicSynonym matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildTagWord requireOneByTagId(int $tag_id) Return the first ChildTagWord filtered by the tag_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTagWord requireOneByWordNumber(int $word_number) Return the first ChildTagWord filtered by the word_number column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTagWord requireOneById(int $id) Return the first ChildTagWord filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTopicSynonym requireOneByTopicId(int $topic_id) Return the first ChildTopicSynonym filtered by the topic_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTopicSynonym requireOneByName(string $name) Return the first ChildTopicSynonym filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTopicSynonym requireOneById(int $id) Return the first ChildTopicSynonym filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildTagWord[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTagWord objects based on current ModelCriteria
- * @method     ChildTagWord[]|ObjectCollection findByTagId(int $tag_id) Return ChildTagWord objects filtered by the tag_id column
- * @method     ChildTagWord[]|ObjectCollection findByWordNumber(int $word_number) Return ChildTagWord objects filtered by the word_number column
- * @method     ChildTagWord[]|ObjectCollection findById(int $id) Return ChildTagWord objects filtered by the id column
- * @method     ChildTagWord[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
+ * @method     ChildTopicSynonym[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTopicSynonym objects based on current ModelCriteria
+ * @method     ChildTopicSynonym[]|ObjectCollection findByTopicId(int $topic_id) Return ChildTopicSynonym objects filtered by the topic_id column
+ * @method     ChildTopicSynonym[]|ObjectCollection findByName(string $name) Return ChildTopicSynonym objects filtered by the name column
+ * @method     ChildTopicSynonym[]|ObjectCollection findById(int $id) Return ChildTopicSynonym objects filtered by the id column
+ * @method     ChildTopicSynonym[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
-abstract class TagWordQuery extends ModelCriteria
+abstract class TopicSynonymQuery extends ModelCriteria
 {
     protected $entityNotFoundExceptionClass = '\\Propel\\Runtime\\Exception\\EntityNotFoundException';
 
     /**
-     * Initializes internal state of \Base\TagWordQuery object.
+     * Initializes internal state of \Base\TopicSynonymQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'default', $modelName = '\\TagWord', $modelAlias = null)
+    public function __construct($dbName = 'default', $modelName = '\\TopicSynonym', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildTagWordQuery object.
+     * Returns a new ChildTopicSynonymQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildTagWordQuery
+     * @return ChildTopicSynonymQuery
      */
     public static function create($modelAlias = null, Criteria $criteria = null)
     {
-        if ($criteria instanceof ChildTagWordQuery) {
+        if ($criteria instanceof ChildTopicSynonymQuery) {
             return $criteria;
         }
-        $query = new ChildTagWordQuery();
+        $query = new ChildTopicSynonymQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -121,19 +121,19 @@ abstract class TagWordQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildTagWord|array|mixed the result, formatted by the current formatter
+     * @return ChildTopicSynonym|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, ConnectionInterface $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = TagWordTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key))) && !$this->formatter) {
+        if ((null !== ($obj = TopicSynonymTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(TagWordTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(TopicSynonymTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -154,11 +154,11 @@ abstract class TagWordQuery extends ModelCriteria
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
-     * @return ChildTagWord A model object, or null if the key is not found
+     * @return ChildTopicSynonym A model object, or null if the key is not found
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT tag_id, word_number, id FROM tag_word WHERE id = :p0';
+        $sql = 'SELECT topic_id, name, id FROM defender_topic_synonym WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -169,10 +169,10 @@ abstract class TagWordQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            /** @var ChildTagWord $obj */
-            $obj = new ChildTagWord();
+            /** @var ChildTopicSynonym $obj */
+            $obj = new ChildTopicSynonym();
             $obj->hydrate($row);
-            TagWordTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
+            TopicSynonymTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
         }
         $stmt->closeCursor();
 
@@ -185,7 +185,7 @@ abstract class TagWordQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildTagWord|array|mixed the result, formatted by the current formatter
+     * @return ChildTopicSynonym|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, ConnectionInterface $con)
     {
@@ -227,12 +227,12 @@ abstract class TagWordQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return $this|ChildTagWordQuery The current query, for fluid interface
+     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(TagWordTableMap::COL_ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(TopicSynonymTableMap::COL_ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -240,44 +240,44 @@ abstract class TagWordQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return $this|ChildTagWordQuery The current query, for fluid interface
+     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(TagWordTableMap::COL_ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(TopicSynonymTableMap::COL_ID, $keys, Criteria::IN);
     }
 
     /**
-     * Filter the query on the tag_id column
+     * Filter the query on the topic_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByTagId(1234); // WHERE tag_id = 1234
-     * $query->filterByTagId(array(12, 34)); // WHERE tag_id IN (12, 34)
-     * $query->filterByTagId(array('min' => 12)); // WHERE tag_id > 12
+     * $query->filterByTopicId(1234); // WHERE topic_id = 1234
+     * $query->filterByTopicId(array(12, 34)); // WHERE topic_id IN (12, 34)
+     * $query->filterByTopicId(array('min' => 12)); // WHERE topic_id > 12
      * </code>
      *
-     * @see       filterByTag()
+     * @see       filterByTopic()
      *
-     * @param     mixed $tagId The value to use as filter.
+     * @param     mixed $topicId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildTagWordQuery The current query, for fluid interface
+     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
      */
-    public function filterByTagId($tagId = null, $comparison = null)
+    public function filterByTopicId($topicId = null, $comparison = null)
     {
-        if (is_array($tagId)) {
+        if (is_array($topicId)) {
             $useMinMax = false;
-            if (isset($tagId['min'])) {
-                $this->addUsingAlias(TagWordTableMap::COL_TAG_ID, $tagId['min'], Criteria::GREATER_EQUAL);
+            if (isset($topicId['min'])) {
+                $this->addUsingAlias(TopicSynonymTableMap::COL_TOPIC_ID, $topicId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($tagId['max'])) {
-                $this->addUsingAlias(TagWordTableMap::COL_TAG_ID, $tagId['max'], Criteria::LESS_EQUAL);
+            if (isset($topicId['max'])) {
+                $this->addUsingAlias(TopicSynonymTableMap::COL_TOPIC_ID, $topicId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -288,48 +288,36 @@ abstract class TagWordQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(TagWordTableMap::COL_TAG_ID, $tagId, $comparison);
+        return $this->addUsingAlias(TopicSynonymTableMap::COL_TOPIC_ID, $topicId, $comparison);
     }
 
     /**
-     * Filter the query on the word_number column
+     * Filter the query on the name column
      *
      * Example usage:
      * <code>
-     * $query->filterByWordNumber(1234); // WHERE word_number = 1234
-     * $query->filterByWordNumber(array(12, 34)); // WHERE word_number IN (12, 34)
-     * $query->filterByWordNumber(array('min' => 12)); // WHERE word_number > 12
+     * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
+     * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
      * </code>
      *
-     * @param     mixed $wordNumber The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $name The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildTagWordQuery The current query, for fluid interface
+     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
      */
-    public function filterByWordNumber($wordNumber = null, $comparison = null)
+    public function filterByName($name = null, $comparison = null)
     {
-        if (is_array($wordNumber)) {
-            $useMinMax = false;
-            if (isset($wordNumber['min'])) {
-                $this->addUsingAlias(TagWordTableMap::COL_WORD_NUMBER, $wordNumber['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($wordNumber['max'])) {
-                $this->addUsingAlias(TagWordTableMap::COL_WORD_NUMBER, $wordNumber['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
+        if (null === $comparison) {
+            if (is_array($name)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $name)) {
+                $name = str_replace('*', '%', $name);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(TagWordTableMap::COL_WORD_NUMBER, $wordNumber, $comparison);
+        return $this->addUsingAlias(TopicSynonymTableMap::COL_NAME, $name, $comparison);
     }
 
     /**
@@ -348,18 +336,18 @@ abstract class TagWordQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildTagWordQuery The current query, for fluid interface
+     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(TagWordTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(TopicSynonymTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(TagWordTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(TopicSynonymTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -370,48 +358,48 @@ abstract class TagWordQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(TagWordTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(TopicSynonymTableMap::COL_ID, $id, $comparison);
     }
 
     /**
-     * Filter the query by a related \Tag object
+     * Filter the query by a related \Topic object
      *
-     * @param \Tag|ObjectCollection $tag The related object(s) to use as filter
+     * @param \Topic|ObjectCollection $topic The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
-     * @return ChildTagWordQuery The current query, for fluid interface
+     * @return ChildTopicSynonymQuery The current query, for fluid interface
      */
-    public function filterByTag($tag, $comparison = null)
+    public function filterByTopic($topic, $comparison = null)
     {
-        if ($tag instanceof \Tag) {
+        if ($topic instanceof \Topic) {
             return $this
-                ->addUsingAlias(TagWordTableMap::COL_TAG_ID, $tag->getId(), $comparison);
-        } elseif ($tag instanceof ObjectCollection) {
+                ->addUsingAlias(TopicSynonymTableMap::COL_TOPIC_ID, $topic->getId(), $comparison);
+        } elseif ($topic instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(TagWordTableMap::COL_TAG_ID, $tag->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(TopicSynonymTableMap::COL_TOPIC_ID, $topic->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByTag() only accepts arguments of type \Tag or Collection');
+            throw new PropelException('filterByTopic() only accepts arguments of type \Topic or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Tag relation
+     * Adds a JOIN clause to the query using the Topic relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildTagWordQuery The current query, for fluid interface
+     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
      */
-    public function joinTag($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinTopic($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Tag');
+        $relationMap = $tableMap->getRelation('Topic');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -426,14 +414,14 @@ abstract class TagWordQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Tag');
+            $this->addJoinObject($join, 'Topic');
         }
 
         return $this;
     }
 
     /**
-     * Use the Tag relation Tag object
+     * Use the Topic relation Topic object
      *
      * @see useQuery()
      *
@@ -441,33 +429,33 @@ abstract class TagWordQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \TagQuery A secondary query class using the current class as primary query
+     * @return \TopicQuery A secondary query class using the current class as primary query
      */
-    public function useTagQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useTopicQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinTag($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Tag', '\TagQuery');
+            ->joinTopic($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Topic', '\TopicQuery');
     }
 
     /**
      * Exclude object from result
      *
-     * @param   ChildTagWord $tagWord Object to remove from the list of results
+     * @param   ChildTopicSynonym $topicSynonym Object to remove from the list of results
      *
-     * @return $this|ChildTagWordQuery The current query, for fluid interface
+     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
      */
-    public function prune($tagWord = null)
+    public function prune($topicSynonym = null)
     {
-        if ($tagWord) {
-            $this->addUsingAlias(TagWordTableMap::COL_ID, $tagWord->getId(), Criteria::NOT_EQUAL);
+        if ($topicSynonym) {
+            $this->addUsingAlias(TopicSynonymTableMap::COL_ID, $topicSynonym->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the tag_word table.
+     * Deletes all rows from the defender_topic_synonym table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -475,7 +463,7 @@ abstract class TagWordQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TagWordTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TopicSynonymTableMap::DATABASE_NAME);
         }
 
         // use transaction because $criteria could contain info
@@ -486,8 +474,8 @@ abstract class TagWordQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            TagWordTableMap::clearInstancePool();
-            TagWordTableMap::clearRelatedInstancePool();
+            TopicSynonymTableMap::clearInstancePool();
+            TopicSynonymTableMap::clearRelatedInstancePool();
 
             return $affectedRows;
         });
@@ -505,26 +493,26 @@ abstract class TagWordQuery extends ModelCriteria
     public function delete(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TagWordTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TopicSynonymTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(TagWordTableMap::DATABASE_NAME);
+        $criteria->setDbName(TopicSynonymTableMap::DATABASE_NAME);
 
         // use transaction because $criteria could contain info
         // for more than one table or we could emulating ON DELETE CASCADE, etc.
         return $con->transaction(function () use ($con, $criteria) {
             $affectedRows = 0; // initialize var to track total num of affected rows
 
-            TagWordTableMap::removeInstanceFromPool($criteria);
+            TopicSynonymTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            TagWordTableMap::clearRelatedInstancePool();
+            TopicSynonymTableMap::clearRelatedInstancePool();
 
             return $affectedRows;
         });
     }
 
-} // TagWordQuery
+} // TopicSynonymQuery

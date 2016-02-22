@@ -1,4 +1,4 @@
-# The Bible App
+# The Defender App
 
 ### Install Composer
 ###### 1) Create composer.json
@@ -21,7 +21,7 @@
 ###### 1) Open bashrc file
 	vim ~/.bashrc
 ###### 2) Add Propel to bash (as per example) and save
-	export PATH=$PATH:~/Documents/bible/vendor/bin/
+	export PATH=$PATH:~/Documents/defender-app/vendor/bin/
 ###### 3) If necessary, read bashrc file
 	source ~/.bashrc
 ###### 4) Initialise project

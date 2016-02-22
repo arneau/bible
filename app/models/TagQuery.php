@@ -3,7 +3,7 @@
 use Base\TagQuery as BaseTagQuery;
 
 /**
- * Skeleton subclass for performing query and update operations on the 'tag' table.
+ * Skeleton subclass for performing query and update operations on the 'defender_tag' table.
  *
  *
  *

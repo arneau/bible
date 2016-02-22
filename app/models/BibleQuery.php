@@ -3,7 +3,7 @@
 use Base\BibleQuery as BaseBibleQuery;
 
 /**
- * Skeleton subclass for performing query and update operations on the 'bible' table.
+ * Skeleton subclass for performing query and update operations on the 'defender_bible' table.
  *
  *
  *

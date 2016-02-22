@@ -3,7 +3,7 @@
 use Base\TagVote as BaseTagVote;
 
 /**
- * Skeleton subclass for representing a row from the 'tag_vote' table.
+ * Skeleton subclass for representing a row from the 'defender_tag_vote' table.
  *
  *
  *
