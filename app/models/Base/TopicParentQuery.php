@@ -2,11 +2,11 @@
 
 namespace Base;
 
-use \TopicSynonym as ChildTopicSynonym;
-use \TopicSynonymQuery as ChildTopicSynonymQuery;
+use \TopicParent as ChildTopicParent;
+use \TopicParentQuery as ChildTopicParentQuery;
 use \Exception;
 use \PDO;
-use Map\TopicSynonymTableMap;
+use Map\TopicParentTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -16,89 +16,89 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 
 /**
- * Base class that represents a query for the 'defender_topic_synonym' table.
+ * Base class that represents a query for the 'defender_topic_parent' table.
  *
  *
  *
- * @method     ChildTopicSynonymQuery orderByName($order = Criteria::ASC) Order by the name column
- * @method     ChildTopicSynonymQuery orderByTopicId($order = Criteria::ASC) Order by the topic_id column
- * @method     ChildTopicSynonymQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildTopicParentQuery orderByParentId($order = Criteria::ASC) Order by the parent_id column
+ * @method     ChildTopicParentQuery orderByTopicId($order = Criteria::ASC) Order by the topic_id column
+ * @method     ChildTopicParentQuery orderById($order = Criteria::ASC) Order by the id column
  *
- * @method     ChildTopicSynonymQuery groupByName() Group by the name column
- * @method     ChildTopicSynonymQuery groupByTopicId() Group by the topic_id column
- * @method     ChildTopicSynonymQuery groupById() Group by the id column
+ * @method     ChildTopicParentQuery groupByParentId() Group by the parent_id column
+ * @method     ChildTopicParentQuery groupByTopicId() Group by the topic_id column
+ * @method     ChildTopicParentQuery groupById() Group by the id column
  *
- * @method     ChildTopicSynonymQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildTopicSynonymQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildTopicSynonymQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildTopicParentQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildTopicParentQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildTopicParentQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildTopicSynonymQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
- * @method     ChildTopicSynonymQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
- * @method     ChildTopicSynonymQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
+ * @method     ChildTopicParentQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
+ * @method     ChildTopicParentQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
+ * @method     ChildTopicParentQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
- * @method     ChildTopicSynonymQuery leftJoinTopic($relationAlias = null) Adds a LEFT JOIN clause to the query using the Topic relation
- * @method     ChildTopicSynonymQuery rightJoinTopic($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Topic relation
- * @method     ChildTopicSynonymQuery innerJoinTopic($relationAlias = null) Adds a INNER JOIN clause to the query using the Topic relation
+ * @method     ChildTopicParentQuery leftJoinTopic($relationAlias = null) Adds a LEFT JOIN clause to the query using the Topic relation
+ * @method     ChildTopicParentQuery rightJoinTopic($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Topic relation
+ * @method     ChildTopicParentQuery innerJoinTopic($relationAlias = null) Adds a INNER JOIN clause to the query using the Topic relation
  *
- * @method     ChildTopicSynonymQuery joinWithTopic($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Topic relation
+ * @method     ChildTopicParentQuery joinWithTopic($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Topic relation
  *
- * @method     ChildTopicSynonymQuery leftJoinWithTopic() Adds a LEFT JOIN clause and with to the query using the Topic relation
- * @method     ChildTopicSynonymQuery rightJoinWithTopic() Adds a RIGHT JOIN clause and with to the query using the Topic relation
- * @method     ChildTopicSynonymQuery innerJoinWithTopic() Adds a INNER JOIN clause and with to the query using the Topic relation
+ * @method     ChildTopicParentQuery leftJoinWithTopic() Adds a LEFT JOIN clause and with to the query using the Topic relation
+ * @method     ChildTopicParentQuery rightJoinWithTopic() Adds a RIGHT JOIN clause and with to the query using the Topic relation
+ * @method     ChildTopicParentQuery innerJoinWithTopic() Adds a INNER JOIN clause and with to the query using the Topic relation
  *
  * @method     \TopicQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
- * @method     ChildTopicSynonym findOne(ConnectionInterface $con = null) Return the first ChildTopicSynonym matching the query
- * @method     ChildTopicSynonym findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTopicSynonym matching the query, or a new ChildTopicSynonym object populated from the query conditions when no match is found
+ * @method     ChildTopicParent findOne(ConnectionInterface $con = null) Return the first ChildTopicParent matching the query
+ * @method     ChildTopicParent findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTopicParent matching the query, or a new ChildTopicParent object populated from the query conditions when no match is found
  *
- * @method     ChildTopicSynonym findOneByName(string $name) Return the first ChildTopicSynonym filtered by the name column
- * @method     ChildTopicSynonym findOneByTopicId(int $topic_id) Return the first ChildTopicSynonym filtered by the topic_id column
- * @method     ChildTopicSynonym findOneById(int $id) Return the first ChildTopicSynonym filtered by the id column *
+ * @method     ChildTopicParent findOneByParentId(int $parent_id) Return the first ChildTopicParent filtered by the parent_id column
+ * @method     ChildTopicParent findOneByTopicId(int $topic_id) Return the first ChildTopicParent filtered by the topic_id column
+ * @method     ChildTopicParent findOneById(int $id) Return the first ChildTopicParent filtered by the id column *
 
- * @method     ChildTopicSynonym requirePk($key, ConnectionInterface $con = null) Return the ChildTopicSynonym by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTopicSynonym requireOne(ConnectionInterface $con = null) Return the first ChildTopicSynonym matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTopicParent requirePk($key, ConnectionInterface $con = null) Return the ChildTopicParent by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTopicParent requireOne(ConnectionInterface $con = null) Return the first ChildTopicParent matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildTopicSynonym requireOneByName(string $name) Return the first ChildTopicSynonym filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTopicSynonym requireOneByTopicId(int $topic_id) Return the first ChildTopicSynonym filtered by the topic_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTopicSynonym requireOneById(int $id) Return the first ChildTopicSynonym filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTopicParent requireOneByParentId(int $parent_id) Return the first ChildTopicParent filtered by the parent_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTopicParent requireOneByTopicId(int $topic_id) Return the first ChildTopicParent filtered by the topic_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTopicParent requireOneById(int $id) Return the first ChildTopicParent filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildTopicSynonym[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTopicSynonym objects based on current ModelCriteria
- * @method     ChildTopicSynonym[]|ObjectCollection findByName(string $name) Return ChildTopicSynonym objects filtered by the name column
- * @method     ChildTopicSynonym[]|ObjectCollection findByTopicId(int $topic_id) Return ChildTopicSynonym objects filtered by the topic_id column
- * @method     ChildTopicSynonym[]|ObjectCollection findById(int $id) Return ChildTopicSynonym objects filtered by the id column
- * @method     ChildTopicSynonym[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
+ * @method     ChildTopicParent[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTopicParent objects based on current ModelCriteria
+ * @method     ChildTopicParent[]|ObjectCollection findByParentId(int $parent_id) Return ChildTopicParent objects filtered by the parent_id column
+ * @method     ChildTopicParent[]|ObjectCollection findByTopicId(int $topic_id) Return ChildTopicParent objects filtered by the topic_id column
+ * @method     ChildTopicParent[]|ObjectCollection findById(int $id) Return ChildTopicParent objects filtered by the id column
+ * @method     ChildTopicParent[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
-abstract class TopicSynonymQuery extends ModelCriteria
+abstract class TopicParentQuery extends ModelCriteria
 {
     protected $entityNotFoundExceptionClass = '\\Propel\\Runtime\\Exception\\EntityNotFoundException';
 
     /**
-     * Initializes internal state of \Base\TopicSynonymQuery object.
+     * Initializes internal state of \Base\TopicParentQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'default', $modelName = '\\TopicSynonym', $modelAlias = null)
+    public function __construct($dbName = 'default', $modelName = '\\TopicParent', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildTopicSynonymQuery object.
+     * Returns a new ChildTopicParentQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildTopicSynonymQuery
+     * @return ChildTopicParentQuery
      */
     public static function create($modelAlias = null, Criteria $criteria = null)
     {
-        if ($criteria instanceof ChildTopicSynonymQuery) {
+        if ($criteria instanceof ChildTopicParentQuery) {
             return $criteria;
         }
-        $query = new ChildTopicSynonymQuery();
+        $query = new ChildTopicParentQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -121,19 +121,19 @@ abstract class TopicSynonymQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildTopicSynonym|array|mixed the result, formatted by the current formatter
+     * @return ChildTopicParent|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, ConnectionInterface $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = TopicSynonymTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key))) && !$this->formatter) {
+        if ((null !== ($obj = TopicParentTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(TopicSynonymTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(TopicParentTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -154,11 +154,11 @@ abstract class TopicSynonymQuery extends ModelCriteria
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
-     * @return ChildTopicSynonym A model object, or null if the key is not found
+     * @return ChildTopicParent A model object, or null if the key is not found
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT name, topic_id, id FROM defender_topic_synonym WHERE id = :p0';
+        $sql = 'SELECT parent_id, topic_id, id FROM defender_topic_parent WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -169,10 +169,10 @@ abstract class TopicSynonymQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            /** @var ChildTopicSynonym $obj */
-            $obj = new ChildTopicSynonym();
+            /** @var ChildTopicParent $obj */
+            $obj = new ChildTopicParent();
             $obj->hydrate($row);
-            TopicSynonymTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
+            TopicParentTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
         }
         $stmt->closeCursor();
 
@@ -185,7 +185,7 @@ abstract class TopicSynonymQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildTopicSynonym|array|mixed the result, formatted by the current formatter
+     * @return ChildTopicParent|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, ConnectionInterface $con)
     {
@@ -227,12 +227,12 @@ abstract class TopicSynonymQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
+     * @return $this|ChildTopicParentQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(TopicSynonymTableMap::COL_ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(TopicParentTableMap::COL_ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -240,41 +240,53 @@ abstract class TopicSynonymQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
+     * @return $this|ChildTopicParentQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(TopicSynonymTableMap::COL_ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(TopicParentTableMap::COL_ID, $keys, Criteria::IN);
     }
 
     /**
-     * Filter the query on the name column
+     * Filter the query on the parent_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
-     * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
+     * $query->filterByParentId(1234); // WHERE parent_id = 1234
+     * $query->filterByParentId(array(12, 34)); // WHERE parent_id IN (12, 34)
+     * $query->filterByParentId(array('min' => 12)); // WHERE parent_id > 12
      * </code>
      *
-     * @param     string $name The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     mixed $parentId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
+     * @return $this|ChildTopicParentQuery The current query, for fluid interface
      */
-    public function filterByName($name = null, $comparison = null)
+    public function filterByParentId($parentId = null, $comparison = null)
     {
-        if (null === $comparison) {
-            if (is_array($name)) {
+        if (is_array($parentId)) {
+            $useMinMax = false;
+            if (isset($parentId['min'])) {
+                $this->addUsingAlias(TopicParentTableMap::COL_PARENT_ID, $parentId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($parentId['max'])) {
+                $this->addUsingAlias(TopicParentTableMap::COL_PARENT_ID, $parentId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $name)) {
-                $name = str_replace('*', '%', $name);
-                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(TopicSynonymTableMap::COL_NAME, $name, $comparison);
+        return $this->addUsingAlias(TopicParentTableMap::COL_PARENT_ID, $parentId, $comparison);
     }
 
     /**
@@ -295,18 +307,18 @@ abstract class TopicSynonymQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
+     * @return $this|ChildTopicParentQuery The current query, for fluid interface
      */
     public function filterByTopicId($topicId = null, $comparison = null)
     {
         if (is_array($topicId)) {
             $useMinMax = false;
             if (isset($topicId['min'])) {
-                $this->addUsingAlias(TopicSynonymTableMap::COL_TOPIC_ID, $topicId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(TopicParentTableMap::COL_TOPIC_ID, $topicId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($topicId['max'])) {
-                $this->addUsingAlias(TopicSynonymTableMap::COL_TOPIC_ID, $topicId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(TopicParentTableMap::COL_TOPIC_ID, $topicId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -317,7 +329,7 @@ abstract class TopicSynonymQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(TopicSynonymTableMap::COL_TOPIC_ID, $topicId, $comparison);
+        return $this->addUsingAlias(TopicParentTableMap::COL_TOPIC_ID, $topicId, $comparison);
     }
 
     /**
@@ -336,18 +348,18 @@ abstract class TopicSynonymQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
+     * @return $this|ChildTopicParentQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(TopicSynonymTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(TopicParentTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(TopicSynonymTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(TopicParentTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -358,7 +370,7 @@ abstract class TopicSynonymQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(TopicSynonymTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(TopicParentTableMap::COL_ID, $id, $comparison);
     }
 
     /**
@@ -369,20 +381,20 @@ abstract class TopicSynonymQuery extends ModelCriteria
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
-     * @return ChildTopicSynonymQuery The current query, for fluid interface
+     * @return ChildTopicParentQuery The current query, for fluid interface
      */
     public function filterByTopic($topic, $comparison = null)
     {
         if ($topic instanceof \Topic) {
             return $this
-                ->addUsingAlias(TopicSynonymTableMap::COL_TOPIC_ID, $topic->getId(), $comparison);
+                ->addUsingAlias(TopicParentTableMap::COL_TOPIC_ID, $topic->getId(), $comparison);
         } elseif ($topic instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(TopicSynonymTableMap::COL_TOPIC_ID, $topic->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(TopicParentTableMap::COL_TOPIC_ID, $topic->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByTopic() only accepts arguments of type \Topic or Collection');
         }
@@ -394,7 +406,7 @@ abstract class TopicSynonymQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
+     * @return $this|ChildTopicParentQuery The current query, for fluid interface
      */
     public function joinTopic($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -441,21 +453,21 @@ abstract class TopicSynonymQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildTopicSynonym $topicSynonym Object to remove from the list of results
+     * @param   ChildTopicParent $topicParent Object to remove from the list of results
      *
-     * @return $this|ChildTopicSynonymQuery The current query, for fluid interface
+     * @return $this|ChildTopicParentQuery The current query, for fluid interface
      */
-    public function prune($topicSynonym = null)
+    public function prune($topicParent = null)
     {
-        if ($topicSynonym) {
-            $this->addUsingAlias(TopicSynonymTableMap::COL_ID, $topicSynonym->getId(), Criteria::NOT_EQUAL);
+        if ($topicParent) {
+            $this->addUsingAlias(TopicParentTableMap::COL_ID, $topicParent->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the defender_topic_synonym table.
+     * Deletes all rows from the defender_topic_parent table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -463,7 +475,7 @@ abstract class TopicSynonymQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TopicSynonymTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TopicParentTableMap::DATABASE_NAME);
         }
 
         // use transaction because $criteria could contain info
@@ -474,8 +486,8 @@ abstract class TopicSynonymQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            TopicSynonymTableMap::clearInstancePool();
-            TopicSynonymTableMap::clearRelatedInstancePool();
+            TopicParentTableMap::clearInstancePool();
+            TopicParentTableMap::clearRelatedInstancePool();
 
             return $affectedRows;
         });
@@ -493,26 +505,26 @@ abstract class TopicSynonymQuery extends ModelCriteria
     public function delete(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TopicSynonymTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TopicParentTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(TopicSynonymTableMap::DATABASE_NAME);
+        $criteria->setDbName(TopicParentTableMap::DATABASE_NAME);
 
         // use transaction because $criteria could contain info
         // for more than one table or we could emulating ON DELETE CASCADE, etc.
         return $con->transaction(function () use ($con, $criteria) {
             $affectedRows = 0; // initialize var to track total num of affected rows
 
-            TopicSynonymTableMap::removeInstanceFromPool($criteria);
+            TopicParentTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            TopicSynonymTableMap::clearRelatedInstancePool();
+            TopicParentTableMap::clearRelatedInstancePool();
 
             return $affectedRows;
         });
     }
 
-} // TopicSynonymQuery
+} // TopicParentQuery

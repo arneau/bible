@@ -719,6 +719,62 @@ abstract class TagQuery extends ModelCriteria
     }
 
     /**
+     * Code to execute before every DELETE statement
+     *
+     * @param     ConnectionInterface $con The connection object used by the query
+     */
+    protected function basePreDelete(ConnectionInterface $con)
+    {
+        // aggregate_column_relation_tag_count_aggregate behavior
+        $this->findRelatedTopicTagCounts($con);
+
+        return $this->preDelete($con);
+    }
+
+    /**
+     * Code to execute after every DELETE statement
+     *
+     * @param     int $affectedRows the number of deleted rows
+     * @param     ConnectionInterface $con The connection object used by the query
+     */
+    protected function basePostDelete($affectedRows, ConnectionInterface $con)
+    {
+        // aggregate_column_relation_tag_count_aggregate behavior
+        $this->updateRelatedTopicTagCounts($con);
+
+        return $this->postDelete($affectedRows, $con);
+    }
+
+    /**
+     * Code to execute before every UPDATE statement
+     *
+     * @param     array $values The associative array of columns and values for the update
+     * @param     ConnectionInterface $con The connection object used by the query
+     * @param     boolean $forceIndividualSaves If false (default), the resulting call is a Criteria::doUpdate(), otherwise it is a series of save() calls on all the found objects
+     */
+    protected function basePreUpdate(&$values, ConnectionInterface $con, $forceIndividualSaves = false)
+    {
+        // aggregate_column_relation_tag_count_aggregate behavior
+        $this->findRelatedTopicTagCounts($con);
+
+        return $this->preUpdate($values, $con, $forceIndividualSaves);
+    }
+
+    /**
+     * Code to execute after every UPDATE statement
+     *
+     * @param     int $affectedRows the number of updated rows
+     * @param     ConnectionInterface $con The connection object used by the query
+     */
+    protected function basePostUpdate($affectedRows, ConnectionInterface $con)
+    {
+        // aggregate_column_relation_tag_count_aggregate behavior
+        $this->updateRelatedTopicTagCounts($con);
+
+        return $this->postUpdate($affectedRows, $con);
+    }
+
+    /**
      * Deletes all rows from the defender_tag table.
      *
      * @param ConnectionInterface $con the connection to use
@@ -777,6 +833,36 @@ abstract class TagQuery extends ModelCriteria
 
             return $affectedRows;
         });
+    }
+
+    // aggregate_column_relation_tag_count_aggregate behavior
+
+    /**
+     * Finds the related Topic objects and keep them for later
+     *
+     * @param ConnectionInterface $con A connection object
+     */
+    protected function findRelatedTopicTagCounts($con)
+    {
+        $criteria = clone $this;
+        if ($this->useAliasInSQL) {
+            $alias = $this->getModelAlias();
+            $criteria->removeAlias($alias);
+        } else {
+            $alias = '';
+        }
+        $this->topicTagCounts = \TopicQuery::create()
+            ->joinTag($alias)
+            ->mergeWith($criteria)
+            ->find($con);
+    }
+
+    protected function updateRelatedTopicTagCounts($con)
+    {
+        foreach ($this->topicTagCounts as $topicTagCount) {
+            $topicTagCount->updateTagCount($con);
+        }
+        $this->topicTagCounts = array();
     }
 
 } // TagQuery

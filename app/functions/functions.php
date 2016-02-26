@@ -90,7 +90,7 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 				'id' => $verse_tag_object->getId(),
 				'keyword_id' => $verse_tag_keyword_object->getId(),
 				'value' => $verse_tag_keyword_object->getValue(),
-				'vote_count' => $verse_tag_object->getVoteCount()
+				'vote_count' => $verse_tag_object->getVoteCount(),
 			];
 
 		}
@@ -107,5 +107,36 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 
 	# Return passage data
 	return $passage_data;
+
+}
+
+function getTopicChildrenData($topic_id) {
+
+	# Get topic children ids
+	$topic_children_ids = TopicParentQuery::create()
+		->filterByParentId($topic_id)
+		->select([
+			'topic_id',
+		])
+		->find()
+		->toArray();
+
+	# Handle topic children
+	foreach ($topic_children_ids as $topic_child_id) {
+
+		# Get child data
+		$topic_child_object = TopicQuery::create()
+			->findOneById($topic_child_id);
+
+		# Return child data
+		$topic_children_data[] = [
+			'id' => $topic_child_object->getId(),
+			'name' => $topic_child_object->getName(),
+		];
+
+	}
+
+	# Return topic children data
+	return $topic_children_data;
 
 }

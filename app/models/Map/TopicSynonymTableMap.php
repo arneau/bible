@@ -72,14 +72,14 @@ class TopicSynonymTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 3;
 
     /**
-     * the column name for the topic_id field
-     */
-    const COL_TOPIC_ID = 'defender_topic_synonym.topic_id';
-
-    /**
      * the column name for the name field
      */
     const COL_NAME = 'defender_topic_synonym.name';
+
+    /**
+     * the column name for the topic_id field
+     */
+    const COL_TOPIC_ID = 'defender_topic_synonym.topic_id';
 
     /**
      * the column name for the id field
@@ -98,10 +98,10 @@ class TopicSynonymTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('TopicId', 'Name', 'Id', ),
-        self::TYPE_CAMELNAME     => array('topicId', 'name', 'id', ),
-        self::TYPE_COLNAME       => array(TopicSynonymTableMap::COL_TOPIC_ID, TopicSynonymTableMap::COL_NAME, TopicSynonymTableMap::COL_ID, ),
-        self::TYPE_FIELDNAME     => array('topic_id', 'name', 'id', ),
+        self::TYPE_PHPNAME       => array('Name', 'TopicId', 'Id', ),
+        self::TYPE_CAMELNAME     => array('name', 'topicId', 'id', ),
+        self::TYPE_COLNAME       => array(TopicSynonymTableMap::COL_NAME, TopicSynonymTableMap::COL_TOPIC_ID, TopicSynonymTableMap::COL_ID, ),
+        self::TYPE_FIELDNAME     => array('name', 'topic_id', 'id', ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -112,10 +112,10 @@ class TopicSynonymTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('TopicId' => 0, 'Name' => 1, 'Id' => 2, ),
-        self::TYPE_CAMELNAME     => array('topicId' => 0, 'name' => 1, 'id' => 2, ),
-        self::TYPE_COLNAME       => array(TopicSynonymTableMap::COL_TOPIC_ID => 0, TopicSynonymTableMap::COL_NAME => 1, TopicSynonymTableMap::COL_ID => 2, ),
-        self::TYPE_FIELDNAME     => array('topic_id' => 0, 'name' => 1, 'id' => 2, ),
+        self::TYPE_PHPNAME       => array('Name' => 0, 'TopicId' => 1, 'Id' => 2, ),
+        self::TYPE_CAMELNAME     => array('name' => 0, 'topicId' => 1, 'id' => 2, ),
+        self::TYPE_COLNAME       => array(TopicSynonymTableMap::COL_NAME => 0, TopicSynonymTableMap::COL_TOPIC_ID => 1, TopicSynonymTableMap::COL_ID => 2, ),
+        self::TYPE_FIELDNAME     => array('name' => 0, 'topic_id' => 1, 'id' => 2, ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -136,8 +136,8 @@ class TopicSynonymTableMap extends TableMap
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignKey('topic_id', 'TopicId', 'INTEGER', 'defender_topic', 'id', true, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
+        $this->addForeignKey('topic_id', 'TopicId', 'INTEGER', 'defender_topic', 'id', true, null, null);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
     } // initialize()
 
@@ -309,12 +309,12 @@ class TopicSynonymTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(TopicSynonymTableMap::COL_TOPIC_ID);
             $criteria->addSelectColumn(TopicSynonymTableMap::COL_NAME);
+            $criteria->addSelectColumn(TopicSynonymTableMap::COL_TOPIC_ID);
             $criteria->addSelectColumn(TopicSynonymTableMap::COL_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.topic_id');
             $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.topic_id');
             $criteria->addSelectColumn($alias . '.id');
         }
     }

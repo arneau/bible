@@ -62,18 +62,18 @@ abstract class TopicSynonym implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the topic_id field.
-     *
-     * @var        int
-     */
-    protected $topic_id;
-
-    /**
      * The value for the name field.
      *
      * @var        string
      */
     protected $name;
+
+    /**
+     * The value for the topic_id field.
+     *
+     * @var        int
+     */
+    protected $topic_id;
 
     /**
      * The value for the id field.
@@ -321,16 +321,6 @@ abstract class TopicSynonym implements ActiveRecordInterface
     }
 
     /**
-     * Get the [topic_id] column value.
-     *
-     * @return int
-     */
-    public function getTopicId()
-    {
-        return $this->topic_id;
-    }
-
-    /**
      * Get the [name] column value.
      *
      * @return string
@@ -338,6 +328,16 @@ abstract class TopicSynonym implements ActiveRecordInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Get the [topic_id] column value.
+     *
+     * @return int
+     */
+    public function getTopicId()
+    {
+        return $this->topic_id;
     }
 
     /**
@@ -349,6 +349,26 @@ abstract class TopicSynonym implements ActiveRecordInterface
     {
         return $this->id;
     }
+
+    /**
+     * Set the value of [name] column.
+     *
+     * @param string $v new value
+     * @return $this|\TopicSynonym The current object (for fluent API support)
+     */
+    public function setName($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->name !== $v) {
+            $this->name = $v;
+            $this->modifiedColumns[TopicSynonymTableMap::COL_NAME] = true;
+        }
+
+        return $this;
+    } // setName()
 
     /**
      * Set the value of [topic_id] column.
@@ -373,26 +393,6 @@ abstract class TopicSynonym implements ActiveRecordInterface
 
         return $this;
     } // setTopicId()
-
-    /**
-     * Set the value of [name] column.
-     *
-     * @param string $v new value
-     * @return $this|\TopicSynonym The current object (for fluent API support)
-     */
-    public function setName($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->name !== $v) {
-            $this->name = $v;
-            $this->modifiedColumns[TopicSynonymTableMap::COL_NAME] = true;
-        }
-
-        return $this;
-    } // setName()
 
     /**
      * Set the value of [id] column.
@@ -450,11 +450,11 @@ abstract class TopicSynonym implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TopicSynonymTableMap::translateFieldName('TopicId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->topic_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TopicSynonymTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TopicSynonymTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TopicSynonymTableMap::translateFieldName('TopicId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->topic_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TopicSynonymTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
@@ -679,11 +679,11 @@ abstract class TopicSynonym implements ActiveRecordInterface
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(TopicSynonymTableMap::COL_TOPIC_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'topic_id';
-        }
         if ($this->isColumnModified(TopicSynonymTableMap::COL_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'name';
+        }
+        if ($this->isColumnModified(TopicSynonymTableMap::COL_TOPIC_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'topic_id';
         }
         if ($this->isColumnModified(TopicSynonymTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
@@ -699,11 +699,11 @@ abstract class TopicSynonym implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'topic_id':
-                        $stmt->bindValue($identifier, $this->topic_id, PDO::PARAM_INT);
-                        break;
                     case 'name':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                        break;
+                    case 'topic_id':
+                        $stmt->bindValue($identifier, $this->topic_id, PDO::PARAM_INT);
                         break;
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
@@ -771,10 +771,10 @@ abstract class TopicSynonym implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getTopicId();
+                return $this->getName();
                 break;
             case 1:
-                return $this->getName();
+                return $this->getTopicId();
                 break;
             case 2:
                 return $this->getId();
@@ -809,8 +809,8 @@ abstract class TopicSynonym implements ActiveRecordInterface
         $alreadyDumpedObjects['TopicSynonym'][$this->hashCode()] = true;
         $keys = TopicSynonymTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getTopicId(),
-            $keys[1] => $this->getName(),
+            $keys[0] => $this->getName(),
+            $keys[1] => $this->getTopicId(),
             $keys[2] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
@@ -869,10 +869,10 @@ abstract class TopicSynonym implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setTopicId($value);
+                $this->setName($value);
                 break;
             case 1:
-                $this->setName($value);
+                $this->setTopicId($value);
                 break;
             case 2:
                 $this->setId($value);
@@ -904,10 +904,10 @@ abstract class TopicSynonym implements ActiveRecordInterface
         $keys = TopicSynonymTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setTopicId($arr[$keys[0]]);
+            $this->setName($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setName($arr[$keys[1]]);
+            $this->setTopicId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
             $this->setId($arr[$keys[2]]);
@@ -953,11 +953,11 @@ abstract class TopicSynonym implements ActiveRecordInterface
     {
         $criteria = new Criteria(TopicSynonymTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(TopicSynonymTableMap::COL_TOPIC_ID)) {
-            $criteria->add(TopicSynonymTableMap::COL_TOPIC_ID, $this->topic_id);
-        }
         if ($this->isColumnModified(TopicSynonymTableMap::COL_NAME)) {
             $criteria->add(TopicSynonymTableMap::COL_NAME, $this->name);
+        }
+        if ($this->isColumnModified(TopicSynonymTableMap::COL_TOPIC_ID)) {
+            $criteria->add(TopicSynonymTableMap::COL_TOPIC_ID, $this->topic_id);
         }
         if ($this->isColumnModified(TopicSynonymTableMap::COL_ID)) {
             $criteria->add(TopicSynonymTableMap::COL_ID, $this->id);
@@ -1048,8 +1048,8 @@ abstract class TopicSynonym implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setTopicId($this->getTopicId());
         $copyObj->setName($this->getName());
+        $copyObj->setTopicId($this->getTopicId());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1139,8 +1139,8 @@ abstract class TopicSynonym implements ActiveRecordInterface
         if (null !== $this->aTopic) {
             $this->aTopic->removeTopicSynonym($this);
         }
-        $this->topic_id = null;
         $this->name = null;
+        $this->topic_id = null;
         $this->id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();

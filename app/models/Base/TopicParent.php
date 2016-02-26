@@ -2,24 +2,17 @@
 
 namespace Base;
 
-use \Tag as ChildTag;
-use \TagQuery as ChildTagQuery;
-use \TagVote as ChildTagVote;
-use \TagVoteQuery as ChildTagVoteQuery;
 use \Topic as ChildTopic;
+use \TopicParentQuery as ChildTopicParentQuery;
 use \TopicQuery as ChildTopicQuery;
-use \Verse as ChildVerse;
-use \VerseQuery as ChildVerseQuery;
 use \Exception;
 use \PDO;
-use Map\TagTableMap;
-use Map\TagVoteTableMap;
+use Map\TopicParentTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -28,18 +21,18 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
 /**
- * Base class that represents a row from the 'defender_tag' table.
+ * Base class that represents a row from the 'defender_topic_parent' table.
  *
  *
  *
 * @package    propel.generator..Base
 */
-abstract class Tag implements ActiveRecordInterface
+abstract class TopicParent implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Map\\TagTableMap';
+    const TABLE_MAP = '\\Map\\TopicParentTableMap';
 
 
     /**
@@ -69,11 +62,11 @@ abstract class Tag implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the relevant_words field.
+     * The value for the parent_id field.
      *
-     * @var        string
+     * @var        int
      */
-    protected $relevant_words;
+    protected $parent_id;
 
     /**
      * The value for the topic_id field.
@@ -81,21 +74,6 @@ abstract class Tag implements ActiveRecordInterface
      * @var        int
      */
     protected $topic_id;
-
-    /**
-     * The value for the verse_id field.
-     *
-     * @var        int
-     */
-    protected $verse_id;
-
-    /**
-     * The value for the vote_count field.
-     *
-     * Note: this column has a database default value of: 0
-     * @var        int
-     */
-    protected $vote_count;
 
     /**
      * The value for the id field.
@@ -110,17 +88,6 @@ abstract class Tag implements ActiveRecordInterface
     protected $aTopic;
 
     /**
-     * @var        ChildVerse
-     */
-    protected $aVerse;
-
-    /**
-     * @var        ObjectCollection|ChildTagVote[] Collection to store aggregation of ChildTagVote objects.
-     */
-    protected $collTagVotes;
-    protected $collTagVotesPartial;
-
-    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -128,36 +95,11 @@ abstract class Tag implements ActiveRecordInterface
      */
     protected $alreadyInSave = false;
 
-    // aggregate_column_relation_tag_count_aggregate behavior
     /**
-     * @var ChildTopic
-     */
-    protected $oldTopicTagCount;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildTagVote[]
-     */
-    protected $tagVotesScheduledForDeletion = null;
-
-    /**
-     * Applies default values to this object.
-     * This method should be called from the object's constructor (or
-     * equivalent initialization method).
-     * @see __construct()
-     */
-    public function applyDefaultValues()
-    {
-        $this->vote_count = 0;
-    }
-
-    /**
-     * Initializes internal state of Base\Tag object.
-     * @see applyDefaults()
+     * Initializes internal state of Base\TopicParent object.
      */
     public function __construct()
     {
-        $this->applyDefaultValues();
     }
 
     /**
@@ -249,9 +191,9 @@ abstract class Tag implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Tag</code> instance.  If
-     * <code>obj</code> is an instance of <code>Tag</code>, delegates to
-     * <code>equals(Tag)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>TopicParent</code> instance.  If
+     * <code>obj</code> is an instance of <code>TopicParent</code>, delegates to
+     * <code>equals(TopicParent)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -317,7 +259,7 @@ abstract class Tag implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|Tag The current object, for fluid interface
+     * @return $this|TopicParent The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -379,13 +321,13 @@ abstract class Tag implements ActiveRecordInterface
     }
 
     /**
-     * Get the [relevant_words] column value.
+     * Get the [parent_id] column value.
      *
-     * @return string
+     * @return int
      */
-    public function getRelevantWords()
+    public function getParentId()
     {
-        return $this->relevant_words;
+        return $this->parent_id;
     }
 
     /**
@@ -399,26 +341,6 @@ abstract class Tag implements ActiveRecordInterface
     }
 
     /**
-     * Get the [verse_id] column value.
-     *
-     * @return int
-     */
-    public function getVerseId()
-    {
-        return $this->verse_id;
-    }
-
-    /**
-     * Get the [vote_count] column value.
-     *
-     * @return int
-     */
-    public function getVoteCount()
-    {
-        return $this->vote_count;
-    }
-
-    /**
      * Get the [id] column value.
      *
      * @return int
@@ -429,30 +351,30 @@ abstract class Tag implements ActiveRecordInterface
     }
 
     /**
-     * Set the value of [relevant_words] column.
+     * Set the value of [parent_id] column.
      *
-     * @param string $v new value
-     * @return $this|\Tag The current object (for fluent API support)
+     * @param int $v new value
+     * @return $this|\TopicParent The current object (for fluent API support)
      */
-    public function setRelevantWords($v)
+    public function setParentId($v)
     {
         if ($v !== null) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->relevant_words !== $v) {
-            $this->relevant_words = $v;
-            $this->modifiedColumns[TagTableMap::COL_RELEVANT_WORDS] = true;
+        if ($this->parent_id !== $v) {
+            $this->parent_id = $v;
+            $this->modifiedColumns[TopicParentTableMap::COL_PARENT_ID] = true;
         }
 
         return $this;
-    } // setRelevantWords()
+    } // setParentId()
 
     /**
      * Set the value of [topic_id] column.
      *
      * @param int $v new value
-     * @return $this|\Tag The current object (for fluent API support)
+     * @return $this|\TopicParent The current object (for fluent API support)
      */
     public function setTopicId($v)
     {
@@ -462,7 +384,7 @@ abstract class Tag implements ActiveRecordInterface
 
         if ($this->topic_id !== $v) {
             $this->topic_id = $v;
-            $this->modifiedColumns[TagTableMap::COL_TOPIC_ID] = true;
+            $this->modifiedColumns[TopicParentTableMap::COL_TOPIC_ID] = true;
         }
 
         if ($this->aTopic !== null && $this->aTopic->getId() !== $v) {
@@ -473,54 +395,10 @@ abstract class Tag implements ActiveRecordInterface
     } // setTopicId()
 
     /**
-     * Set the value of [verse_id] column.
-     *
-     * @param int $v new value
-     * @return $this|\Tag The current object (for fluent API support)
-     */
-    public function setVerseId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->verse_id !== $v) {
-            $this->verse_id = $v;
-            $this->modifiedColumns[TagTableMap::COL_VERSE_ID] = true;
-        }
-
-        if ($this->aVerse !== null && $this->aVerse->getId() !== $v) {
-            $this->aVerse = null;
-        }
-
-        return $this;
-    } // setVerseId()
-
-    /**
-     * Set the value of [vote_count] column.
-     *
-     * @param int $v new value
-     * @return $this|\Tag The current object (for fluent API support)
-     */
-    public function setVoteCount($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->vote_count !== $v) {
-            $this->vote_count = $v;
-            $this->modifiedColumns[TagTableMap::COL_VOTE_COUNT] = true;
-        }
-
-        return $this;
-    } // setVoteCount()
-
-    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return $this|\Tag The current object (for fluent API support)
+     * @return $this|\TopicParent The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -530,7 +408,7 @@ abstract class Tag implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[TagTableMap::COL_ID] = true;
+            $this->modifiedColumns[TopicParentTableMap::COL_ID] = true;
         }
 
         return $this;
@@ -546,10 +424,6 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->vote_count !== 0) {
-                return false;
-            }
-
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -576,19 +450,13 @@ abstract class Tag implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TagTableMap::translateFieldName('RelevantWords', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->relevant_words = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TopicParentTableMap::translateFieldName('ParentId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->parent_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TagTableMap::translateFieldName('TopicId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TopicParentTableMap::translateFieldName('TopicId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->topic_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TagTableMap::translateFieldName('VerseId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->verse_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TagTableMap::translateFieldName('VoteCount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->vote_count = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TagTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TopicParentTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -598,10 +466,10 @@ abstract class Tag implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = TagTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = TopicParentTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\Tag'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\TopicParent'), 0, $e);
         }
     }
 
@@ -622,9 +490,6 @@ abstract class Tag implements ActiveRecordInterface
     {
         if ($this->aTopic !== null && $this->topic_id !== $this->aTopic->getId()) {
             $this->aTopic = null;
-        }
-        if ($this->aVerse !== null && $this->verse_id !== $this->aVerse->getId()) {
-            $this->aVerse = null;
         }
     } // ensureConsistency
 
@@ -649,13 +514,13 @@ abstract class Tag implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(TagTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(TopicParentTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildTagQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildTopicParentQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -666,9 +531,6 @@ abstract class Tag implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aTopic = null;
-            $this->aVerse = null;
-            $this->collTagVotes = null;
-
         } // if (deep)
     }
 
@@ -678,8 +540,8 @@ abstract class Tag implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Tag::setDeleted()
-     * @see Tag::isDeleted()
+     * @see TopicParent::setDeleted()
+     * @see TopicParent::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -688,11 +550,11 @@ abstract class Tag implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TagTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TopicParentTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildTagQuery::create()
+            $deleteQuery = ChildTopicParentQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -723,7 +585,7 @@ abstract class Tag implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TagTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TopicParentTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -742,9 +604,7 @@ abstract class Tag implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                // aggregate_column_relation_tag_count_aggregate behavior
-                $this->updateRelatedTopicTagCount($con);
-                TagTableMap::addInstanceToPool($this);
+                TopicParentTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -782,13 +642,6 @@ abstract class Tag implements ActiveRecordInterface
                 $this->setTopic($this->aTopic);
             }
 
-            if ($this->aVerse !== null) {
-                if ($this->aVerse->isModified() || $this->aVerse->isNew()) {
-                    $affectedRows += $this->aVerse->save($con);
-                }
-                $this->setVerse($this->aVerse);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -798,23 +651,6 @@ abstract class Tag implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
-            }
-
-            if ($this->tagVotesScheduledForDeletion !== null) {
-                if (!$this->tagVotesScheduledForDeletion->isEmpty()) {
-                    \TagVoteQuery::create()
-                        ->filterByPrimaryKeys($this->tagVotesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->tagVotesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collTagVotes !== null) {
-                foreach ($this->collTagVotes as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
             }
 
             $this->alreadyInSave = false;
@@ -837,30 +673,24 @@ abstract class Tag implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[TagTableMap::COL_ID] = true;
+        $this->modifiedColumns[TopicParentTableMap::COL_ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TagTableMap::COL_ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TopicParentTableMap::COL_ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(TagTableMap::COL_RELEVANT_WORDS)) {
-            $modifiedColumns[':p' . $index++]  = 'relevant_words';
+        if ($this->isColumnModified(TopicParentTableMap::COL_PARENT_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'parent_id';
         }
-        if ($this->isColumnModified(TagTableMap::COL_TOPIC_ID)) {
+        if ($this->isColumnModified(TopicParentTableMap::COL_TOPIC_ID)) {
             $modifiedColumns[':p' . $index++]  = 'topic_id';
         }
-        if ($this->isColumnModified(TagTableMap::COL_VERSE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'verse_id';
-        }
-        if ($this->isColumnModified(TagTableMap::COL_VOTE_COUNT)) {
-            $modifiedColumns[':p' . $index++]  = 'vote_count';
-        }
-        if ($this->isColumnModified(TagTableMap::COL_ID)) {
+        if ($this->isColumnModified(TopicParentTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
 
         $sql = sprintf(
-            'INSERT INTO defender_tag (%s) VALUES (%s)',
+            'INSERT INTO defender_topic_parent (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -869,17 +699,11 @@ abstract class Tag implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'relevant_words':
-                        $stmt->bindValue($identifier, $this->relevant_words, PDO::PARAM_STR);
+                    case 'parent_id':
+                        $stmt->bindValue($identifier, $this->parent_id, PDO::PARAM_INT);
                         break;
                     case 'topic_id':
                         $stmt->bindValue($identifier, $this->topic_id, PDO::PARAM_INT);
-                        break;
-                    case 'verse_id':
-                        $stmt->bindValue($identifier, $this->verse_id, PDO::PARAM_INT);
-                        break;
-                    case 'vote_count':
-                        $stmt->bindValue($identifier, $this->vote_count, PDO::PARAM_INT);
                         break;
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
@@ -930,7 +754,7 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = TagTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = TopicParentTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -947,18 +771,12 @@ abstract class Tag implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getRelevantWords();
+                return $this->getParentId();
                 break;
             case 1:
                 return $this->getTopicId();
                 break;
             case 2:
-                return $this->getVerseId();
-                break;
-            case 3:
-                return $this->getVoteCount();
-                break;
-            case 4:
                 return $this->getId();
                 break;
             default:
@@ -985,17 +803,15 @@ abstract class Tag implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['Tag'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['TopicParent'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Tag'][$this->hashCode()] = true;
-        $keys = TagTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['TopicParent'][$this->hashCode()] = true;
+        $keys = TopicParentTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getRelevantWords(),
+            $keys[0] => $this->getParentId(),
             $keys[1] => $this->getTopicId(),
-            $keys[2] => $this->getVerseId(),
-            $keys[3] => $this->getVoteCount(),
-            $keys[4] => $this->getId(),
+            $keys[2] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1018,36 +834,6 @@ abstract class Tag implements ActiveRecordInterface
 
                 $result[$key] = $this->aTopic->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aVerse) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'verse';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'defender_verse';
-                        break;
-                    default:
-                        $key = 'Verse';
-                }
-
-                $result[$key] = $this->aVerse->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->collTagVotes) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'tagVotes';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'defender_tag_votes';
-                        break;
-                    default:
-                        $key = 'TagVotes';
-                }
-
-                $result[$key] = $this->collTagVotes->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
         }
 
         return $result;
@@ -1062,11 +848,11 @@ abstract class Tag implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\Tag
+     * @return $this|\TopicParent
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = TagTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = TopicParentTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1077,24 +863,18 @@ abstract class Tag implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\Tag
+     * @return $this|\TopicParent
      */
     public function setByPosition($pos, $value)
     {
         switch ($pos) {
             case 0:
-                $this->setRelevantWords($value);
+                $this->setParentId($value);
                 break;
             case 1:
                 $this->setTopicId($value);
                 break;
             case 2:
-                $this->setVerseId($value);
-                break;
-            case 3:
-                $this->setVoteCount($value);
-                break;
-            case 4:
                 $this->setId($value);
                 break;
         } // switch()
@@ -1121,22 +901,16 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = TagTableMap::getFieldNames($keyType);
+        $keys = TopicParentTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setRelevantWords($arr[$keys[0]]);
+            $this->setParentId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
             $this->setTopicId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setVerseId($arr[$keys[2]]);
-        }
-        if (array_key_exists($keys[3], $arr)) {
-            $this->setVoteCount($arr[$keys[3]]);
-        }
-        if (array_key_exists($keys[4], $arr)) {
-            $this->setId($arr[$keys[4]]);
+            $this->setId($arr[$keys[2]]);
         }
     }
 
@@ -1157,7 +931,7 @@ abstract class Tag implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\Tag The current object, for fluid interface
+     * @return $this|\TopicParent The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -1177,22 +951,16 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(TagTableMap::DATABASE_NAME);
+        $criteria = new Criteria(TopicParentTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(TagTableMap::COL_RELEVANT_WORDS)) {
-            $criteria->add(TagTableMap::COL_RELEVANT_WORDS, $this->relevant_words);
+        if ($this->isColumnModified(TopicParentTableMap::COL_PARENT_ID)) {
+            $criteria->add(TopicParentTableMap::COL_PARENT_ID, $this->parent_id);
         }
-        if ($this->isColumnModified(TagTableMap::COL_TOPIC_ID)) {
-            $criteria->add(TagTableMap::COL_TOPIC_ID, $this->topic_id);
+        if ($this->isColumnModified(TopicParentTableMap::COL_TOPIC_ID)) {
+            $criteria->add(TopicParentTableMap::COL_TOPIC_ID, $this->topic_id);
         }
-        if ($this->isColumnModified(TagTableMap::COL_VERSE_ID)) {
-            $criteria->add(TagTableMap::COL_VERSE_ID, $this->verse_id);
-        }
-        if ($this->isColumnModified(TagTableMap::COL_VOTE_COUNT)) {
-            $criteria->add(TagTableMap::COL_VOTE_COUNT, $this->vote_count);
-        }
-        if ($this->isColumnModified(TagTableMap::COL_ID)) {
-            $criteria->add(TagTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(TopicParentTableMap::COL_ID)) {
+            $criteria->add(TopicParentTableMap::COL_ID, $this->id);
         }
 
         return $criteria;
@@ -1210,8 +978,8 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildTagQuery::create();
-        $criteria->add(TagTableMap::COL_ID, $this->id);
+        $criteria = ChildTopicParentQuery::create();
+        $criteria->add(TopicParentTableMap::COL_ID, $this->id);
 
         return $criteria;
     }
@@ -1273,31 +1041,15 @@ abstract class Tag implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Tag (or compatible) type.
+     * @param      object $copyObj An object of \TopicParent (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setRelevantWords($this->getRelevantWords());
+        $copyObj->setParentId($this->getParentId());
         $copyObj->setTopicId($this->getTopicId());
-        $copyObj->setVerseId($this->getVerseId());
-        $copyObj->setVoteCount($this->getVoteCount());
-
-        if ($deepCopy) {
-            // important: temporarily setNew(false) because this affects the behavior of
-            // the getter/setter methods for fkey referrer objects.
-            $copyObj->setNew(false);
-
-            foreach ($this->getTagVotes() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addTagVote($relObj->copy($deepCopy));
-                }
-            }
-
-        } // if ($deepCopy)
-
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1313,7 +1065,7 @@ abstract class Tag implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Tag Clone of current object.
+     * @return \TopicParent Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1330,15 +1082,11 @@ abstract class Tag implements ActiveRecordInterface
      * Declares an association between this object and a ChildTopic object.
      *
      * @param  ChildTopic $v
-     * @return $this|\Tag The current object (for fluent API support)
+     * @return $this|\TopicParent The current object (for fluent API support)
      * @throws PropelException
      */
     public function setTopic(ChildTopic $v = null)
     {
-        // aggregate_column_relation behavior
-        if (null !== $this->aTopic && $v !== $this->aTopic) {
-            $this->oldTopicTagCount = $this->aTopic;
-        }
         if ($v === null) {
             $this->setTopicId(NULL);
         } else {
@@ -1350,7 +1098,7 @@ abstract class Tag implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildTopic object, it will not be re-added.
         if ($v !== null) {
-            $v->addTag($this);
+            $v->addTopicParent($this);
         }
 
 
@@ -1374,303 +1122,11 @@ abstract class Tag implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aTopic->addTags($this);
+                $this->aTopic->addTopicParents($this);
              */
         }
 
         return $this->aTopic;
-    }
-
-    /**
-     * Declares an association between this object and a ChildVerse object.
-     *
-     * @param  ChildVerse $v
-     * @return $this|\Tag The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setVerse(ChildVerse $v = null)
-    {
-        if ($v === null) {
-            $this->setVerseId(NULL);
-        } else {
-            $this->setVerseId($v->getId());
-        }
-
-        $this->aVerse = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildVerse object, it will not be re-added.
-        if ($v !== null) {
-            $v->addTag($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildVerse object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildVerse The associated ChildVerse object.
-     * @throws PropelException
-     */
-    public function getVerse(ConnectionInterface $con = null)
-    {
-        if ($this->aVerse === null && ($this->verse_id !== null)) {
-            $this->aVerse = ChildVerseQuery::create()->findPk($this->verse_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aVerse->addTags($this);
-             */
-        }
-
-        return $this->aVerse;
-    }
-
-
-    /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
-     *
-     * @param      string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-        if ('TagVote' == $relationName) {
-            return $this->initTagVotes();
-        }
-    }
-
-    /**
-     * Clears out the collTagVotes collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addTagVotes()
-     */
-    public function clearTagVotes()
-    {
-        $this->collTagVotes = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collTagVotes collection loaded partially.
-     */
-    public function resetPartialTagVotes($v = true)
-    {
-        $this->collTagVotesPartial = $v;
-    }
-
-    /**
-     * Initializes the collTagVotes collection.
-     *
-     * By default this just sets the collTagVotes collection to an empty array (like clearcollTagVotes());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initTagVotes($overrideExisting = true)
-    {
-        if (null !== $this->collTagVotes && !$overrideExisting) {
-            return;
-        }
-
-        $collectionClassName = TagVoteTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collTagVotes = new $collectionClassName;
-        $this->collTagVotes->setModel('\TagVote');
-    }
-
-    /**
-     * Gets an array of ChildTagVote objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildTag is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildTagVote[] List of ChildTagVote objects
-     * @throws PropelException
-     */
-    public function getTagVotes(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collTagVotesPartial && !$this->isNew();
-        if (null === $this->collTagVotes || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collTagVotes) {
-                // return empty collection
-                $this->initTagVotes();
-            } else {
-                $collTagVotes = ChildTagVoteQuery::create(null, $criteria)
-                    ->filterByTag($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collTagVotesPartial && count($collTagVotes)) {
-                        $this->initTagVotes(false);
-
-                        foreach ($collTagVotes as $obj) {
-                            if (false == $this->collTagVotes->contains($obj)) {
-                                $this->collTagVotes->append($obj);
-                            }
-                        }
-
-                        $this->collTagVotesPartial = true;
-                    }
-
-                    return $collTagVotes;
-                }
-
-                if ($partial && $this->collTagVotes) {
-                    foreach ($this->collTagVotes as $obj) {
-                        if ($obj->isNew()) {
-                            $collTagVotes[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collTagVotes = $collTagVotes;
-                $this->collTagVotesPartial = false;
-            }
-        }
-
-        return $this->collTagVotes;
-    }
-
-    /**
-     * Sets a collection of ChildTagVote objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $tagVotes A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildTag The current object (for fluent API support)
-     */
-    public function setTagVotes(Collection $tagVotes, ConnectionInterface $con = null)
-    {
-        /** @var ChildTagVote[] $tagVotesToDelete */
-        $tagVotesToDelete = $this->getTagVotes(new Criteria(), $con)->diff($tagVotes);
-
-
-        $this->tagVotesScheduledForDeletion = $tagVotesToDelete;
-
-        foreach ($tagVotesToDelete as $tagVoteRemoved) {
-            $tagVoteRemoved->setTag(null);
-        }
-
-        $this->collTagVotes = null;
-        foreach ($tagVotes as $tagVote) {
-            $this->addTagVote($tagVote);
-        }
-
-        $this->collTagVotes = $tagVotes;
-        $this->collTagVotesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related TagVote objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related TagVote objects.
-     * @throws PropelException
-     */
-    public function countTagVotes(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collTagVotesPartial && !$this->isNew();
-        if (null === $this->collTagVotes || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collTagVotes) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getTagVotes());
-            }
-
-            $query = ChildTagVoteQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByTag($this)
-                ->count($con);
-        }
-
-        return count($this->collTagVotes);
-    }
-
-    /**
-     * Method called to associate a ChildTagVote object to this object
-     * through the ChildTagVote foreign key attribute.
-     *
-     * @param  ChildTagVote $l ChildTagVote
-     * @return $this|\Tag The current object (for fluent API support)
-     */
-    public function addTagVote(ChildTagVote $l)
-    {
-        if ($this->collTagVotes === null) {
-            $this->initTagVotes();
-            $this->collTagVotesPartial = true;
-        }
-
-        if (!$this->collTagVotes->contains($l)) {
-            $this->doAddTagVote($l);
-
-            if ($this->tagVotesScheduledForDeletion and $this->tagVotesScheduledForDeletion->contains($l)) {
-                $this->tagVotesScheduledForDeletion->remove($this->tagVotesScheduledForDeletion->search($l));
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildTagVote $tagVote The ChildTagVote object to add.
-     */
-    protected function doAddTagVote(ChildTagVote $tagVote)
-    {
-        $this->collTagVotes[]= $tagVote;
-        $tagVote->setTag($this);
-    }
-
-    /**
-     * @param  ChildTagVote $tagVote The ChildTagVote object to remove.
-     * @return $this|ChildTag The current object (for fluent API support)
-     */
-    public function removeTagVote(ChildTagVote $tagVote)
-    {
-        if ($this->getTagVotes()->contains($tagVote)) {
-            $pos = $this->collTagVotes->search($tagVote);
-            $this->collTagVotes->remove($pos);
-            if (null === $this->tagVotesScheduledForDeletion) {
-                $this->tagVotesScheduledForDeletion = clone $this->collTagVotes;
-                $this->tagVotesScheduledForDeletion->clear();
-            }
-            $this->tagVotesScheduledForDeletion[]= clone $tagVote;
-            $tagVote->setTag(null);
-        }
-
-        return $this;
     }
 
     /**
@@ -1681,19 +1137,13 @@ abstract class Tag implements ActiveRecordInterface
     public function clear()
     {
         if (null !== $this->aTopic) {
-            $this->aTopic->removeTag($this);
+            $this->aTopic->removeTopicParent($this);
         }
-        if (null !== $this->aVerse) {
-            $this->aVerse->removeTag($this);
-        }
-        $this->relevant_words = null;
+        $this->parent_id = null;
         $this->topic_id = null;
-        $this->verse_id = null;
-        $this->vote_count = null;
         $this->id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
-        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1710,16 +1160,9 @@ abstract class Tag implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collTagVotes) {
-                foreach ($this->collTagVotes as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
         } // if ($deep)
 
-        $this->collTagVotes = null;
         $this->aTopic = null;
-        $this->aVerse = null;
     }
 
     /**
@@ -1729,52 +1172,7 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(TagTableMap::DEFAULT_STRING_FORMAT);
-    }
-
-    // vote_count_aggregate behavior
-
-    /**
-     * Computes the value of the aggregate column vote_count *
-     * @param ConnectionInterface $con A connection object
-     *
-     * @return mixed The scalar result from the aggregate query
-     */
-    public function computeVoteCount(ConnectionInterface $con)
-    {
-        $stmt = $con->prepare('SELECT COUNT(tag_id) FROM defender_tag_vote WHERE defender_tag_vote.TAG_ID = :p1');
-        $stmt->bindValue(':p1', $this->getId());
-        $stmt->execute();
-
-        return $stmt->fetchColumn();
-    }
-
-    /**
-     * Updates the aggregate column vote_count *
-     * @param ConnectionInterface $con A connection object
-     */
-    public function updateVoteCount(ConnectionInterface $con)
-    {
-        $this->setVoteCount($this->computeVoteCount($con));
-        $this->save($con);
-    }
-
-    // aggregate_column_relation_tag_count_aggregate behavior
-
-    /**
-     * Update the aggregate column in the related Topic object
-     *
-     * @param ConnectionInterface $con A connection object
-     */
-    protected function updateRelatedTopicTagCount(ConnectionInterface $con)
-    {
-        if ($topic = $this->getTopic()) {
-            $topic->updateTagCount($con);
-        }
-        if ($this->oldTopicTagCount) {
-            $this->oldTopicTagCount->updateTagCount($con);
-            $this->oldTopicTagCount = null;
-        }
+        return (string) $this->exportTo(TopicParentTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

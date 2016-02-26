@@ -5,19 +5,21 @@ namespace Base;
 use \Tag as ChildTag;
 use \TagQuery as ChildTagQuery;
 use \Topic as ChildTopic;
+use \TopicParent as ChildTopicParent;
+use \TopicParentQuery as ChildTopicParentQuery;
 use \TopicQuery as ChildTopicQuery;
 use \TopicSynonym as ChildTopicSynonym;
 use \TopicSynonymQuery as ChildTopicSynonymQuery;
 use \Exception;
 use \PDO;
 use Map\TagTableMap;
+use Map\TopicParentTableMap;
 use Map\TopicSynonymTableMap;
 use Map\TopicTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Propel\Runtime\ActiveRecord\NestedSetRecursiveIterator;
 use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -69,6 +71,14 @@ abstract class Topic implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
+     * The value for the is_root field.
+     *
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $is_root;
+
+    /**
      * The value for the name field.
      *
      * @var        string
@@ -76,25 +86,12 @@ abstract class Topic implements ActiveRecordInterface
     protected $name;
 
     /**
-     * The value for the tree_left field.
+     * The value for the tag_count field.
      *
+     * Note: this column has a database default value of: 0
      * @var        int
      */
-    protected $tree_left;
-
-    /**
-     * The value for the tree_right field.
-     *
-     * @var        int
-     */
-    protected $tree_right;
-
-    /**
-     * The value for the tree_level field.
-     *
-     * @var        int
-     */
-    protected $tree_level;
+    protected $tag_count;
 
     /**
      * The value for the id field.
@@ -110,6 +107,12 @@ abstract class Topic implements ActiveRecordInterface
     protected $collTagsPartial;
 
     /**
+     * @var        ObjectCollection|ChildTopicParent[] Collection to store aggregation of ChildTopicParent objects.
+     */
+    protected $collTopicParents;
+    protected $collTopicParentsPartial;
+
+    /**
      * @var        ObjectCollection|ChildTopicSynonym[] Collection to store aggregation of ChildTopicSynonym objects.
      */
     protected $collTopicSynonyms;
@@ -123,41 +126,6 @@ abstract class Topic implements ActiveRecordInterface
      */
     protected $alreadyInSave = false;
 
-    // nested_set behavior
-
-    /**
-     * Queries to be executed in the save transaction
-     * @var        array
-     */
-    protected $nestedSetQueries = array();
-
-    /**
-     * Internal cache for children nodes
-     * @var        null|ObjectCollection
-     */
-    protected $collNestedSetChildren = null;
-
-    /**
-     * Internal cache for parent node
-     * @var        null|ChildTopic
-     */
-    protected $aNestedSetParent = null;
-
-    /**
-     * Left column for the set
-     */
-    const LEFT_COL = 'defender_topic.tree_left';
-
-    /**
-     * Right column for the set
-     */
-    const RIGHT_COL = 'defender_topic.tree_right';
-
-    /**
-     * Level column for the set
-     */
-    const LEVEL_COL = 'defender_topic.tree_level';
-
     /**
      * An array of objects scheduled for deletion.
      * @var ObjectCollection|ChildTag[]
@@ -166,15 +134,35 @@ abstract class Topic implements ActiveRecordInterface
 
     /**
      * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildTopicParent[]
+     */
+    protected $topicParentsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
      * @var ObjectCollection|ChildTopicSynonym[]
      */
     protected $topicSynonymsScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->is_root = false;
+        $this->tag_count = 0;
+    }
+
+    /**
      * Initializes internal state of Base\Topic object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -396,6 +384,26 @@ abstract class Topic implements ActiveRecordInterface
     }
 
     /**
+     * Get the [is_root] column value.
+     *
+     * @return boolean
+     */
+    public function getIsRoot()
+    {
+        return $this->is_root;
+    }
+
+    /**
+     * Get the [is_root] column value.
+     *
+     * @return boolean
+     */
+    public function isRoot()
+    {
+        return $this->getIsRoot();
+    }
+
+    /**
      * Get the [name] column value.
      *
      * @return string
@@ -406,33 +414,13 @@ abstract class Topic implements ActiveRecordInterface
     }
 
     /**
-     * Get the [tree_left] column value.
+     * Get the [tag_count] column value.
      *
      * @return int
      */
-    public function getTreeLeft()
+    public function getTagCount()
     {
-        return $this->tree_left;
-    }
-
-    /**
-     * Get the [tree_right] column value.
-     *
-     * @return int
-     */
-    public function getTreeRight()
-    {
-        return $this->tree_right;
-    }
-
-    /**
-     * Get the [tree_level] column value.
-     *
-     * @return int
-     */
-    public function getTreeLevel()
-    {
-        return $this->tree_level;
+        return $this->tag_count;
     }
 
     /**
@@ -444,6 +432,34 @@ abstract class Topic implements ActiveRecordInterface
     {
         return $this->id;
     }
+
+    /**
+     * Sets the value of the [is_root] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param  boolean|integer|string $v The new value
+     * @return $this|\Topic The current object (for fluent API support)
+     */
+    public function setIsRoot($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_root !== $v) {
+            $this->is_root = $v;
+            $this->modifiedColumns[TopicTableMap::COL_IS_ROOT] = true;
+        }
+
+        return $this;
+    } // setIsRoot()
 
     /**
      * Set the value of [name] column.
@@ -466,64 +482,24 @@ abstract class Topic implements ActiveRecordInterface
     } // setName()
 
     /**
-     * Set the value of [tree_left] column.
+     * Set the value of [tag_count] column.
      *
      * @param int $v new value
      * @return $this|\Topic The current object (for fluent API support)
      */
-    public function setTreeLeft($v)
+    public function setTagCount($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->tree_left !== $v) {
-            $this->tree_left = $v;
-            $this->modifiedColumns[TopicTableMap::COL_TREE_LEFT] = true;
+        if ($this->tag_count !== $v) {
+            $this->tag_count = $v;
+            $this->modifiedColumns[TopicTableMap::COL_TAG_COUNT] = true;
         }
 
         return $this;
-    } // setTreeLeft()
-
-    /**
-     * Set the value of [tree_right] column.
-     *
-     * @param int $v new value
-     * @return $this|\Topic The current object (for fluent API support)
-     */
-    public function setTreeRight($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->tree_right !== $v) {
-            $this->tree_right = $v;
-            $this->modifiedColumns[TopicTableMap::COL_TREE_RIGHT] = true;
-        }
-
-        return $this;
-    } // setTreeRight()
-
-    /**
-     * Set the value of [tree_level] column.
-     *
-     * @param int $v new value
-     * @return $this|\Topic The current object (for fluent API support)
-     */
-    public function setTreeLevel($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->tree_level !== $v) {
-            $this->tree_level = $v;
-            $this->modifiedColumns[TopicTableMap::COL_TREE_LEVEL] = true;
-        }
-
-        return $this;
-    } // setTreeLevel()
+    } // setTagCount()
 
     /**
      * Set the value of [id] column.
@@ -555,6 +531,14 @@ abstract class Topic implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->is_root !== false) {
+                return false;
+            }
+
+            if ($this->tag_count !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -581,19 +565,16 @@ abstract class Topic implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TopicTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TopicTableMap::translateFieldName('IsRoot', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_root = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TopicTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TopicTableMap::translateFieldName('TreeLeft', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->tree_left = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TopicTableMap::translateFieldName('TagCount', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->tag_count = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TopicTableMap::translateFieldName('TreeRight', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->tree_right = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TopicTableMap::translateFieldName('TreeLevel', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->tree_level = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TopicTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TopicTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -603,7 +584,7 @@ abstract class Topic implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = TopicTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = TopicTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Topic'), 0, $e);
@@ -666,6 +647,8 @@ abstract class Topic implements ActiveRecordInterface
 
             $this->collTags = null;
 
+            $this->collTopicParents = null;
+
             $this->collTopicSynonyms = null;
 
         } // if (deep)
@@ -694,24 +677,9 @@ abstract class Topic implements ActiveRecordInterface
             $deleteQuery = ChildTopicQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
-            // nested_set behavior
-            if ($this->isRoot()) {
-                throw new PropelException('Deletion of a root node is disabled for nested sets. Use ChildTopicQuery::deleteTree() instead to delete an entire tree');
-            }
-
-            if ($this->isInTree()) {
-                $this->deleteDescendants($con);
-            }
-
             if ($ret) {
                 $deleteQuery->delete($con);
                 $this->postDelete($con);
-                // nested_set behavior
-                if ($this->isInTree()) {
-                    // fill up the room that was used by the node
-                    ChildTopicQuery::shiftRLValues(-2, $this->getRightValue() + 1, null, $con);
-                }
-
                 $this->setDeleted(true);
             }
         });
@@ -743,17 +711,6 @@ abstract class Topic implements ActiveRecordInterface
         return $con->transaction(function () use ($con) {
             $isInsert = $this->isNew();
             $ret = $this->preSave($con);
-            // nested_set behavior
-            if ($this->isNew() && $this->isRoot()) {
-                // check if no other root exist in, the tree
-                $rootExists = ChildTopicQuery::create()
-                    ->addUsingAlias(ChildTopic::LEFT_COL, 1, Criteria::EQUAL)
-                    ->exists($con);
-                if ($rootExists) {
-                        throw new PropelException('A root node already exists in this tree. To allow multiple root nodes, add the `use_scope` parameter in the nested_set behavior tag.');
-                }
-            }
-            $this->processNestedSetQueries($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
             } else {
@@ -821,6 +778,23 @@ abstract class Topic implements ActiveRecordInterface
                 }
             }
 
+            if ($this->topicParentsScheduledForDeletion !== null) {
+                if (!$this->topicParentsScheduledForDeletion->isEmpty()) {
+                    \TopicParentQuery::create()
+                        ->filterByPrimaryKeys($this->topicParentsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->topicParentsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTopicParents !== null) {
+                foreach ($this->collTopicParents as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->topicSynonymsScheduledForDeletion !== null) {
                 if (!$this->topicSynonymsScheduledForDeletion->isEmpty()) {
                     \TopicSynonymQuery::create()
@@ -864,17 +838,14 @@ abstract class Topic implements ActiveRecordInterface
         }
 
          // check the columns in natural order for more readable SQL queries
+        if ($this->isColumnModified(TopicTableMap::COL_IS_ROOT)) {
+            $modifiedColumns[':p' . $index++]  = 'is_root';
+        }
         if ($this->isColumnModified(TopicTableMap::COL_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'name';
         }
-        if ($this->isColumnModified(TopicTableMap::COL_TREE_LEFT)) {
-            $modifiedColumns[':p' . $index++]  = 'tree_left';
-        }
-        if ($this->isColumnModified(TopicTableMap::COL_TREE_RIGHT)) {
-            $modifiedColumns[':p' . $index++]  = 'tree_right';
-        }
-        if ($this->isColumnModified(TopicTableMap::COL_TREE_LEVEL)) {
-            $modifiedColumns[':p' . $index++]  = 'tree_level';
+        if ($this->isColumnModified(TopicTableMap::COL_TAG_COUNT)) {
+            $modifiedColumns[':p' . $index++]  = 'tag_count';
         }
         if ($this->isColumnModified(TopicTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
@@ -890,17 +861,14 @@ abstract class Topic implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
+                    case 'is_root':
+                        $stmt->bindValue($identifier, (int) $this->is_root, PDO::PARAM_INT);
+                        break;
                     case 'name':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
-                    case 'tree_left':
-                        $stmt->bindValue($identifier, $this->tree_left, PDO::PARAM_INT);
-                        break;
-                    case 'tree_right':
-                        $stmt->bindValue($identifier, $this->tree_right, PDO::PARAM_INT);
-                        break;
-                    case 'tree_level':
-                        $stmt->bindValue($identifier, $this->tree_level, PDO::PARAM_INT);
+                    case 'tag_count':
+                        $stmt->bindValue($identifier, $this->tag_count, PDO::PARAM_INT);
                         break;
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
@@ -968,18 +936,15 @@ abstract class Topic implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getName();
+                return $this->getIsRoot();
                 break;
             case 1:
-                return $this->getTreeLeft();
+                return $this->getName();
                 break;
             case 2:
-                return $this->getTreeRight();
+                return $this->getTagCount();
                 break;
             case 3:
-                return $this->getTreeLevel();
-                break;
-            case 4:
                 return $this->getId();
                 break;
             default:
@@ -1012,11 +977,10 @@ abstract class Topic implements ActiveRecordInterface
         $alreadyDumpedObjects['Topic'][$this->hashCode()] = true;
         $keys = TopicTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getName(),
-            $keys[1] => $this->getTreeLeft(),
-            $keys[2] => $this->getTreeRight(),
-            $keys[3] => $this->getTreeLevel(),
-            $keys[4] => $this->getId(),
+            $keys[0] => $this->getIsRoot(),
+            $keys[1] => $this->getName(),
+            $keys[2] => $this->getTagCount(),
+            $keys[3] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1038,6 +1002,21 @@ abstract class Topic implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->collTags->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collTopicParents) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'topicParents';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'defender_topic_parents';
+                        break;
+                    default:
+                        $key = 'TopicParents';
+                }
+
+                $result[$key] = $this->collTopicParents->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collTopicSynonyms) {
 
@@ -1089,18 +1068,15 @@ abstract class Topic implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setName($value);
+                $this->setIsRoot($value);
                 break;
             case 1:
-                $this->setTreeLeft($value);
+                $this->setName($value);
                 break;
             case 2:
-                $this->setTreeRight($value);
+                $this->setTagCount($value);
                 break;
             case 3:
-                $this->setTreeLevel($value);
-                break;
-            case 4:
                 $this->setId($value);
                 break;
         } // switch()
@@ -1130,19 +1106,16 @@ abstract class Topic implements ActiveRecordInterface
         $keys = TopicTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setName($arr[$keys[0]]);
+            $this->setIsRoot($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setTreeLeft($arr[$keys[1]]);
+            $this->setName($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setTreeRight($arr[$keys[2]]);
+            $this->setTagCount($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setTreeLevel($arr[$keys[3]]);
-        }
-        if (array_key_exists($keys[4], $arr)) {
-            $this->setId($arr[$keys[4]]);
+            $this->setId($arr[$keys[3]]);
         }
     }
 
@@ -1185,17 +1158,14 @@ abstract class Topic implements ActiveRecordInterface
     {
         $criteria = new Criteria(TopicTableMap::DATABASE_NAME);
 
+        if ($this->isColumnModified(TopicTableMap::COL_IS_ROOT)) {
+            $criteria->add(TopicTableMap::COL_IS_ROOT, $this->is_root);
+        }
         if ($this->isColumnModified(TopicTableMap::COL_NAME)) {
             $criteria->add(TopicTableMap::COL_NAME, $this->name);
         }
-        if ($this->isColumnModified(TopicTableMap::COL_TREE_LEFT)) {
-            $criteria->add(TopicTableMap::COL_TREE_LEFT, $this->tree_left);
-        }
-        if ($this->isColumnModified(TopicTableMap::COL_TREE_RIGHT)) {
-            $criteria->add(TopicTableMap::COL_TREE_RIGHT, $this->tree_right);
-        }
-        if ($this->isColumnModified(TopicTableMap::COL_TREE_LEVEL)) {
-            $criteria->add(TopicTableMap::COL_TREE_LEVEL, $this->tree_level);
+        if ($this->isColumnModified(TopicTableMap::COL_TAG_COUNT)) {
+            $criteria->add(TopicTableMap::COL_TAG_COUNT, $this->tag_count);
         }
         if ($this->isColumnModified(TopicTableMap::COL_ID)) {
             $criteria->add(TopicTableMap::COL_ID, $this->id);
@@ -1286,10 +1256,9 @@ abstract class Topic implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setIsRoot($this->getIsRoot());
         $copyObj->setName($this->getName());
-        $copyObj->setTreeLeft($this->getTreeLeft());
-        $copyObj->setTreeRight($this->getTreeRight());
-        $copyObj->setTreeLevel($this->getTreeLevel());
+        $copyObj->setTagCount($this->getTagCount());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1299,6 +1268,12 @@ abstract class Topic implements ActiveRecordInterface
             foreach ($this->getTags() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTag($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getTopicParents() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTopicParent($relObj->copy($deepCopy));
                 }
             }
 
@@ -1351,6 +1326,9 @@ abstract class Topic implements ActiveRecordInterface
     {
         if ('Tag' == $relationName) {
             return $this->initTags();
+        }
+        if ('TopicParent' == $relationName) {
+            return $this->initTopicParents();
         }
         if ('TopicSynonym' == $relationName) {
             return $this->initTopicSynonyms();
@@ -1608,6 +1586,231 @@ abstract class Topic implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collTopicParents collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTopicParents()
+     */
+    public function clearTopicParents()
+    {
+        $this->collTopicParents = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collTopicParents collection loaded partially.
+     */
+    public function resetPartialTopicParents($v = true)
+    {
+        $this->collTopicParentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collTopicParents collection.
+     *
+     * By default this just sets the collTopicParents collection to an empty array (like clearcollTopicParents());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTopicParents($overrideExisting = true)
+    {
+        if (null !== $this->collTopicParents && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = TopicParentTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collTopicParents = new $collectionClassName;
+        $this->collTopicParents->setModel('\TopicParent');
+    }
+
+    /**
+     * Gets an array of ChildTopicParent objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildTopic is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildTopicParent[] List of ChildTopicParent objects
+     * @throws PropelException
+     */
+    public function getTopicParents(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTopicParentsPartial && !$this->isNew();
+        if (null === $this->collTopicParents || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTopicParents) {
+                // return empty collection
+                $this->initTopicParents();
+            } else {
+                $collTopicParents = ChildTopicParentQuery::create(null, $criteria)
+                    ->filterByTopic($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collTopicParentsPartial && count($collTopicParents)) {
+                        $this->initTopicParents(false);
+
+                        foreach ($collTopicParents as $obj) {
+                            if (false == $this->collTopicParents->contains($obj)) {
+                                $this->collTopicParents->append($obj);
+                            }
+                        }
+
+                        $this->collTopicParentsPartial = true;
+                    }
+
+                    return $collTopicParents;
+                }
+
+                if ($partial && $this->collTopicParents) {
+                    foreach ($this->collTopicParents as $obj) {
+                        if ($obj->isNew()) {
+                            $collTopicParents[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTopicParents = $collTopicParents;
+                $this->collTopicParentsPartial = false;
+            }
+        }
+
+        return $this->collTopicParents;
+    }
+
+    /**
+     * Sets a collection of ChildTopicParent objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $topicParents A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildTopic The current object (for fluent API support)
+     */
+    public function setTopicParents(Collection $topicParents, ConnectionInterface $con = null)
+    {
+        /** @var ChildTopicParent[] $topicParentsToDelete */
+        $topicParentsToDelete = $this->getTopicParents(new Criteria(), $con)->diff($topicParents);
+
+
+        $this->topicParentsScheduledForDeletion = $topicParentsToDelete;
+
+        foreach ($topicParentsToDelete as $topicParentRemoved) {
+            $topicParentRemoved->setTopic(null);
+        }
+
+        $this->collTopicParents = null;
+        foreach ($topicParents as $topicParent) {
+            $this->addTopicParent($topicParent);
+        }
+
+        $this->collTopicParents = $topicParents;
+        $this->collTopicParentsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related TopicParent objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related TopicParent objects.
+     * @throws PropelException
+     */
+    public function countTopicParents(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTopicParentsPartial && !$this->isNew();
+        if (null === $this->collTopicParents || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTopicParents) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getTopicParents());
+            }
+
+            $query = ChildTopicParentQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTopic($this)
+                ->count($con);
+        }
+
+        return count($this->collTopicParents);
+    }
+
+    /**
+     * Method called to associate a ChildTopicParent object to this object
+     * through the ChildTopicParent foreign key attribute.
+     *
+     * @param  ChildTopicParent $l ChildTopicParent
+     * @return $this|\Topic The current object (for fluent API support)
+     */
+    public function addTopicParent(ChildTopicParent $l)
+    {
+        if ($this->collTopicParents === null) {
+            $this->initTopicParents();
+            $this->collTopicParentsPartial = true;
+        }
+
+        if (!$this->collTopicParents->contains($l)) {
+            $this->doAddTopicParent($l);
+
+            if ($this->topicParentsScheduledForDeletion and $this->topicParentsScheduledForDeletion->contains($l)) {
+                $this->topicParentsScheduledForDeletion->remove($this->topicParentsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildTopicParent $topicParent The ChildTopicParent object to add.
+     */
+    protected function doAddTopicParent(ChildTopicParent $topicParent)
+    {
+        $this->collTopicParents[]= $topicParent;
+        $topicParent->setTopic($this);
+    }
+
+    /**
+     * @param  ChildTopicParent $topicParent The ChildTopicParent object to remove.
+     * @return $this|ChildTopic The current object (for fluent API support)
+     */
+    public function removeTopicParent(ChildTopicParent $topicParent)
+    {
+        if ($this->getTopicParents()->contains($topicParent)) {
+            $pos = $this->collTopicParents->search($topicParent);
+            $this->collTopicParents->remove($pos);
+            if (null === $this->topicParentsScheduledForDeletion) {
+                $this->topicParentsScheduledForDeletion = clone $this->collTopicParents;
+                $this->topicParentsScheduledForDeletion->clear();
+            }
+            $this->topicParentsScheduledForDeletion[]= clone $topicParent;
+            $topicParent->setTopic(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears out the collTopicSynonyms collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -1839,13 +2042,13 @@ abstract class Topic implements ActiveRecordInterface
      */
     public function clear()
     {
+        $this->is_root = null;
         $this->name = null;
-        $this->tree_left = null;
-        $this->tree_right = null;
-        $this->tree_level = null;
+        $this->tag_count = null;
         $this->id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1867,6 +2070,11 @@ abstract class Topic implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collTopicParents) {
+                foreach ($this->collTopicParents as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collTopicSynonyms) {
                 foreach ($this->collTopicSynonyms as $o) {
                     $o->clearAllReferences($deep);
@@ -1874,10 +2082,8 @@ abstract class Topic implements ActiveRecordInterface
             }
         } // if ($deep)
 
-        // nested_set behavior
-        $this->collNestedSetChildren = null;
-        $this->aNestedSetParent = null;
         $this->collTags = null;
+        $this->collTopicParents = null;
         $this->collTopicSynonyms = null;
     }
 
@@ -1891,840 +2097,31 @@ abstract class Topic implements ActiveRecordInterface
         return (string) $this->exportTo(TopicTableMap::DEFAULT_STRING_FORMAT);
     }
 
-    // nested_set behavior
+    // tag_count_aggregate behavior
 
     /**
-     * Execute queries that were saved to be run inside the save transaction
+     * Computes the value of the aggregate column tag_count *
+     * @param ConnectionInterface $con A connection object
      *
-     * @param  ConnectionInterface $con Connection to use.
+     * @return mixed The scalar result from the aggregate query
      */
-    protected function processNestedSetQueries(ConnectionInterface $con)
+    public function computeTagCount(ConnectionInterface $con)
     {
-        foreach ($this->nestedSetQueries as $query) {
-            $query['arguments'][] = $con;
-            call_user_func_array($query['callable'], $query['arguments']);
-        }
-        $this->nestedSetQueries = array();
+        $stmt = $con->prepare('SELECT COUNT(topic_id) FROM defender_tag WHERE defender_tag.TOPIC_ID = :p1');
+        $stmt->bindValue(':p1', $this->getId());
+        $stmt->execute();
+
+        return $stmt->fetchColumn();
     }
 
     /**
-     * Proxy getter method for the left value of the nested set model.
-     * It provides a generic way to get the value, whatever the actual column name is.
-     *
-     * @return     int The nested set left value
+     * Updates the aggregate column tag_count *
+     * @param ConnectionInterface $con A connection object
      */
-    public function getLeftValue()
+    public function updateTagCount(ConnectionInterface $con)
     {
-        return $this->tree_left;
-    }
-
-    /**
-     * Proxy getter method for the right value of the nested set model.
-     * It provides a generic way to get the value, whatever the actual column name is.
-     *
-     * @return     int The nested set right value
-     */
-    public function getRightValue()
-    {
-        return $this->tree_right;
-    }
-
-    /**
-     * Proxy getter method for the level value of the nested set model.
-     * It provides a generic way to get the value, whatever the actual column name is.
-     *
-     * @return     int The nested set level value
-     */
-    public function getLevel()
-    {
-        return $this->tree_level;
-    }
-
-    /**
-     * Proxy setter method for the left value of the nested set model.
-     * It provides a generic way to set the value, whatever the actual column name is.
-     *
-     * @param  int $v The nested set left value
-     * @return $this|ChildTopic The current object (for fluent API support)
-     */
-    public function setLeftValue($v)
-    {
-        return $this->setTreeLeft($v);
-    }
-
-    /**
-     * Proxy setter method for the right value of the nested set model.
-     * It provides a generic way to set the value, whatever the actual column name is.
-     *
-     * @param      int $v The nested set right value
-     * @return     $this|ChildTopic The current object (for fluent API support)
-     */
-    public function setRightValue($v)
-    {
-        return $this->setTreeRight($v);
-    }
-
-    /**
-     * Proxy setter method for the level value of the nested set model.
-     * It provides a generic way to set the value, whatever the actual column name is.
-     *
-     * @param      int $v The nested set level value
-     * @return     $this|ChildTopic The current object (for fluent API support)
-     */
-    public function setLevel($v)
-    {
-        return $this->setTreeLevel($v);
-    }
-
-    /**
-     * Creates the supplied node as the root node.
-     *
-     * @return     $this|ChildTopic The current object (for fluent API support)
-     * @throws     PropelException
-     */
-    public function makeRoot()
-    {
-        if ($this->getLeftValue() || $this->getRightValue()) {
-            throw new PropelException('Cannot turn an existing node into a root node.');
-        }
-
-        $this->setLeftValue(1);
-        $this->setRightValue(2);
-        $this->setLevel(0);
-
-        return $this;
-    }
-
-    /**
-     * Tests if object is a node, i.e. if it is inserted in the tree
-     *
-     * @return     bool
-     */
-    public function isInTree()
-    {
-        return $this->getLeftValue() > 0 && $this->getRightValue() > $this->getLeftValue();
-    }
-
-    /**
-     * Tests if node is a root
-     *
-     * @return     bool
-     */
-    public function isRoot()
-    {
-        return $this->isInTree() && $this->getLeftValue() == 1;
-    }
-
-    /**
-     * Tests if node is a leaf
-     *
-     * @return     bool
-     */
-    public function isLeaf()
-    {
-        return $this->isInTree() &&  ($this->getRightValue() - $this->getLeftValue()) == 1;
-    }
-
-    /**
-     * Tests if node is a descendant of another node
-     *
-     * @param      ChildTopic $parent Propel node object
-     * @return     bool
-     */
-    public function isDescendantOf(ChildTopic $parent)
-    {
-        return $this->isInTree() && $this->getLeftValue() > $parent->getLeftValue() && $this->getRightValue() < $parent->getRightValue();
-    }
-
-    /**
-     * Tests if node is a ancestor of another node
-     *
-     * @param      ChildTopic $child Propel node object
-     * @return     bool
-     */
-    public function isAncestorOf(ChildTopic $child)
-    {
-        return $child->isDescendantOf($this);
-    }
-
-    /**
-     * Tests if object has an ancestor
-     *
-     * @return boolean
-     */
-    public function hasParent()
-    {
-        return $this->getLevel() > 0;
-    }
-
-    /**
-     * Sets the cache for parent node of the current object.
-     * Warning: this does not move the current object in the tree.
-     * Use moveTofirstChildOf() or moveToLastChildOf() for that purpose
-     *
-     * @param      ChildTopic $parent
-     * @return     $this|ChildTopic The current object, for fluid interface
-     */
-    public function setParent(ChildTopic $parent = null)
-    {
-        $this->aNestedSetParent = $parent;
-
-        return $this;
-    }
-
-    /**
-     * Gets parent node for the current object if it exists
-     * The result is cached so further calls to the same method don't issue any queries
-     *
-     * @param  ConnectionInterface $con Connection to use.
-     * @return ChildTopic|null Propel object if exists else null
-     */
-    public function getParent(ConnectionInterface $con = null)
-    {
-        if (null === $this->aNestedSetParent && $this->hasParent()) {
-            $this->aNestedSetParent = ChildTopicQuery::create()
-                ->ancestorsOf($this)
-                ->orderByLevel(true)
-                ->findOne($con);
-        }
-
-        return $this->aNestedSetParent;
-    }
-
-    /**
-     * Determines if the node has previous sibling
-     *
-     * @param      ConnectionInterface $con Connection to use.
-     * @return     bool
-     */
-    public function hasPrevSibling(ConnectionInterface $con = null)
-    {
-        if (!ChildTopicQuery::isValid($this)) {
-            return false;
-        }
-
-        return ChildTopicQuery::create()
-            ->filterByTreeRight($this->getLeftValue() - 1)
-            ->exists($con);
-    }
-
-    /**
-     * Gets previous sibling for the given node if it exists
-     *
-     * @param      ConnectionInterface $con Connection to use.
-     * @return     ChildTopic|null         Propel object if exists else null
-     */
-    public function getPrevSibling(ConnectionInterface $con = null)
-    {
-        return ChildTopicQuery::create()
-            ->filterByTreeRight($this->getLeftValue() - 1)
-            ->findOne($con);
-    }
-
-    /**
-     * Determines if the node has next sibling
-     *
-     * @param      ConnectionInterface $con Connection to use.
-     * @return     bool
-     */
-    public function hasNextSibling(ConnectionInterface $con = null)
-    {
-        if (!ChildTopicQuery::isValid($this)) {
-            return false;
-        }
-
-        return ChildTopicQuery::create()
-            ->filterByTreeLeft($this->getRightValue() + 1)
-            ->exists($con);
-    }
-
-    /**
-     * Gets next sibling for the given node if it exists
-     *
-     * @param      ConnectionInterface $con Connection to use.
-     * @return     ChildTopic|null         Propel object if exists else null
-     */
-    public function getNextSibling(ConnectionInterface $con = null)
-    {
-        return ChildTopicQuery::create()
-            ->filterByTreeLeft($this->getRightValue() + 1)
-            ->findOne($con);
-    }
-
-    /**
-     * Clears out the $collNestedSetChildren collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return     void
-     */
-    public function clearNestedSetChildren()
-    {
-        $this->collNestedSetChildren = null;
-    }
-
-    /**
-     * Initializes the $collNestedSetChildren collection.
-     *
-     * @return     void
-     */
-    public function initNestedSetChildren()
-    {
-        $collectionClassName = \Map\TopicTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collNestedSetChildren = new $collectionClassName;
-        $this->collNestedSetChildren->setModel('\Topic');
-    }
-
-    /**
-     * Adds an element to the internal $collNestedSetChildren collection.
-     * Beware that this doesn't insert a node in the tree.
-     * This method is only used to facilitate children hydration.
-     *
-     * @param      ChildTopic $topic
-     *
-     * @return     void
-     */
-    public function addNestedSetChild(ChildTopic $topic)
-    {
-        if (null === $this->collNestedSetChildren) {
-            $this->initNestedSetChildren();
-        }
-        if (!in_array($topic, $this->collNestedSetChildren->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->collNestedSetChildren[]= $topic;
-            $topic->setParent($this);
-        }
-    }
-
-    /**
-     * Tests if node has children
-     *
-     * @return     bool
-     */
-    public function hasChildren()
-    {
-        return ($this->getRightValue() - $this->getLeftValue()) > 1;
-    }
-
-    /**
-     * Gets the children of the given node
-     *
-     * @param      Criteria  $criteria Criteria to filter results.
-     * @param      ConnectionInterface $con Connection to use.
-     * @return     ObjectCollection|ChildTopic[] List of ChildTopic objects
-     */
-    public function getChildren(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        if (null === $this->collNestedSetChildren || null !== $criteria) {
-            if ($this->isLeaf() || ($this->isNew() && null === $this->collNestedSetChildren)) {
-                // return empty collection
-                $this->initNestedSetChildren();
-            } else {
-                $collNestedSetChildren = ChildTopicQuery::create(null, $criteria)
-                    ->childrenOf($this)
-                    ->orderByBranch()
-                    ->find($con);
-                if (null !== $criteria) {
-                    return $collNestedSetChildren;
-                }
-                $this->collNestedSetChildren = $collNestedSetChildren;
-            }
-        }
-
-        return $this->collNestedSetChildren;
-    }
-
-    /**
-     * Gets number of children for the given node
-     *
-     * @param      Criteria  $criteria Criteria to filter results.
-     * @param      ConnectionInterface $con Connection to use.
-     * @return     int       Number of children
-     */
-    public function countChildren(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        if (null === $this->collNestedSetChildren || null !== $criteria) {
-            if ($this->isLeaf() || ($this->isNew() && null === $this->collNestedSetChildren)) {
-                return 0;
-            } else {
-                return ChildTopicQuery::create(null, $criteria)
-                    ->childrenOf($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collNestedSetChildren);
-        }
-    }
-
-    /**
-     * Gets the first child of the given node
-     *
-     * @param      Criteria $criteria Criteria to filter results.
-     * @param      ConnectionInterface $con Connection to use.
-     * @return     ChildTopic|null First child or null if this is a leaf
-     */
-    public function getFirstChild(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        if ($this->isLeaf()) {
-            return null;
-        } else {
-            return ChildTopicQuery::create(null, $criteria)
-                ->childrenOf($this)
-                ->orderByBranch()
-                ->findOne($con);
-        }
-    }
-
-    /**
-     * Gets the last child of the given node
-     *
-     * @param      Criteria $criteria Criteria to filter results.
-     * @param      ConnectionInterface $con Connection to use.
-     * @return     ChildTopic|null Last child or null if this is a leaf
-     */
-    public function getLastChild(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        if ($this->isLeaf()) {
-            return null;
-        } else {
-            return ChildTopicQuery::create(null, $criteria)
-                ->childrenOf($this)
-                ->orderByBranch(true)
-                ->findOne($con);
-        }
-    }
-
-    /**
-     * Gets the siblings of the given node
-     *
-     * @param boolean             $includeNode Whether to include the current node or not
-     * @param Criteria            $criteria Criteria to filter results.
-     * @param ConnectionInterface $con Connection to use.
-     *
-     * @return ObjectCollection|ChildTopic[] List of ChildTopic objects
-     */
-    public function getSiblings($includeNode = false, Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        if ($this->isRoot()) {
-            return array();
-        } else {
-            $query = ChildTopicQuery::create(null, $criteria)
-                ->childrenOf($this->getParent($con))
-                ->orderByBranch();
-            if (!$includeNode) {
-                $query->prune($this);
-            }
-
-            return $query->find($con);
-        }
-    }
-
-    /**
-     * Gets descendants for the given node
-     *
-     * @param      Criteria $criteria Criteria to filter results.
-     * @param      ConnectionInterface $con Connection to use.
-     * @return     ObjectCollection|ChildTopic[] List of ChildTopic objects
-     */
-    public function getDescendants(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        if ($this->isLeaf()) {
-            return array();
-        } else {
-            return ChildTopicQuery::create(null, $criteria)
-                ->descendantsOf($this)
-                ->orderByBranch()
-                ->find($con);
-        }
-    }
-
-    /**
-     * Gets number of descendants for the given node
-     *
-     * @param      Criteria $criteria Criteria to filter results.
-     * @param      ConnectionInterface $con Connection to use.
-     * @return     int         Number of descendants
-     */
-    public function countDescendants(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        if ($this->isLeaf()) {
-            // save one query
-            return 0;
-        } else {
-            return ChildTopicQuery::create(null, $criteria)
-                ->descendantsOf($this)
-                ->count($con);
-        }
-    }
-
-    /**
-     * Gets descendants for the given node, plus the current node
-     *
-     * @param      Criteria $criteria Criteria to filter results.
-     * @param      ConnectionInterface $con Connection to use.
-     * @return     ObjectCollection|ChildTopic[] List of ChildTopic objects
-     */
-    public function getBranch(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        return ChildTopicQuery::create(null, $criteria)
-            ->branchOf($this)
-            ->orderByBranch()
-            ->find($con);
-    }
-
-    /**
-     * Gets ancestors for the given node, starting with the root node
-     * Use it for breadcrumb paths for instance
-     *
-     * @param      Criteria $criteria Criteria to filter results.
-     * @param      ConnectionInterface $con Connection to use.
-     * @return     ObjectCollection|ChildTopic[] List of ChildTopic objects
-     */
-    public function getAncestors(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        if ($this->isRoot()) {
-            // save one query
-            return array();
-        } else {
-            return ChildTopicQuery::create(null, $criteria)
-                ->ancestorsOf($this)
-                ->orderByBranch()
-                ->find($con);
-        }
-    }
-
-    /**
-     * Inserts the given $child node as first child of current
-     * The modifications in the current object and the tree
-     * are not persisted until the child object is saved.
-     *
-     * @param      ChildTopic $child    Propel object for child node
-     *
-     * @return     $this|ChildTopic The current Propel object
-     */
-    public function addChild(ChildTopic $child)
-    {
-        if ($this->isNew()) {
-            throw new PropelException('A ChildTopic object must not be new to accept children.');
-        }
-        $child->insertAsFirstChildOf($this);
-
-        return $this;
-    }
-
-    /**
-     * Inserts the current node as first child of given $parent node
-     * The modifications in the current object and the tree
-     * are not persisted until the current object is saved.
-     *
-     * @param      ChildTopic $parent    Propel object for parent node
-     *
-     * @return     $this|ChildTopic The current Propel object
-     */
-    public function insertAsFirstChildOf(ChildTopic $parent)
-    {
-        if ($this->isInTree()) {
-            throw new PropelException('A ChildTopic object must not already be in the tree to be inserted. Use the moveToFirstChildOf() instead.');
-        }
-        $left = $parent->getLeftValue() + 1;
-        // Update node properties
-        $this->setLeftValue($left);
-        $this->setRightValue($left + 1);
-        $this->setLevel($parent->getLevel() + 1);
-        // update the children collection of the parent
-        $parent->addNestedSetChild($this);
-
-        // Keep the tree modification query for the save() transaction
-        $this->nestedSetQueries[] = array(
-            'callable'  => array('\TopicQuery', 'makeRoomForLeaf'),
-            'arguments' => array($left, $this->isNew() ? null : $this)
-        );
-
-        return $this;
-    }
-
-    /**
-     * Inserts the current node as last child of given $parent node
-     * The modifications in the current object and the tree
-     * are not persisted until the current object is saved.
-     *
-     * @param  ChildTopic $parent Propel object for parent node
-     * @return $this|ChildTopic The current Propel object
-     */
-    public function insertAsLastChildOf(ChildTopic $parent)
-    {
-        if ($this->isInTree()) {
-            throw new PropelException(
-                'A ChildTopic object must not already be in the tree to be inserted. Use the moveToLastChildOf() instead.'
-            );
-        }
-
-        $left = $parent->getRightValue();
-        // Update node properties
-        $this->setLeftValue($left);
-        $this->setRightValue($left + 1);
-        $this->setLevel($parent->getLevel() + 1);
-
-        // update the children collection of the parent
-        $parent->addNestedSetChild($this);
-
-        // Keep the tree modification query for the save() transaction
-        $this->nestedSetQueries []= array(
-            'callable'  => array('\TopicQuery', 'makeRoomForLeaf'),
-            'arguments' => array($left, $this->isNew() ? null : $this)
-        );
-
-        return $this;
-    }
-
-    /**
-     * Inserts the current node as prev sibling given $sibling node
-     * The modifications in the current object and the tree
-     * are not persisted until the current object is saved.
-     *
-     * @param      ChildTopic $sibling    Propel object for parent node
-     *
-     * @return     $this|ChildTopic The current Propel object
-     */
-    public function insertAsPrevSiblingOf(ChildTopic $sibling)
-    {
-        if ($this->isInTree()) {
-            throw new PropelException('A ChildTopic object must not already be in the tree to be inserted. Use the moveToPrevSiblingOf() instead.');
-        }
-        $left = $sibling->getLeftValue();
-        // Update node properties
-        $this->setLeftValue($left);
-        $this->setRightValue($left + 1);
-        $this->setLevel($sibling->getLevel());
-        // Keep the tree modification query for the save() transaction
-        $this->nestedSetQueries []= array(
-            'callable'  => array('\TopicQuery', 'makeRoomForLeaf'),
-            'arguments' => array($left, $this->isNew() ? null : $this)
-        );
-
-        return $this;
-    }
-
-    /**
-     * Inserts the current node as next sibling given $sibling node
-     * The modifications in the current object and the tree
-     * are not persisted until the current object is saved.
-     *
-     * @param      ChildTopic $sibling    Propel object for parent node
-     *
-     * @return     $this|ChildTopic The current Propel object
-     */
-    public function insertAsNextSiblingOf(ChildTopic $sibling)
-    {
-        if ($this->isInTree()) {
-            throw new PropelException('A ChildTopic object must not already be in the tree to be inserted. Use the moveToNextSiblingOf() instead.');
-        }
-        $left = $sibling->getRightValue() + 1;
-        // Update node properties
-        $this->setLeftValue($left);
-        $this->setRightValue($left + 1);
-        $this->setLevel($sibling->getLevel());
-        // Keep the tree modification query for the save() transaction
-        $this->nestedSetQueries []= array(
-            'callable'  => array('\TopicQuery', 'makeRoomForLeaf'),
-            'arguments' => array($left, $this->isNew() ? null : $this)
-        );
-
-        return $this;
-    }
-
-    /**
-     * Moves current node and its subtree to be the first child of $parent
-     * The modifications in the current object and the tree are immediate
-     *
-     * @param      ChildTopic $parent    Propel object for parent node
-     * @param      ConnectionInterface $con    Connection to use.
-     *
-     * @return     $this|ChildTopic The current Propel object
-     */
-    public function moveToFirstChildOf(ChildTopic $parent, ConnectionInterface $con = null)
-    {
-        if (!$this->isInTree()) {
-            throw new PropelException('A ChildTopic object must be already in the tree to be moved. Use the insertAsFirstChildOf() instead.');
-        }
-        if ($parent->isDescendantOf($this)) {
-            throw new PropelException('Cannot move a node as child of one of its subtree nodes.');
-        }
-
-        $this->moveSubtreeTo($parent->getLeftValue() + 1, $parent->getLevel() - $this->getLevel() + 1, $con);
-
-        return $this;
-    }
-
-    /**
-     * Moves current node and its subtree to be the last child of $parent
-     * The modifications in the current object and the tree are immediate
-     *
-     * @param      ChildTopic $parent    Propel object for parent node
-     * @param      ConnectionInterface $con    Connection to use.
-     *
-     * @return     $this|ChildTopic The current Propel object
-     */
-    public function moveToLastChildOf(ChildTopic $parent, ConnectionInterface $con = null)
-    {
-        if (!$this->isInTree()) {
-            throw new PropelException('A ChildTopic object must be already in the tree to be moved. Use the insertAsLastChildOf() instead.');
-        }
-        if ($parent->isDescendantOf($this)) {
-            throw new PropelException('Cannot move a node as child of one of its subtree nodes.');
-        }
-
-        $this->moveSubtreeTo($parent->getRightValue(), $parent->getLevel() - $this->getLevel() + 1, $con);
-
-        return $this;
-    }
-
-    /**
-     * Moves current node and its subtree to be the previous sibling of $sibling
-     * The modifications in the current object and the tree are immediate
-     *
-     * @param      ChildTopic $sibling    Propel object for sibling node
-     * @param      ConnectionInterface $con    Connection to use.
-     *
-     * @return     $this|ChildTopic The current Propel object
-     */
-    public function moveToPrevSiblingOf(ChildTopic $sibling, ConnectionInterface $con = null)
-    {
-        if (!$this->isInTree()) {
-            throw new PropelException('A ChildTopic object must be already in the tree to be moved. Use the insertAsPrevSiblingOf() instead.');
-        }
-        if ($sibling->isRoot()) {
-            throw new PropelException('Cannot move to previous sibling of a root node.');
-        }
-        if ($sibling->isDescendantOf($this)) {
-            throw new PropelException('Cannot move a node as sibling of one of its subtree nodes.');
-        }
-
-        $this->moveSubtreeTo($sibling->getLeftValue(), $sibling->getLevel() - $this->getLevel(), $con);
-
-        return $this;
-    }
-
-    /**
-     * Moves current node and its subtree to be the next sibling of $sibling
-     * The modifications in the current object and the tree are immediate
-     *
-     * @param      ChildTopic $sibling    Propel object for sibling node
-     * @param      ConnectionInterface $con    Connection to use.
-     *
-     * @return     $this|ChildTopic The current Propel object
-     */
-    public function moveToNextSiblingOf(ChildTopic $sibling, ConnectionInterface $con = null)
-    {
-        if (!$this->isInTree()) {
-            throw new PropelException('A ChildTopic object must be already in the tree to be moved. Use the insertAsNextSiblingOf() instead.');
-        }
-        if ($sibling->isRoot()) {
-            throw new PropelException('Cannot move to next sibling of a root node.');
-        }
-        if ($sibling->isDescendantOf($this)) {
-            throw new PropelException('Cannot move a node as sibling of one of its subtree nodes.');
-        }
-
-        $this->moveSubtreeTo($sibling->getRightValue() + 1, $sibling->getLevel() - $this->getLevel(), $con);
-
-        return $this;
-    }
-
-    /**
-     * Move current node and its children to location $destLeft and updates rest of tree
-     *
-     * @param      int    $destLeft Destination left value
-     * @param      int    $levelDelta Delta to add to the levels
-     * @param      ConnectionInterface $con        Connection to use.
-     */
-    protected function moveSubtreeTo($destLeft, $levelDelta, ConnectionInterface $con = null)
-    {
-        $left  = $this->getLeftValue();
-        $right = $this->getRightValue();
-
-        $treeSize = $right - $left +1;
-
-        if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TopicTableMap::DATABASE_NAME);
-        }
-
-        $con->transaction(function () use ($con, $treeSize, $destLeft, $left, $right, $levelDelta) {
-            $preventDefault = false;
-
-            // make room next to the target for the subtree
-            ChildTopicQuery::shiftRLValues($treeSize, $destLeft, null, $con);
-
-            if (!$preventDefault) {
-
-                if ($left >= $destLeft) { // src was shifted too?
-                    $left += $treeSize;
-                    $right += $treeSize;
-                }
-
-                if ($levelDelta) {
-                    // update the levels of the subtree
-                    ChildTopicQuery::shiftLevel($levelDelta, $left, $right, $con);
-                }
-
-                // move the subtree to the target
-                ChildTopicQuery::shiftRLValues($destLeft - $left, $left, $right, $con);
-            }
-
-            // remove the empty room at the previous location of the subtree
-            ChildTopicQuery::shiftRLValues(-$treeSize, $right + 1, null, $con);
-
-            // update all loaded nodes
-            ChildTopicQuery::updateLoadedNodes(null, $con);
-        });
-    }
-
-    /**
-     * Deletes all descendants for the given node
-     * Instance pooling is wiped out by this command,
-     * so existing ChildTopic instances are probably invalid (except for the current one)
-     *
-     * @param      ConnectionInterface $con Connection to use.
-     *
-     * @return     int         number of deleted nodes
-     */
-    public function deleteDescendants(ConnectionInterface $con = null)
-    {
-        if ($this->isLeaf()) {
-            // save one query
-            return;
-        }
-        if (null === $con) {
-            $con = Propel::getServiceContainer()->getReadConnection(TopicTableMap::DATABASE_NAME);
-        }
-        $left = $this->getLeftValue();
-        $right = $this->getRightValue();
-
-        return $con->transaction(function () use ($con, $left, $right) {
-            // delete descendant nodes (will empty the instance pool)
-            $ret = ChildTopicQuery::create()
-                ->descendantsOf($this)
-                ->delete($con);
-
-            // fill up the room that was used by descendants
-            ChildTopicQuery::shiftRLValues($left - $right + 1, $right, null, $con);
-
-            // fix the right value for the current node, which is now a leaf
-            $this->setRightValue($left + 1);
-
-            return $ret;
-        });
-    }
-
-    /**
-     * Returns a pre-order iterator for this node and its children.
-     *
-     * @return NestedSetRecursiveIterator
-     */
-    public function getIterator()
-    {
-        return new NestedSetRecursiveIterator($this);
+        $this->setTagCount($this->computeTagCount($con));
+        $this->save($con);
     }
 
     /**

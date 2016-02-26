@@ -50,13 +50,28 @@
 			<reference foreign="id" local="tag_id" />
 		</foreign-key>
 	</table>
+
+	<!-- Topic tables -->
 	<table name="topic">
-		<behavior name="nested_set" />
+		<behavior id="tag_count_aggregate" name="aggregate_column">
+			<parameter name="name" value="tag_count" />
+			<parameter name="foreign_table" value="tag" />
+			<parameter name="expression" value="COUNT(topic_id)" />
+		</behavior>
+		<column defaultValue="0" name="is_root" required="true" type="boolean" />
 		<column name="name" required="true" size="255" type="varchar" />
+		<column defaultValue="0" name="tag_count" required="true" type="integer" />
+	</table>
+	<table name="topic_parent">
+		<column name="parent_id" required="true" type="integer" />
+		<column name="topic_id" required="true" type="integer" />
+		<foreign-key foreignTable="topic" onDelete="cascade">
+			<reference foreign="id" local="topic_id" />
+		</foreign-key>
 	</table>
 	<table name="topic_synonym">
-		<column name="topic_id" required="true" type="integer" />
 		<column name="name" required="true" size="255" type="varchar" />
+		<column name="topic_id" required="true" type="integer" />
 		<foreign-key foreignTable="topic" onDelete="cascade">
 			<reference foreign="id" local="topic_id" />
 		</foreign-key>

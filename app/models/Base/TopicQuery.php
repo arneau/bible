@@ -14,23 +14,20 @@ use Propel\Runtime\ActiveQuery\ModelJoin;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Propel\Runtime\Map\TableMap;
 
 /**
  * Base class that represents a query for the 'defender_topic' table.
  *
  *
  *
+ * @method     ChildTopicQuery orderByIsRoot($order = Criteria::ASC) Order by the is_root column
  * @method     ChildTopicQuery orderByName($order = Criteria::ASC) Order by the name column
- * @method     ChildTopicQuery orderByTreeLeft($order = Criteria::ASC) Order by the tree_left column
- * @method     ChildTopicQuery orderByTreeRight($order = Criteria::ASC) Order by the tree_right column
- * @method     ChildTopicQuery orderByTreeLevel($order = Criteria::ASC) Order by the tree_level column
+ * @method     ChildTopicQuery orderByTagCount($order = Criteria::ASC) Order by the tag_count column
  * @method     ChildTopicQuery orderById($order = Criteria::ASC) Order by the id column
  *
+ * @method     ChildTopicQuery groupByIsRoot() Group by the is_root column
  * @method     ChildTopicQuery groupByName() Group by the name column
- * @method     ChildTopicQuery groupByTreeLeft() Group by the tree_left column
- * @method     ChildTopicQuery groupByTreeRight() Group by the tree_right column
- * @method     ChildTopicQuery groupByTreeLevel() Group by the tree_level column
+ * @method     ChildTopicQuery groupByTagCount() Group by the tag_count column
  * @method     ChildTopicQuery groupById() Group by the id column
  *
  * @method     ChildTopicQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -51,6 +48,16 @@ use Propel\Runtime\Map\TableMap;
  * @method     ChildTopicQuery rightJoinWithTag() Adds a RIGHT JOIN clause and with to the query using the Tag relation
  * @method     ChildTopicQuery innerJoinWithTag() Adds a INNER JOIN clause and with to the query using the Tag relation
  *
+ * @method     ChildTopicQuery leftJoinTopicParent($relationAlias = null) Adds a LEFT JOIN clause to the query using the TopicParent relation
+ * @method     ChildTopicQuery rightJoinTopicParent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TopicParent relation
+ * @method     ChildTopicQuery innerJoinTopicParent($relationAlias = null) Adds a INNER JOIN clause to the query using the TopicParent relation
+ *
+ * @method     ChildTopicQuery joinWithTopicParent($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the TopicParent relation
+ *
+ * @method     ChildTopicQuery leftJoinWithTopicParent() Adds a LEFT JOIN clause and with to the query using the TopicParent relation
+ * @method     ChildTopicQuery rightJoinWithTopicParent() Adds a RIGHT JOIN clause and with to the query using the TopicParent relation
+ * @method     ChildTopicQuery innerJoinWithTopicParent() Adds a INNER JOIN clause and with to the query using the TopicParent relation
+ *
  * @method     ChildTopicQuery leftJoinTopicSynonym($relationAlias = null) Adds a LEFT JOIN clause to the query using the TopicSynonym relation
  * @method     ChildTopicQuery rightJoinTopicSynonym($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TopicSynonym relation
  * @method     ChildTopicQuery innerJoinTopicSynonym($relationAlias = null) Adds a INNER JOIN clause to the query using the TopicSynonym relation
@@ -61,31 +68,28 @@ use Propel\Runtime\Map\TableMap;
  * @method     ChildTopicQuery rightJoinWithTopicSynonym() Adds a RIGHT JOIN clause and with to the query using the TopicSynonym relation
  * @method     ChildTopicQuery innerJoinWithTopicSynonym() Adds a INNER JOIN clause and with to the query using the TopicSynonym relation
  *
- * @method     \TagQuery|\TopicSynonymQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \TagQuery|\TopicParentQuery|\TopicSynonymQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildTopic findOne(ConnectionInterface $con = null) Return the first ChildTopic matching the query
  * @method     ChildTopic findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTopic matching the query, or a new ChildTopic object populated from the query conditions when no match is found
  *
+ * @method     ChildTopic findOneByIsRoot(boolean $is_root) Return the first ChildTopic filtered by the is_root column
  * @method     ChildTopic findOneByName(string $name) Return the first ChildTopic filtered by the name column
- * @method     ChildTopic findOneByTreeLeft(int $tree_left) Return the first ChildTopic filtered by the tree_left column
- * @method     ChildTopic findOneByTreeRight(int $tree_right) Return the first ChildTopic filtered by the tree_right column
- * @method     ChildTopic findOneByTreeLevel(int $tree_level) Return the first ChildTopic filtered by the tree_level column
+ * @method     ChildTopic findOneByTagCount(int $tag_count) Return the first ChildTopic filtered by the tag_count column
  * @method     ChildTopic findOneById(int $id) Return the first ChildTopic filtered by the id column *
 
  * @method     ChildTopic requirePk($key, ConnectionInterface $con = null) Return the ChildTopic by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTopic requireOne(ConnectionInterface $con = null) Return the first ChildTopic matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
+ * @method     ChildTopic requireOneByIsRoot(boolean $is_root) Return the first ChildTopic filtered by the is_root column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTopic requireOneByName(string $name) Return the first ChildTopic filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTopic requireOneByTreeLeft(int $tree_left) Return the first ChildTopic filtered by the tree_left column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTopic requireOneByTreeRight(int $tree_right) Return the first ChildTopic filtered by the tree_right column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTopic requireOneByTreeLevel(int $tree_level) Return the first ChildTopic filtered by the tree_level column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTopic requireOneByTagCount(int $tag_count) Return the first ChildTopic filtered by the tag_count column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTopic requireOneById(int $id) Return the first ChildTopic filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildTopic[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTopic objects based on current ModelCriteria
+ * @method     ChildTopic[]|ObjectCollection findByIsRoot(boolean $is_root) Return ChildTopic objects filtered by the is_root column
  * @method     ChildTopic[]|ObjectCollection findByName(string $name) Return ChildTopic objects filtered by the name column
- * @method     ChildTopic[]|ObjectCollection findByTreeLeft(int $tree_left) Return ChildTopic objects filtered by the tree_left column
- * @method     ChildTopic[]|ObjectCollection findByTreeRight(int $tree_right) Return ChildTopic objects filtered by the tree_right column
- * @method     ChildTopic[]|ObjectCollection findByTreeLevel(int $tree_level) Return ChildTopic objects filtered by the tree_level column
+ * @method     ChildTopic[]|ObjectCollection findByTagCount(int $tag_count) Return ChildTopic objects filtered by the tag_count column
  * @method     ChildTopic[]|ObjectCollection findById(int $id) Return ChildTopic objects filtered by the id column
  * @method     ChildTopic[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
@@ -179,7 +183,7 @@ abstract class TopicQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT name, tree_left, tree_right, tree_level, id FROM defender_topic WHERE id = :p0';
+        $sql = 'SELECT is_root, name, tag_count, id FROM defender_topic WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -270,6 +274,33 @@ abstract class TopicQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the is_root column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByIsRoot(true); // WHERE is_root = true
+     * $query->filterByIsRoot('yes'); // WHERE is_root = true
+     * </code>
+     *
+     * @param     boolean|string $isRoot The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildTopicQuery The current query, for fluid interface
+     */
+    public function filterByIsRoot($isRoot = null, $comparison = null)
+    {
+        if (is_string($isRoot)) {
+            $isRoot = in_array(strtolower($isRoot), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(TopicTableMap::COL_IS_ROOT, $isRoot, $comparison);
+    }
+
+    /**
      * Filter the query on the name column
      *
      * Example usage:
@@ -299,16 +330,16 @@ abstract class TopicQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the tree_left column
+     * Filter the query on the tag_count column
      *
      * Example usage:
      * <code>
-     * $query->filterByTreeLeft(1234); // WHERE tree_left = 1234
-     * $query->filterByTreeLeft(array(12, 34)); // WHERE tree_left IN (12, 34)
-     * $query->filterByTreeLeft(array('min' => 12)); // WHERE tree_left > 12
+     * $query->filterByTagCount(1234); // WHERE tag_count = 1234
+     * $query->filterByTagCount(array(12, 34)); // WHERE tag_count IN (12, 34)
+     * $query->filterByTagCount(array('min' => 12)); // WHERE tag_count > 12
      * </code>
      *
-     * @param     mixed $treeLeft The value to use as filter.
+     * @param     mixed $tagCount The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -316,16 +347,16 @@ abstract class TopicQuery extends ModelCriteria
      *
      * @return $this|ChildTopicQuery The current query, for fluid interface
      */
-    public function filterByTreeLeft($treeLeft = null, $comparison = null)
+    public function filterByTagCount($tagCount = null, $comparison = null)
     {
-        if (is_array($treeLeft)) {
+        if (is_array($tagCount)) {
             $useMinMax = false;
-            if (isset($treeLeft['min'])) {
-                $this->addUsingAlias(TopicTableMap::COL_TREE_LEFT, $treeLeft['min'], Criteria::GREATER_EQUAL);
+            if (isset($tagCount['min'])) {
+                $this->addUsingAlias(TopicTableMap::COL_TAG_COUNT, $tagCount['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($treeLeft['max'])) {
-                $this->addUsingAlias(TopicTableMap::COL_TREE_LEFT, $treeLeft['max'], Criteria::LESS_EQUAL);
+            if (isset($tagCount['max'])) {
+                $this->addUsingAlias(TopicTableMap::COL_TAG_COUNT, $tagCount['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -336,89 +367,7 @@ abstract class TopicQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(TopicTableMap::COL_TREE_LEFT, $treeLeft, $comparison);
-    }
-
-    /**
-     * Filter the query on the tree_right column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByTreeRight(1234); // WHERE tree_right = 1234
-     * $query->filterByTreeRight(array(12, 34)); // WHERE tree_right IN (12, 34)
-     * $query->filterByTreeRight(array('min' => 12)); // WHERE tree_right > 12
-     * </code>
-     *
-     * @param     mixed $treeRight The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildTopicQuery The current query, for fluid interface
-     */
-    public function filterByTreeRight($treeRight = null, $comparison = null)
-    {
-        if (is_array($treeRight)) {
-            $useMinMax = false;
-            if (isset($treeRight['min'])) {
-                $this->addUsingAlias(TopicTableMap::COL_TREE_RIGHT, $treeRight['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($treeRight['max'])) {
-                $this->addUsingAlias(TopicTableMap::COL_TREE_RIGHT, $treeRight['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(TopicTableMap::COL_TREE_RIGHT, $treeRight, $comparison);
-    }
-
-    /**
-     * Filter the query on the tree_level column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByTreeLevel(1234); // WHERE tree_level = 1234
-     * $query->filterByTreeLevel(array(12, 34)); // WHERE tree_level IN (12, 34)
-     * $query->filterByTreeLevel(array('min' => 12)); // WHERE tree_level > 12
-     * </code>
-     *
-     * @param     mixed $treeLevel The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildTopicQuery The current query, for fluid interface
-     */
-    public function filterByTreeLevel($treeLevel = null, $comparison = null)
-    {
-        if (is_array($treeLevel)) {
-            $useMinMax = false;
-            if (isset($treeLevel['min'])) {
-                $this->addUsingAlias(TopicTableMap::COL_TREE_LEVEL, $treeLevel['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($treeLevel['max'])) {
-                $this->addUsingAlias(TopicTableMap::COL_TREE_LEVEL, $treeLevel['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(TopicTableMap::COL_TREE_LEVEL, $treeLevel, $comparison);
+        return $this->addUsingAlias(TopicTableMap::COL_TAG_COUNT, $tagCount, $comparison);
     }
 
     /**
@@ -533,6 +482,79 @@ abstract class TopicQuery extends ModelCriteria
         return $this
             ->joinTag($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Tag', '\TagQuery');
+    }
+
+    /**
+     * Filter the query by a related \TopicParent object
+     *
+     * @param \TopicParent|ObjectCollection $topicParent the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTopicQuery The current query, for fluid interface
+     */
+    public function filterByTopicParent($topicParent, $comparison = null)
+    {
+        if ($topicParent instanceof \TopicParent) {
+            return $this
+                ->addUsingAlias(TopicTableMap::COL_ID, $topicParent->getTopicId(), $comparison);
+        } elseif ($topicParent instanceof ObjectCollection) {
+            return $this
+                ->useTopicParentQuery()
+                ->filterByPrimaryKeys($topicParent->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTopicParent() only accepts arguments of type \TopicParent or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the TopicParent relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildTopicQuery The current query, for fluid interface
+     */
+    public function joinTopicParent($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('TopicParent');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'TopicParent');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the TopicParent relation TopicParent object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \TopicParentQuery A secondary query class using the current class as primary query
+     */
+    public function useTopicParentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinTopicParent($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'TopicParent', '\TopicParentQuery');
     }
 
     /**
@@ -683,397 +705,6 @@ abstract class TopicQuery extends ModelCriteria
 
             return $affectedRows;
         });
-    }
-
-    // nested_set behavior
-
-    /**
-     * Filter the query to restrict the result to descendants of an object
-     *
-     * @param     ChildTopic $topic The object to use for descendant search
-     *
-     * @return    $this|ChildTopicQuery The current query, for fluid interface
-     */
-    public function descendantsOf(ChildTopic $topic)
-    {
-        return $this
-            ->addUsingAlias(ChildTopic::LEFT_COL, $topic->getLeftValue(), Criteria::GREATER_THAN)
-            ->addUsingAlias(ChildTopic::LEFT_COL, $topic->getRightValue(), Criteria::LESS_THAN);
-    }
-
-    /**
-     * Filter the query to restrict the result to the branch of an object.
-     * Same as descendantsOf(), except that it includes the object passed as parameter in the result
-     *
-     * @param     ChildTopic $topic The object to use for branch search
-     *
-     * @return    $this|ChildTopicQuery The current query, for fluid interface
-     */
-    public function branchOf(ChildTopic $topic)
-    {
-        return $this
-            ->addUsingAlias(ChildTopic::LEFT_COL, $topic->getLeftValue(), Criteria::GREATER_EQUAL)
-            ->addUsingAlias(ChildTopic::LEFT_COL, $topic->getRightValue(), Criteria::LESS_EQUAL);
-    }
-
-    /**
-     * Filter the query to restrict the result to children of an object
-     *
-     * @param     ChildTopic $topic The object to use for child search
-     *
-     * @return    $this|ChildTopicQuery The current query, for fluid interface
-     */
-    public function childrenOf(ChildTopic $topic)
-    {
-        return $this
-            ->descendantsOf($topic)
-            ->addUsingAlias(ChildTopic::LEVEL_COL, $topic->getLevel() + 1, Criteria::EQUAL);
-    }
-
-    /**
-     * Filter the query to restrict the result to siblings of an object.
-     * The result does not include the object passed as parameter.
-     *
-     * @param     ChildTopic $topic The object to use for sibling search
-     * @param      ConnectionInterface $con Connection to use.
-     *
-     * @return    $this|ChildTopicQuery The current query, for fluid interface
-     */
-    public function siblingsOf(ChildTopic $topic, ConnectionInterface $con = null)
-    {
-        if ($topic->isRoot()) {
-            return $this->
-                add(ChildTopic::LEVEL_COL, '1<>1', Criteria::CUSTOM);
-        } else {
-            return $this
-                ->childrenOf($topic->getParent($con))
-                ->prune($topic);
-        }
-    }
-
-    /**
-     * Filter the query to restrict the result to ancestors of an object
-     *
-     * @param     ChildTopic $topic The object to use for ancestors search
-     *
-     * @return    $this|ChildTopicQuery The current query, for fluid interface
-     */
-    public function ancestorsOf(ChildTopic $topic)
-    {
-        return $this
-            ->addUsingAlias(ChildTopic::LEFT_COL, $topic->getLeftValue(), Criteria::LESS_THAN)
-            ->addUsingAlias(ChildTopic::RIGHT_COL, $topic->getRightValue(), Criteria::GREATER_THAN);
-    }
-
-    /**
-     * Filter the query to restrict the result to roots of an object.
-     * Same as ancestorsOf(), except that it includes the object passed as parameter in the result
-     *
-     * @param     ChildTopic $topic The object to use for roots search
-     *
-     * @return    $this|ChildTopicQuery The current query, for fluid interface
-     */
-    public function rootsOf(ChildTopic $topic)
-    {
-        return $this
-            ->addUsingAlias(ChildTopic::LEFT_COL, $topic->getLeftValue(), Criteria::LESS_EQUAL)
-            ->addUsingAlias(ChildTopic::RIGHT_COL, $topic->getRightValue(), Criteria::GREATER_EQUAL);
-    }
-
-    /**
-     * Order the result by branch, i.e. natural tree order
-     *
-     * @param     bool $reverse if true, reverses the order
-     *
-     * @return    $this|ChildTopicQuery The current query, for fluid interface
-     */
-    public function orderByBranch($reverse = false)
-    {
-        if ($reverse) {
-            return $this
-                ->addDescendingOrderByColumn(ChildTopic::LEFT_COL);
-        } else {
-            return $this
-                ->addAscendingOrderByColumn(ChildTopic::LEFT_COL);
-        }
-    }
-
-    /**
-     * Order the result by level, the closer to the root first
-     *
-     * @param     bool $reverse if true, reverses the order
-     *
-     * @return    $this|ChildTopicQuery The current query, for fluid interface
-     */
-    public function orderByLevel($reverse = false)
-    {
-        if ($reverse) {
-            return $this
-                ->addDescendingOrderByColumn(ChildTopic::LEVEL_COL)
-                ->addDescendingOrderByColumn(ChildTopic::LEFT_COL);
-        } else {
-            return $this
-                ->addAscendingOrderByColumn(ChildTopic::LEVEL_COL)
-                ->addAscendingOrderByColumn(ChildTopic::LEFT_COL);
-        }
-    }
-
-    /**
-     * Returns the root node for the tree
-     *
-     * @param      ConnectionInterface $con    Connection to use.
-     *
-     * @return     ChildTopic The tree root object
-     */
-    public function findRoot(ConnectionInterface $con = null)
-    {
-        return $this
-            ->addUsingAlias(ChildTopic::LEFT_COL, 1, Criteria::EQUAL)
-            ->findOne($con);
-    }
-
-    /**
-     * Returns the tree of objects
-     *
-     * @param      ConnectionInterface $con    Connection to use.
-     *
-     * @return     ChildTopic[]|ObjectCollection|mixed the list of results, formatted by the current formatter
-     */
-    public function findTree(ConnectionInterface $con = null)
-    {
-        return $this
-            ->orderByBranch()
-            ->find($con);
-    }
-
-    /**
-     * Returns the root node for a given scope
-     *
-     * @param      ConnectionInterface $con    Connection to use.
-     * @return     ChildTopic            Propel object for root node
-     */
-    static public function retrieveRoot(ConnectionInterface $con = null)
-    {
-        $c = new Criteria(TopicTableMap::DATABASE_NAME);
-        $c->add(ChildTopic::LEFT_COL, 1, Criteria::EQUAL);
-
-        return ChildTopicQuery::create(null, $c)->findOne($con);
-    }
-
-    /**
-     * Returns the whole tree node for a given scope
-     *
-     * @param      Criteria $criteria    Optional Criteria to filter the query
-     * @param      ConnectionInterface $con    Connection to use.
-     * @return     ChildTopic[]|ObjectCollection|mixed the list of results, formatted by the current formatter
-     */
-    static public function retrieveTree(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        if (null === $criteria) {
-            $criteria = new Criteria(TopicTableMap::DATABASE_NAME);
-        }
-        $criteria->addAscendingOrderByColumn(ChildTopic::LEFT_COL);
-
-        return ChildTopicQuery::create(null, $criteria)->find($con);
-    }
-
-    /**
-     * Tests if node is valid
-     *
-     * @param      ChildTopic $node    Propel object for src node
-     * @return     bool
-     */
-    static public function isValid(ChildTopic $node = null)
-    {
-        if (is_object($node) && $node->getRightValue() > $node->getLeftValue()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Delete an entire tree
-     *
-     * @param      ConnectionInterface $con    Connection to use.
-     *
-     * @return     int  The number of deleted nodes
-     */
-    static public function deleteTree(ConnectionInterface $con = null)
-    {
-
-        return TopicTableMap::doDeleteAll($con);
-    }
-
-    /**
-     * Adds $delta to all L and R values that are >= $first and <= $last.
-     * '$delta' can also be negative.
-     *
-     * @param int $delta               Value to be shifted by, can be negative
-     * @param int $first               First node to be shifted
-     * @param int $last                Last node to be shifted (optional)
-     * @param ConnectionInterface $con Connection to use.
-     */
-    static public function shiftRLValues($delta, $first, $last = null, ConnectionInterface $con = null)
-    {
-        if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TopicTableMap::DATABASE_NAME);
-        }
-
-        // Shift left column values
-        $whereCriteria = new Criteria(TopicTableMap::DATABASE_NAME);
-        $criterion = $whereCriteria->getNewCriterion(ChildTopic::LEFT_COL, $first, Criteria::GREATER_EQUAL);
-        if (null !== $last) {
-            $criterion->addAnd($whereCriteria->getNewCriterion(ChildTopic::LEFT_COL, $last, Criteria::LESS_EQUAL));
-        }
-        $whereCriteria->add($criterion);
-
-        $valuesCriteria = new Criteria(TopicTableMap::DATABASE_NAME);
-        $valuesCriteria->add(ChildTopic::LEFT_COL, array('raw' => ChildTopic::LEFT_COL . ' + ?', 'value' => $delta), Criteria::CUSTOM_EQUAL);
-
-        $whereCriteria->doUpdate($valuesCriteria, $con);
-
-        // Shift right column values
-        $whereCriteria = new Criteria(TopicTableMap::DATABASE_NAME);
-        $criterion = $whereCriteria->getNewCriterion(ChildTopic::RIGHT_COL, $first, Criteria::GREATER_EQUAL);
-        if (null !== $last) {
-            $criterion->addAnd($whereCriteria->getNewCriterion(ChildTopic::RIGHT_COL, $last, Criteria::LESS_EQUAL));
-        }
-        $whereCriteria->add($criterion);
-
-        $valuesCriteria = new Criteria(TopicTableMap::DATABASE_NAME);
-        $valuesCriteria->add(ChildTopic::RIGHT_COL, array('raw' => ChildTopic::RIGHT_COL . ' + ?', 'value' => $delta), Criteria::CUSTOM_EQUAL);
-
-        $whereCriteria->doUpdate($valuesCriteria, $con);
-    }
-
-    /**
-     * Adds $delta to level for nodes having left value >= $first and right value <= $last.
-     * '$delta' can also be negative.
-     *
-     * @param      int $delta        Value to be shifted by, can be negative
-     * @param      int $first        First node to be shifted
-     * @param      int $last            Last node to be shifted
-     * @param      ConnectionInterface $con        Connection to use.
-     */
-    static public function shiftLevel($delta, $first, $last, ConnectionInterface $con = null)
-    {
-        if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TopicTableMap::DATABASE_NAME);
-        }
-
-        $whereCriteria = new Criteria(TopicTableMap::DATABASE_NAME);
-        $whereCriteria->add(ChildTopic::LEFT_COL, $first, Criteria::GREATER_EQUAL);
-        $whereCriteria->add(ChildTopic::RIGHT_COL, $last, Criteria::LESS_EQUAL);
-
-        $valuesCriteria = new Criteria(TopicTableMap::DATABASE_NAME);
-        $valuesCriteria->add(ChildTopic::LEVEL_COL, array('raw' => ChildTopic::LEVEL_COL . ' + ?', 'value' => $delta), Criteria::CUSTOM_EQUAL);
-
-        $whereCriteria->doUpdate($valuesCriteria, $con);
-    }
-
-    /**
-     * Reload all already loaded nodes to sync them with updated db
-     *
-     * @param      ChildTopic $prune        Object to prune from the update
-     * @param      ConnectionInterface $con        Connection to use.
-     */
-    static public function updateLoadedNodes($prune = null, ConnectionInterface $con = null)
-    {
-        if (Propel::isInstancePoolingEnabled()) {
-            $keys = array();
-            /** @var $obj ChildTopic */
-            foreach (TopicTableMap::$instances as $obj) {
-                if (!$prune || !$prune->equals($obj)) {
-                    $keys[] = $obj->getPrimaryKey();
-                }
-            }
-
-            if (!empty($keys)) {
-                // We don't need to alter the object instance pool; we're just modifying these ones
-                // already in the pool.
-                $criteria = new Criteria(TopicTableMap::DATABASE_NAME);
-                $criteria->add(TopicTableMap::COL_ID, $keys, Criteria::IN);
-                $dataFetcher = ChildTopicQuery::create(null, $criteria)->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
-                while ($row = $dataFetcher->fetch()) {
-                    $key = TopicTableMap::getPrimaryKeyHashFromRow($row, 0);
-                    /** @var $object ChildTopic */
-                    if (null !== ($object = TopicTableMap::getInstanceFromPool($key))) {
-                        $object->setLeftValue($row[1]);
-                        $object->setRightValue($row[2]);
-                        $object->setLevel($row[3]);
-                        $object->clearNestedSetChildren();
-                    }
-                }
-                $dataFetcher->close();
-            }
-        }
-    }
-
-    /**
-     * Update the tree to allow insertion of a leaf at the specified position
-     *
-     * @param      int $left    left column value
-     * @param      mixed $prune    Object to prune from the shift
-     * @param      ConnectionInterface $con    Connection to use.
-     */
-    static public function makeRoomForLeaf($left, $prune = null, ConnectionInterface $con = null)
-    {
-        // Update database nodes
-        ChildTopicQuery::shiftRLValues(2, $left, null, $con);
-
-        // Update all loaded nodes
-        ChildTopicQuery::updateLoadedNodes($prune, $con);
-    }
-
-    /**
-     * Update the tree to allow insertion of a leaf at the specified position
-     *
-     * @param      ConnectionInterface $con    Connection to use.
-     */
-    static public function fixLevels(ConnectionInterface $con = null)
-    {
-        $c = new Criteria();
-        $c->addAscendingOrderByColumn(ChildTopic::LEFT_COL);
-        $dataFetcher = ChildTopicQuery::create(null, $c)->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
-
-        // set the class once to avoid overhead in the loop
-        $cls = TopicTableMap::getOMClass(false);
-        $level = null;
-        // iterate over the statement
-        while ($row = $dataFetcher->fetch()) {
-
-            // hydrate object
-            $key = TopicTableMap::getPrimaryKeyHashFromRow($row, 0);
-            /** @var $obj ChildTopic */
-            if (null === ($obj = TopicTableMap::getInstanceFromPool($key))) {
-                $obj = new $cls();
-                $obj->hydrate($row);
-                TopicTableMap::addInstanceToPool($obj, $key);
-            }
-
-            // compute level
-            // Algorithm shamelessly stolen from sfPropelActAsNestedSetBehaviorPlugin
-            // Probably authored by Tristan Rivoallan
-            if ($level === null) {
-                $level = 0;
-                $i = 0;
-                $prev = array($obj->getRightValue());
-            } else {
-                while ($obj->getRightValue() > $prev[$i]) {
-                    $i--;
-                }
-                $level = ++$i;
-                $prev[$i] = $obj->getRightValue();
-            }
-
-            // update level in node if necessary
-            if ($obj->getLevel() !== $level) {
-                $obj->setLevel($level);
-                $obj->save($con);
-            }
-        }
-        $dataFetcher->close();
     }
 
 } // TopicQuery
