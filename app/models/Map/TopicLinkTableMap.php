@@ -2,8 +2,8 @@
 
 namespace Map;
 
-use \Topic;
-use \TopicQuery;
+use \TopicLink;
+use \TopicLinkQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'defender_topic' table.
+ * This class defines the structure of the 'defender_topic_link' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class TopicTableMap extends TableMap
+class TopicLinkTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class TopicTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = '.Map.TopicTableMap';
+    const CLASS_NAME = '.Map.TopicLinkTableMap';
 
     /**
      * The default database name for this class
@@ -44,17 +44,17 @@ class TopicTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'defender_topic';
+    const TABLE_NAME = 'defender_topic_link';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Topic';
+    const OM_CLASS = '\\TopicLink';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Topic';
+    const CLASS_DEFAULT = 'TopicLink';
 
     /**
      * The total number of columns
@@ -72,24 +72,24 @@ class TopicTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 4;
 
     /**
-     * the column name for the is_root field
+     * the column name for the link_id field
      */
-    const COL_IS_ROOT = 'defender_topic.is_root';
+    const COL_LINK_ID = 'defender_topic_link.link_id';
 
     /**
-     * the column name for the name field
+     * the column name for the strength field
      */
-    const COL_NAME = 'defender_topic.name';
+    const COL_STRENGTH = 'defender_topic_link.strength';
 
     /**
-     * the column name for the tag_count field
+     * the column name for the topic_id field
      */
-    const COL_TAG_COUNT = 'defender_topic.tag_count';
+    const COL_TOPIC_ID = 'defender_topic_link.topic_id';
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'defender_topic.id';
+    const COL_ID = 'defender_topic_link.id';
 
     /**
      * The default string format for model objects of the related table
@@ -103,10 +103,10 @@ class TopicTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('IsRoot', 'Name', 'TagCount', 'Id', ),
-        self::TYPE_CAMELNAME     => array('isRoot', 'name', 'tagCount', 'id', ),
-        self::TYPE_COLNAME       => array(TopicTableMap::COL_IS_ROOT, TopicTableMap::COL_NAME, TopicTableMap::COL_TAG_COUNT, TopicTableMap::COL_ID, ),
-        self::TYPE_FIELDNAME     => array('is_root', 'name', 'tag_count', 'id', ),
+        self::TYPE_PHPNAME       => array('LinkId', 'Strength', 'TopicId', 'Id', ),
+        self::TYPE_CAMELNAME     => array('linkId', 'strength', 'topicId', 'id', ),
+        self::TYPE_COLNAME       => array(TopicLinkTableMap::COL_LINK_ID, TopicLinkTableMap::COL_STRENGTH, TopicLinkTableMap::COL_TOPIC_ID, TopicLinkTableMap::COL_ID, ),
+        self::TYPE_FIELDNAME     => array('link_id', 'strength', 'topic_id', 'id', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
@@ -117,10 +117,10 @@ class TopicTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('IsRoot' => 0, 'Name' => 1, 'TagCount' => 2, 'Id' => 3, ),
-        self::TYPE_CAMELNAME     => array('isRoot' => 0, 'name' => 1, 'tagCount' => 2, 'id' => 3, ),
-        self::TYPE_COLNAME       => array(TopicTableMap::COL_IS_ROOT => 0, TopicTableMap::COL_NAME => 1, TopicTableMap::COL_TAG_COUNT => 2, TopicTableMap::COL_ID => 3, ),
-        self::TYPE_FIELDNAME     => array('is_root' => 0, 'name' => 1, 'tag_count' => 2, 'id' => 3, ),
+        self::TYPE_PHPNAME       => array('LinkId' => 0, 'Strength' => 1, 'TopicId' => 2, 'Id' => 3, ),
+        self::TYPE_CAMELNAME     => array('linkId' => 0, 'strength' => 1, 'topicId' => 2, 'id' => 3, ),
+        self::TYPE_COLNAME       => array(TopicLinkTableMap::COL_LINK_ID => 0, TopicLinkTableMap::COL_STRENGTH => 1, TopicLinkTableMap::COL_TOPIC_ID => 2, TopicLinkTableMap::COL_ID => 3, ),
+        self::TYPE_FIELDNAME     => array('link_id' => 0, 'strength' => 1, 'topic_id' => 2, 'id' => 3, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
@@ -134,16 +134,16 @@ class TopicTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('defender_topic');
-        $this->setPhpName('Topic');
+        $this->setName('defender_topic_link');
+        $this->setPhpName('TopicLink');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\Topic');
+        $this->setClassName('\\TopicLink');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addColumn('is_root', 'IsRoot', 'BOOLEAN', true, 1, false);
-        $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
-        $this->addColumn('tag_count', 'TagCount', 'INTEGER', true, null, 0);
+        $this->addColumn('link_id', 'LinkId', 'INTEGER', true, null, null);
+        $this->addColumn('strength', 'Strength', 'INTEGER', true, null, null);
+        $this->addForeignKey('topic_id', 'TopicId', 'INTEGER', 'defender_topic', 'id', true, null, null);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
     } // initialize()
 
@@ -152,34 +152,13 @@ class TopicTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Tag', '\\Tag', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Topic', '\\Topic', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
     0 => ':topic_id',
     1 => ':id',
   ),
-), null, null, 'Tags', false);
-        $this->addRelation('TopicLink', '\\TopicLink', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':topic_id',
-    1 => ':id',
-  ),
-), 'CASCADE', null, 'TopicLinks', false);
-        $this->addRelation('TopicParent', '\\TopicParent', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':topic_id',
-    1 => ':id',
-  ),
-), 'CASCADE', null, 'TopicParents', false);
-        $this->addRelation('TopicSynonym', '\\TopicSynonym', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':topic_id',
-    1 => ':id',
-  ),
-), 'CASCADE', null, 'TopicSynonyms', false);
+), 'CASCADE', null, null, false);
     } // buildRelations()
 
     /**
@@ -191,21 +170,9 @@ class TopicTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'tag_count_aggregate' => array('name' => 'tag_count', 'expression' => 'COUNT(topic_id)', 'condition' => '', 'foreign_table' => 'tag', 'foreign_schema' => '', ),
             'auto_add_pk' => array('name' => 'id', 'autoIncrement' => 'true', 'type' => 'INTEGER', ),
         );
     } // getBehaviors()
-    /**
-     * Method to invalidate the instance pool of all tables related to defender_topic     * by a foreign key with ON DELETE CASCADE
-     */
-    public static function clearRelatedInstancePool()
-    {
-        // Invalidate objects in related instance pools,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        TopicLinkTableMap::clearInstancePool();
-        TopicParentTableMap::clearInstancePool();
-        TopicSynonymTableMap::clearInstancePool();
-    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -264,7 +231,7 @@ class TopicTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? TopicTableMap::CLASS_DEFAULT : TopicTableMap::OM_CLASS;
+        return $withPrefix ? TopicLinkTableMap::CLASS_DEFAULT : TopicLinkTableMap::OM_CLASS;
     }
 
     /**
@@ -278,22 +245,22 @@ class TopicTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Topic object, last column rank)
+     * @return array           (TopicLink object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = TopicTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = TopicTableMap::getInstanceFromPool($key))) {
+        $key = TopicLinkTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = TopicLinkTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + TopicTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + TopicLinkTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = TopicTableMap::OM_CLASS;
-            /** @var Topic $obj */
+            $cls = TopicLinkTableMap::OM_CLASS;
+            /** @var TopicLink $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            TopicTableMap::addInstanceToPool($obj, $key);
+            TopicLinkTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -316,18 +283,18 @@ class TopicTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = TopicTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = TopicTableMap::getInstanceFromPool($key))) {
+            $key = TopicLinkTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = TopicLinkTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Topic $obj */
+                /** @var TopicLink $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                TopicTableMap::addInstanceToPool($obj, $key);
+                TopicLinkTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -348,14 +315,14 @@ class TopicTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(TopicTableMap::COL_IS_ROOT);
-            $criteria->addSelectColumn(TopicTableMap::COL_NAME);
-            $criteria->addSelectColumn(TopicTableMap::COL_TAG_COUNT);
-            $criteria->addSelectColumn(TopicTableMap::COL_ID);
+            $criteria->addSelectColumn(TopicLinkTableMap::COL_LINK_ID);
+            $criteria->addSelectColumn(TopicLinkTableMap::COL_STRENGTH);
+            $criteria->addSelectColumn(TopicLinkTableMap::COL_TOPIC_ID);
+            $criteria->addSelectColumn(TopicLinkTableMap::COL_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.is_root');
-            $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.tag_count');
+            $criteria->addSelectColumn($alias . '.link_id');
+            $criteria->addSelectColumn($alias . '.strength');
+            $criteria->addSelectColumn($alias . '.topic_id');
             $criteria->addSelectColumn($alias . '.id');
         }
     }
@@ -369,7 +336,7 @@ class TopicTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(TopicTableMap::DATABASE_NAME)->getTable(TopicTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(TopicLinkTableMap::DATABASE_NAME)->getTable(TopicLinkTableMap::TABLE_NAME);
     }
 
     /**
@@ -377,16 +344,16 @@ class TopicTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(TopicTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(TopicTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new TopicTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(TopicLinkTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(TopicLinkTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new TopicLinkTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Topic or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a TopicLink or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Topic object or primary key or array of primary keys
+     * @param mixed               $values Criteria or TopicLink object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -397,27 +364,27 @@ class TopicTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TopicTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TopicLinkTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Topic) { // it's a model object
+        } elseif ($values instanceof \TopicLink) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(TopicTableMap::DATABASE_NAME);
-            $criteria->add(TopicTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(TopicLinkTableMap::DATABASE_NAME);
+            $criteria->add(TopicLinkTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = TopicQuery::create()->mergeWith($criteria);
+        $query = TopicLinkQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            TopicTableMap::clearInstancePool();
+            TopicLinkTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                TopicTableMap::removeInstanceFromPool($singleval);
+                TopicLinkTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -425,20 +392,20 @@ class TopicTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the defender_topic table.
+     * Deletes all rows from the defender_topic_link table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return TopicQuery::create()->doDeleteAll($con);
+        return TopicLinkQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Topic or Criteria object.
+     * Performs an INSERT on the database, given a TopicLink or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Topic object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or TopicLink object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -447,22 +414,22 @@ class TopicTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TopicTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TopicLinkTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Topic object
+            $criteria = $criteria->buildCriteria(); // build Criteria from TopicLink object
         }
 
-        if ($criteria->containsKey(TopicTableMap::COL_ID) && $criteria->keyContainsValue(TopicTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.TopicTableMap::COL_ID.')');
+        if ($criteria->containsKey(TopicLinkTableMap::COL_ID) && $criteria->keyContainsValue(TopicLinkTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.TopicLinkTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = TopicQuery::create()->mergeWith($criteria);
+        $query = TopicLinkQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -471,7 +438,7 @@ class TopicTableMap extends TableMap
         });
     }
 
-} // TopicTableMap
+} // TopicLinkTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-TopicTableMap::buildTableMap();
+TopicLinkTableMap::buildTableMap();

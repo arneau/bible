@@ -48,6 +48,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTopicQuery rightJoinWithTag() Adds a RIGHT JOIN clause and with to the query using the Tag relation
  * @method     ChildTopicQuery innerJoinWithTag() Adds a INNER JOIN clause and with to the query using the Tag relation
  *
+ * @method     ChildTopicQuery leftJoinTopicLink($relationAlias = null) Adds a LEFT JOIN clause to the query using the TopicLink relation
+ * @method     ChildTopicQuery rightJoinTopicLink($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TopicLink relation
+ * @method     ChildTopicQuery innerJoinTopicLink($relationAlias = null) Adds a INNER JOIN clause to the query using the TopicLink relation
+ *
+ * @method     ChildTopicQuery joinWithTopicLink($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the TopicLink relation
+ *
+ * @method     ChildTopicQuery leftJoinWithTopicLink() Adds a LEFT JOIN clause and with to the query using the TopicLink relation
+ * @method     ChildTopicQuery rightJoinWithTopicLink() Adds a RIGHT JOIN clause and with to the query using the TopicLink relation
+ * @method     ChildTopicQuery innerJoinWithTopicLink() Adds a INNER JOIN clause and with to the query using the TopicLink relation
+ *
  * @method     ChildTopicQuery leftJoinTopicParent($relationAlias = null) Adds a LEFT JOIN clause to the query using the TopicParent relation
  * @method     ChildTopicQuery rightJoinTopicParent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TopicParent relation
  * @method     ChildTopicQuery innerJoinTopicParent($relationAlias = null) Adds a INNER JOIN clause to the query using the TopicParent relation
@@ -68,7 +78,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTopicQuery rightJoinWithTopicSynonym() Adds a RIGHT JOIN clause and with to the query using the TopicSynonym relation
  * @method     ChildTopicQuery innerJoinWithTopicSynonym() Adds a INNER JOIN clause and with to the query using the TopicSynonym relation
  *
- * @method     \TagQuery|\TopicParentQuery|\TopicSynonymQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \TagQuery|\TopicLinkQuery|\TopicParentQuery|\TopicSynonymQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildTopic findOne(ConnectionInterface $con = null) Return the first ChildTopic matching the query
  * @method     ChildTopic findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTopic matching the query, or a new ChildTopic object populated from the query conditions when no match is found
@@ -482,6 +492,79 @@ abstract class TopicQuery extends ModelCriteria
         return $this
             ->joinTag($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Tag', '\TagQuery');
+    }
+
+    /**
+     * Filter the query by a related \TopicLink object
+     *
+     * @param \TopicLink|ObjectCollection $topicLink the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTopicQuery The current query, for fluid interface
+     */
+    public function filterByTopicLink($topicLink, $comparison = null)
+    {
+        if ($topicLink instanceof \TopicLink) {
+            return $this
+                ->addUsingAlias(TopicTableMap::COL_ID, $topicLink->getTopicId(), $comparison);
+        } elseif ($topicLink instanceof ObjectCollection) {
+            return $this
+                ->useTopicLinkQuery()
+                ->filterByPrimaryKeys($topicLink->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTopicLink() only accepts arguments of type \TopicLink or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the TopicLink relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildTopicQuery The current query, for fluid interface
+     */
+    public function joinTopicLink($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('TopicLink');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'TopicLink');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the TopicLink relation TopicLink object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \TopicLinkQuery A secondary query class using the current class as primary query
+     */
+    public function useTopicLinkQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinTopicLink($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'TopicLink', '\TopicLinkQuery');
     }
 
     /**

@@ -5,6 +5,8 @@ namespace Base;
 use \Tag as ChildTag;
 use \TagQuery as ChildTagQuery;
 use \Topic as ChildTopic;
+use \TopicLink as ChildTopicLink;
+use \TopicLinkQuery as ChildTopicLinkQuery;
 use \TopicParent as ChildTopicParent;
 use \TopicParentQuery as ChildTopicParentQuery;
 use \TopicQuery as ChildTopicQuery;
@@ -13,6 +15,7 @@ use \TopicSynonymQuery as ChildTopicSynonymQuery;
 use \Exception;
 use \PDO;
 use Map\TagTableMap;
+use Map\TopicLinkTableMap;
 use Map\TopicParentTableMap;
 use Map\TopicSynonymTableMap;
 use Map\TopicTableMap;
@@ -107,6 +110,12 @@ abstract class Topic implements ActiveRecordInterface
     protected $collTagsPartial;
 
     /**
+     * @var        ObjectCollection|ChildTopicLink[] Collection to store aggregation of ChildTopicLink objects.
+     */
+    protected $collTopicLinks;
+    protected $collTopicLinksPartial;
+
+    /**
      * @var        ObjectCollection|ChildTopicParent[] Collection to store aggregation of ChildTopicParent objects.
      */
     protected $collTopicParents;
@@ -131,6 +140,12 @@ abstract class Topic implements ActiveRecordInterface
      * @var ObjectCollection|ChildTag[]
      */
     protected $tagsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildTopicLink[]
+     */
+    protected $topicLinksScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -647,6 +662,8 @@ abstract class Topic implements ActiveRecordInterface
 
             $this->collTags = null;
 
+            $this->collTopicLinks = null;
+
             $this->collTopicParents = null;
 
             $this->collTopicSynonyms = null;
@@ -772,6 +789,23 @@ abstract class Topic implements ActiveRecordInterface
 
             if ($this->collTags !== null) {
                 foreach ($this->collTags as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->topicLinksScheduledForDeletion !== null) {
+                if (!$this->topicLinksScheduledForDeletion->isEmpty()) {
+                    \TopicLinkQuery::create()
+                        ->filterByPrimaryKeys($this->topicLinksScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->topicLinksScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTopicLinks !== null) {
+                foreach ($this->collTopicLinks as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1002,6 +1036,21 @@ abstract class Topic implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->collTags->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collTopicLinks) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'topicLinks';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'defender_topic_links';
+                        break;
+                    default:
+                        $key = 'TopicLinks';
+                }
+
+                $result[$key] = $this->collTopicLinks->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collTopicParents) {
 
@@ -1271,6 +1320,12 @@ abstract class Topic implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getTopicLinks() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTopicLink($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getTopicParents() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTopicParent($relObj->copy($deepCopy));
@@ -1326,6 +1381,9 @@ abstract class Topic implements ActiveRecordInterface
     {
         if ('Tag' == $relationName) {
             return $this->initTags();
+        }
+        if ('TopicLink' == $relationName) {
+            return $this->initTopicLinks();
         }
         if ('TopicParent' == $relationName) {
             return $this->initTopicParents();
@@ -1583,6 +1641,231 @@ abstract class Topic implements ActiveRecordInterface
         $query->joinWith('Verse', $joinBehavior);
 
         return $this->getTags($query, $con);
+    }
+
+    /**
+     * Clears out the collTopicLinks collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTopicLinks()
+     */
+    public function clearTopicLinks()
+    {
+        $this->collTopicLinks = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collTopicLinks collection loaded partially.
+     */
+    public function resetPartialTopicLinks($v = true)
+    {
+        $this->collTopicLinksPartial = $v;
+    }
+
+    /**
+     * Initializes the collTopicLinks collection.
+     *
+     * By default this just sets the collTopicLinks collection to an empty array (like clearcollTopicLinks());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTopicLinks($overrideExisting = true)
+    {
+        if (null !== $this->collTopicLinks && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = TopicLinkTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collTopicLinks = new $collectionClassName;
+        $this->collTopicLinks->setModel('\TopicLink');
+    }
+
+    /**
+     * Gets an array of ChildTopicLink objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildTopic is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildTopicLink[] List of ChildTopicLink objects
+     * @throws PropelException
+     */
+    public function getTopicLinks(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTopicLinksPartial && !$this->isNew();
+        if (null === $this->collTopicLinks || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTopicLinks) {
+                // return empty collection
+                $this->initTopicLinks();
+            } else {
+                $collTopicLinks = ChildTopicLinkQuery::create(null, $criteria)
+                    ->filterByTopic($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collTopicLinksPartial && count($collTopicLinks)) {
+                        $this->initTopicLinks(false);
+
+                        foreach ($collTopicLinks as $obj) {
+                            if (false == $this->collTopicLinks->contains($obj)) {
+                                $this->collTopicLinks->append($obj);
+                            }
+                        }
+
+                        $this->collTopicLinksPartial = true;
+                    }
+
+                    return $collTopicLinks;
+                }
+
+                if ($partial && $this->collTopicLinks) {
+                    foreach ($this->collTopicLinks as $obj) {
+                        if ($obj->isNew()) {
+                            $collTopicLinks[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTopicLinks = $collTopicLinks;
+                $this->collTopicLinksPartial = false;
+            }
+        }
+
+        return $this->collTopicLinks;
+    }
+
+    /**
+     * Sets a collection of ChildTopicLink objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $topicLinks A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildTopic The current object (for fluent API support)
+     */
+    public function setTopicLinks(Collection $topicLinks, ConnectionInterface $con = null)
+    {
+        /** @var ChildTopicLink[] $topicLinksToDelete */
+        $topicLinksToDelete = $this->getTopicLinks(new Criteria(), $con)->diff($topicLinks);
+
+
+        $this->topicLinksScheduledForDeletion = $topicLinksToDelete;
+
+        foreach ($topicLinksToDelete as $topicLinkRemoved) {
+            $topicLinkRemoved->setTopic(null);
+        }
+
+        $this->collTopicLinks = null;
+        foreach ($topicLinks as $topicLink) {
+            $this->addTopicLink($topicLink);
+        }
+
+        $this->collTopicLinks = $topicLinks;
+        $this->collTopicLinksPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related TopicLink objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related TopicLink objects.
+     * @throws PropelException
+     */
+    public function countTopicLinks(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTopicLinksPartial && !$this->isNew();
+        if (null === $this->collTopicLinks || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTopicLinks) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getTopicLinks());
+            }
+
+            $query = ChildTopicLinkQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTopic($this)
+                ->count($con);
+        }
+
+        return count($this->collTopicLinks);
+    }
+
+    /**
+     * Method called to associate a ChildTopicLink object to this object
+     * through the ChildTopicLink foreign key attribute.
+     *
+     * @param  ChildTopicLink $l ChildTopicLink
+     * @return $this|\Topic The current object (for fluent API support)
+     */
+    public function addTopicLink(ChildTopicLink $l)
+    {
+        if ($this->collTopicLinks === null) {
+            $this->initTopicLinks();
+            $this->collTopicLinksPartial = true;
+        }
+
+        if (!$this->collTopicLinks->contains($l)) {
+            $this->doAddTopicLink($l);
+
+            if ($this->topicLinksScheduledForDeletion and $this->topicLinksScheduledForDeletion->contains($l)) {
+                $this->topicLinksScheduledForDeletion->remove($this->topicLinksScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildTopicLink $topicLink The ChildTopicLink object to add.
+     */
+    protected function doAddTopicLink(ChildTopicLink $topicLink)
+    {
+        $this->collTopicLinks[]= $topicLink;
+        $topicLink->setTopic($this);
+    }
+
+    /**
+     * @param  ChildTopicLink $topicLink The ChildTopicLink object to remove.
+     * @return $this|ChildTopic The current object (for fluent API support)
+     */
+    public function removeTopicLink(ChildTopicLink $topicLink)
+    {
+        if ($this->getTopicLinks()->contains($topicLink)) {
+            $pos = $this->collTopicLinks->search($topicLink);
+            $this->collTopicLinks->remove($pos);
+            if (null === $this->topicLinksScheduledForDeletion) {
+                $this->topicLinksScheduledForDeletion = clone $this->collTopicLinks;
+                $this->topicLinksScheduledForDeletion->clear();
+            }
+            $this->topicLinksScheduledForDeletion[]= clone $topicLink;
+            $topicLink->setTopic(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -2070,6 +2353,11 @@ abstract class Topic implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collTopicLinks) {
+                foreach ($this->collTopicLinks as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collTopicParents) {
                 foreach ($this->collTopicParents as $o) {
                     $o->clearAllReferences($deep);
@@ -2083,6 +2371,7 @@ abstract class Topic implements ActiveRecordInterface
         } // if ($deep)
 
         $this->collTags = null;
+        $this->collTopicLinks = null;
         $this->collTopicParents = null;
         $this->collTopicSynonyms = null;
     }

@@ -4,31 +4,23 @@ require_once '../vendor/autoload.php';
 require_once '../generated-conf/config.php';
 require_once '../app/functions/functions.php';
 
-$topic_object1 = new Topic();
-$topic_object1->setName('Events')
-	->setIsRoot(true)
-	->save();
+# Add topics
+$topic_1_id = addTopic('Events');
+$topic_2_id = addTopic('Places');
+$topic_3_id = addTopic('Sodom and Gomorrah');
 
-$topic_object2 = new Topic();
-$topic_object2->setName('Places')
-	->save();
+# Add parents
+addTopicParent($topic_3_id, $topic_1_id);
+addTopicParent($topic_3_id, $topic_2_id);
 
-$topic_object3 = new Topic();
-$topic_object3->setName('Sodom and Gomorrah')
-	->save();
+# Get topic 1 children
+$topic_1_children_data = getTopicChildrenData($topic_1_id);
+var_dump($topic_1_children_data);
 
-$topic_parent1 = new TopicParent();
-$topic_parent1->setTopic($topic_object2)
-	->setParentId(1)
-	->save();
+# Add links
+addTopicsLink($topic_1_id, $topic_2_id, 1);
+addTopicsLink($topic_1_id, $topic_3_id, 3);
 
-$topic_parent2 = new TopicParent();
-$topic_parent2->setTopic($topic_object3)
-	->setParentId(1)
-	->save();
-
-$root_topics = new TopicQuery();
-$root_topics = $root_topics->filterByIsRoot(true)
-	->find();
-
-var_dump($root_topics->toArray());
+# Get topic 1 links
+$topic_1_links_data = getTopicLinksData($topic_1_id);
+var_dump($topic_1_links_data);
