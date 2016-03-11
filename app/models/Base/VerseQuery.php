@@ -58,6 +58,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildVerseQuery rightJoinWithTranslation() Adds a RIGHT JOIN clause and with to the query using the Translation relation
  * @method     ChildVerseQuery innerJoinWithTranslation() Adds a INNER JOIN clause and with to the query using the Translation relation
  *
+ * @method     ChildVerseQuery leftJoinIdeaVerse($relationAlias = null) Adds a LEFT JOIN clause to the query using the IdeaVerse relation
+ * @method     ChildVerseQuery rightJoinIdeaVerse($relationAlias = null) Adds a RIGHT JOIN clause to the query using the IdeaVerse relation
+ * @method     ChildVerseQuery innerJoinIdeaVerse($relationAlias = null) Adds a INNER JOIN clause to the query using the IdeaVerse relation
+ *
+ * @method     ChildVerseQuery joinWithIdeaVerse($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the IdeaVerse relation
+ *
+ * @method     ChildVerseQuery leftJoinWithIdeaVerse() Adds a LEFT JOIN clause and with to the query using the IdeaVerse relation
+ * @method     ChildVerseQuery rightJoinWithIdeaVerse() Adds a RIGHT JOIN clause and with to the query using the IdeaVerse relation
+ * @method     ChildVerseQuery innerJoinWithIdeaVerse() Adds a INNER JOIN clause and with to the query using the IdeaVerse relation
+ *
  * @method     ChildVerseQuery leftJoinTag($relationAlias = null) Adds a LEFT JOIN clause to the query using the Tag relation
  * @method     ChildVerseQuery rightJoinTag($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Tag relation
  * @method     ChildVerseQuery innerJoinTag($relationAlias = null) Adds a INNER JOIN clause to the query using the Tag relation
@@ -68,7 +78,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildVerseQuery rightJoinWithTag() Adds a RIGHT JOIN clause and with to the query using the Tag relation
  * @method     ChildVerseQuery innerJoinWithTag() Adds a INNER JOIN clause and with to the query using the Tag relation
  *
- * @method     \BookQuery|\TranslationQuery|\TagQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \BookQuery|\TranslationQuery|\IdeaVerseQuery|\TagQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildVerse findOne(ConnectionInterface $con = null) Return the first ChildVerse matching the query
  * @method     ChildVerse findOneOrCreate(ConnectionInterface $con = null) Return the first ChildVerse matching the query, or a new ChildVerse object populated from the query conditions when no match is found
@@ -587,6 +597,79 @@ abstract class VerseQuery extends ModelCriteria
         return $this
             ->joinTranslation($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Translation', '\TranslationQuery');
+    }
+
+    /**
+     * Filter the query by a related \IdeaVerse object
+     *
+     * @param \IdeaVerse|ObjectCollection $ideaVerse the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildVerseQuery The current query, for fluid interface
+     */
+    public function filterByIdeaVerse($ideaVerse, $comparison = null)
+    {
+        if ($ideaVerse instanceof \IdeaVerse) {
+            return $this
+                ->addUsingAlias(VerseTableMap::COL_ID, $ideaVerse->getVerseId(), $comparison);
+        } elseif ($ideaVerse instanceof ObjectCollection) {
+            return $this
+                ->useIdeaVerseQuery()
+                ->filterByPrimaryKeys($ideaVerse->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByIdeaVerse() only accepts arguments of type \IdeaVerse or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the IdeaVerse relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildVerseQuery The current query, for fluid interface
+     */
+    public function joinIdeaVerse($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('IdeaVerse');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'IdeaVerse');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the IdeaVerse relation IdeaVerse object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \IdeaVerseQuery A secondary query class using the current class as primary query
+     */
+    public function useIdeaVerseQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinIdeaVerse($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'IdeaVerse', '\IdeaVerseQuery');
     }
 
     /**

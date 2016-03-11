@@ -427,7 +427,7 @@ abstract class TagVoteQuery extends ModelCriteria
      */
     protected function basePreDelete(ConnectionInterface $con)
     {
-        // aggregate_column_relation_vote_count_aggregate behavior
+        // aggregate_column_relation_aggregate_column behavior
         $this->findRelatedTagVoteCounts($con);
 
         return $this->preDelete($con);
@@ -441,7 +441,7 @@ abstract class TagVoteQuery extends ModelCriteria
      */
     protected function basePostDelete($affectedRows, ConnectionInterface $con)
     {
-        // aggregate_column_relation_vote_count_aggregate behavior
+        // aggregate_column_relation_aggregate_column behavior
         $this->updateRelatedTagVoteCounts($con);
 
         return $this->postDelete($affectedRows, $con);
@@ -456,7 +456,7 @@ abstract class TagVoteQuery extends ModelCriteria
      */
     protected function basePreUpdate(&$values, ConnectionInterface $con, $forceIndividualSaves = false)
     {
-        // aggregate_column_relation_vote_count_aggregate behavior
+        // aggregate_column_relation_aggregate_column behavior
         $this->findRelatedTagVoteCounts($con);
 
         return $this->preUpdate($values, $con, $forceIndividualSaves);
@@ -470,7 +470,7 @@ abstract class TagVoteQuery extends ModelCriteria
      */
     protected function basePostUpdate($affectedRows, ConnectionInterface $con)
     {
-        // aggregate_column_relation_vote_count_aggregate behavior
+        // aggregate_column_relation_aggregate_column behavior
         $this->updateRelatedTagVoteCounts($con);
 
         return $this->postUpdate($affectedRows, $con);
@@ -537,7 +537,7 @@ abstract class TagVoteQuery extends ModelCriteria
         });
     }
 
-    // aggregate_column_relation_vote_count_aggregate behavior
+    // aggregate_column_relation_aggregate_column behavior
 
     /**
      * Finds the related Tag objects and keep them for later

@@ -32,9 +32,30 @@
 		</foreign-key>
 	</table>
 
+	<!-- Ideas tables -->
+	<table name="idea">
+		<behavior name="aggregate_column">
+			<parameter name="name" value="verse_count" />
+			<parameter name="foreign_table" value="idea_verse" />
+			<parameter name="expression" value="COUNT(idea_id)" />
+		</behavior>
+		<column name="title" required="true" size="255" type="varchar" />
+		<column defaultValue="0" name="verse_count" type="integer" />
+	</table>
+	<table name="idea_verse">
+		<column name="idea_id" required="true" type="integer" />
+		<column name="verse_id" required="true" type="integer" />
+		<foreign-key foreignTable="idea">
+			<reference foreign="id" local="idea_id" />
+		</foreign-key>
+		<foreign-key foreignTable="verse">
+			<reference foreign="id" local="verse_id" />
+		</foreign-key>
+	</table>
+
 	<!-- Tagging tables -->
 	<table name="tag">
-		<behavior id="vote_count_aggregate" name="aggregate_column">
+		<behavior name="aggregate_column">
 			<parameter name="name" value="vote_count" />
 			<parameter name="foreign_table" value="tag_vote" />
 			<parameter name="expression" value="COUNT(tag_id)" />
@@ -59,7 +80,7 @@
 
 	<!-- Topic tables -->
 	<table name="topic">
-		<behavior id="tag_count_aggregate" name="aggregate_column">
+		<behavior name="aggregate_column">
 			<parameter name="name" value="tag_count" />
 			<parameter name="foreign_table" value="tag" />
 			<parameter name="expression" value="COUNT(topic_id)" />

@@ -4,6 +4,8 @@ namespace Base;
 
 use \Book as ChildBook;
 use \BookQuery as ChildBookQuery;
+use \IdeaVerse as ChildIdeaVerse;
+use \IdeaVerseQuery as ChildIdeaVerseQuery;
 use \Tag as ChildTag;
 use \TagQuery as ChildTagQuery;
 use \Translation as ChildTranslation;
@@ -12,6 +14,7 @@ use \Verse as ChildVerse;
 use \VerseQuery as ChildVerseQuery;
 use \Exception;
 use \PDO;
+use Map\IdeaVerseTableMap;
 use Map\TagTableMap;
 use Map\TranslationTableMap;
 use Map\VerseTableMap;
@@ -109,6 +112,12 @@ abstract class Verse implements ActiveRecordInterface
     protected $collTranslationsPartial;
 
     /**
+     * @var        ObjectCollection|ChildIdeaVerse[] Collection to store aggregation of ChildIdeaVerse objects.
+     */
+    protected $collIdeaVerses;
+    protected $collIdeaVersesPartial;
+
+    /**
      * @var        ObjectCollection|ChildTag[] Collection to store aggregation of ChildTag objects.
      */
     protected $collTags;
@@ -127,6 +136,12 @@ abstract class Verse implements ActiveRecordInterface
      * @var ObjectCollection|ChildTranslation[]
      */
     protected $translationsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildIdeaVerse[]
+     */
+    protected $ideaVersesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -605,6 +620,8 @@ abstract class Verse implements ActiveRecordInterface
             $this->aBook = null;
             $this->collTranslations = null;
 
+            $this->collIdeaVerses = null;
+
             $this->collTags = null;
 
         } // if (deep)
@@ -740,6 +757,23 @@ abstract class Verse implements ActiveRecordInterface
 
             if ($this->collTranslations !== null) {
                 foreach ($this->collTranslations as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->ideaVersesScheduledForDeletion !== null) {
+                if (!$this->ideaVersesScheduledForDeletion->isEmpty()) {
+                    \IdeaVerseQuery::create()
+                        ->filterByPrimaryKeys($this->ideaVersesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->ideaVersesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collIdeaVerses !== null) {
+                foreach ($this->collIdeaVerses as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -968,6 +1002,21 @@ abstract class Verse implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->collTranslations->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collIdeaVerses) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'ideaVerses';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'defender_idea_verses';
+                        break;
+                    default:
+                        $key = 'IdeaVerses';
+                }
+
+                $result[$key] = $this->collIdeaVerses->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collTags) {
 
@@ -1222,6 +1271,12 @@ abstract class Verse implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getIdeaVerses() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addIdeaVerse($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getTags() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTag($relObj->copy($deepCopy));
@@ -1322,6 +1377,9 @@ abstract class Verse implements ActiveRecordInterface
     {
         if ('Translation' == $relationName) {
             return $this->initTranslations();
+        }
+        if ('IdeaVerse' == $relationName) {
+            return $this->initIdeaVerses();
         }
         if ('Tag' == $relationName) {
             return $this->initTags();
@@ -1576,6 +1634,256 @@ abstract class Verse implements ActiveRecordInterface
         $query->joinWith('Bible', $joinBehavior);
 
         return $this->getTranslations($query, $con);
+    }
+
+    /**
+     * Clears out the collIdeaVerses collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addIdeaVerses()
+     */
+    public function clearIdeaVerses()
+    {
+        $this->collIdeaVerses = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collIdeaVerses collection loaded partially.
+     */
+    public function resetPartialIdeaVerses($v = true)
+    {
+        $this->collIdeaVersesPartial = $v;
+    }
+
+    /**
+     * Initializes the collIdeaVerses collection.
+     *
+     * By default this just sets the collIdeaVerses collection to an empty array (like clearcollIdeaVerses());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initIdeaVerses($overrideExisting = true)
+    {
+        if (null !== $this->collIdeaVerses && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = IdeaVerseTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collIdeaVerses = new $collectionClassName;
+        $this->collIdeaVerses->setModel('\IdeaVerse');
+    }
+
+    /**
+     * Gets an array of ChildIdeaVerse objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildVerse is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildIdeaVerse[] List of ChildIdeaVerse objects
+     * @throws PropelException
+     */
+    public function getIdeaVerses(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collIdeaVersesPartial && !$this->isNew();
+        if (null === $this->collIdeaVerses || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collIdeaVerses) {
+                // return empty collection
+                $this->initIdeaVerses();
+            } else {
+                $collIdeaVerses = ChildIdeaVerseQuery::create(null, $criteria)
+                    ->filterByVerse($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collIdeaVersesPartial && count($collIdeaVerses)) {
+                        $this->initIdeaVerses(false);
+
+                        foreach ($collIdeaVerses as $obj) {
+                            if (false == $this->collIdeaVerses->contains($obj)) {
+                                $this->collIdeaVerses->append($obj);
+                            }
+                        }
+
+                        $this->collIdeaVersesPartial = true;
+                    }
+
+                    return $collIdeaVerses;
+                }
+
+                if ($partial && $this->collIdeaVerses) {
+                    foreach ($this->collIdeaVerses as $obj) {
+                        if ($obj->isNew()) {
+                            $collIdeaVerses[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collIdeaVerses = $collIdeaVerses;
+                $this->collIdeaVersesPartial = false;
+            }
+        }
+
+        return $this->collIdeaVerses;
+    }
+
+    /**
+     * Sets a collection of ChildIdeaVerse objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $ideaVerses A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildVerse The current object (for fluent API support)
+     */
+    public function setIdeaVerses(Collection $ideaVerses, ConnectionInterface $con = null)
+    {
+        /** @var ChildIdeaVerse[] $ideaVersesToDelete */
+        $ideaVersesToDelete = $this->getIdeaVerses(new Criteria(), $con)->diff($ideaVerses);
+
+
+        $this->ideaVersesScheduledForDeletion = $ideaVersesToDelete;
+
+        foreach ($ideaVersesToDelete as $ideaVerseRemoved) {
+            $ideaVerseRemoved->setVerse(null);
+        }
+
+        $this->collIdeaVerses = null;
+        foreach ($ideaVerses as $ideaVerse) {
+            $this->addIdeaVerse($ideaVerse);
+        }
+
+        $this->collIdeaVerses = $ideaVerses;
+        $this->collIdeaVersesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related IdeaVerse objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related IdeaVerse objects.
+     * @throws PropelException
+     */
+    public function countIdeaVerses(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collIdeaVersesPartial && !$this->isNew();
+        if (null === $this->collIdeaVerses || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collIdeaVerses) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getIdeaVerses());
+            }
+
+            $query = ChildIdeaVerseQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByVerse($this)
+                ->count($con);
+        }
+
+        return count($this->collIdeaVerses);
+    }
+
+    /**
+     * Method called to associate a ChildIdeaVerse object to this object
+     * through the ChildIdeaVerse foreign key attribute.
+     *
+     * @param  ChildIdeaVerse $l ChildIdeaVerse
+     * @return $this|\Verse The current object (for fluent API support)
+     */
+    public function addIdeaVerse(ChildIdeaVerse $l)
+    {
+        if ($this->collIdeaVerses === null) {
+            $this->initIdeaVerses();
+            $this->collIdeaVersesPartial = true;
+        }
+
+        if (!$this->collIdeaVerses->contains($l)) {
+            $this->doAddIdeaVerse($l);
+
+            if ($this->ideaVersesScheduledForDeletion and $this->ideaVersesScheduledForDeletion->contains($l)) {
+                $this->ideaVersesScheduledForDeletion->remove($this->ideaVersesScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildIdeaVerse $ideaVerse The ChildIdeaVerse object to add.
+     */
+    protected function doAddIdeaVerse(ChildIdeaVerse $ideaVerse)
+    {
+        $this->collIdeaVerses[]= $ideaVerse;
+        $ideaVerse->setVerse($this);
+    }
+
+    /**
+     * @param  ChildIdeaVerse $ideaVerse The ChildIdeaVerse object to remove.
+     * @return $this|ChildVerse The current object (for fluent API support)
+     */
+    public function removeIdeaVerse(ChildIdeaVerse $ideaVerse)
+    {
+        if ($this->getIdeaVerses()->contains($ideaVerse)) {
+            $pos = $this->collIdeaVerses->search($ideaVerse);
+            $this->collIdeaVerses->remove($pos);
+            if (null === $this->ideaVersesScheduledForDeletion) {
+                $this->ideaVersesScheduledForDeletion = clone $this->collIdeaVerses;
+                $this->ideaVersesScheduledForDeletion->clear();
+            }
+            $this->ideaVersesScheduledForDeletion[]= clone $ideaVerse;
+            $ideaVerse->setVerse(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Verse is new, it will return
+     * an empty collection; or if this Verse has previously
+     * been saved, it will retrieve related IdeaVerses from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Verse.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildIdeaVerse[] List of ChildIdeaVerse objects
+     */
+    public function getIdeaVersesJoinIdea(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildIdeaVerseQuery::create(null, $criteria);
+        $query->joinWith('Idea', $joinBehavior);
+
+        return $this->getIdeaVerses($query, $con);
     }
 
     /**
@@ -1865,6 +2173,11 @@ abstract class Verse implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collIdeaVerses) {
+                foreach ($this->collIdeaVerses as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collTags) {
                 foreach ($this->collTags as $o) {
                     $o->clearAllReferences($deep);
@@ -1873,6 +2186,7 @@ abstract class Verse implements ActiveRecordInterface
         } // if ($deep)
 
         $this->collTranslations = null;
+        $this->collIdeaVerses = null;
         $this->collTags = null;
         $this->aBook = null;
     }

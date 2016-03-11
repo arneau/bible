@@ -128,7 +128,7 @@ abstract class Tag implements ActiveRecordInterface
      */
     protected $alreadyInSave = false;
 
-    // aggregate_column_relation_tag_count_aggregate behavior
+    // aggregate_column_relation_aggregate_column behavior
     /**
      * @var ChildTopic
      */
@@ -742,7 +742,7 @@ abstract class Tag implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                // aggregate_column_relation_tag_count_aggregate behavior
+                // aggregate_column_relation_aggregate_column behavior
                 $this->updateRelatedTopicTagCount($con);
                 TagTableMap::addInstanceToPool($this);
             } else {
@@ -1732,7 +1732,7 @@ abstract class Tag implements ActiveRecordInterface
         return (string) $this->exportTo(TagTableMap::DEFAULT_STRING_FORMAT);
     }
 
-    // vote_count_aggregate behavior
+    // aggregate_column behavior
 
     /**
      * Computes the value of the aggregate column vote_count *
@@ -1759,7 +1759,7 @@ abstract class Tag implements ActiveRecordInterface
         $this->save($con);
     }
 
-    // aggregate_column_relation_tag_count_aggregate behavior
+    // aggregate_column_relation_aggregate_column behavior
 
     /**
      * Update the aggregate column in the related Topic object

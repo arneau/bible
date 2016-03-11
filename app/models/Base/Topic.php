@@ -2386,7 +2386,7 @@ abstract class Topic implements ActiveRecordInterface
         return (string) $this->exportTo(TopicTableMap::DEFAULT_STRING_FORMAT);
     }
 
-    // tag_count_aggregate behavior
+    // aggregate_column behavior
 
     /**
      * Computes the value of the aggregate column tag_count *

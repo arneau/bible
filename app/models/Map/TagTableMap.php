@@ -190,9 +190,9 @@ class TagTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'vote_count_aggregate' => array('name' => 'vote_count', 'expression' => 'COUNT(tag_id)', 'condition' => '', 'foreign_table' => 'tag_vote', 'foreign_schema' => '', ),
+            'aggregate_column' => array('name' => 'vote_count', 'expression' => 'COUNT(tag_id)', 'condition' => '', 'foreign_table' => 'tag_vote', 'foreign_schema' => '', ),
             'auto_add_pk' => array('name' => 'id', 'autoIncrement' => 'true', 'type' => 'INTEGER', ),
-            'aggregate_column_relation_tag_count_aggregate' => array('foreign_table' => 'defender_topic', 'update_method' => 'updateTagCount', 'aggregate_name' => 'TagCount', ),
+            'aggregate_column_relation_aggregate_column' => array('foreign_table' => 'defender_topic', 'update_method' => 'updateTagCount', 'aggregate_name' => 'TagCount', ),
         );
     } // getBehaviors()
 

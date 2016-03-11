@@ -2,12 +2,14 @@
 
 namespace Base;
 
-use \Tag as ChildTag;
-use \TagQuery as ChildTagQuery;
-use \TagVoteQuery as ChildTagVoteQuery;
+use \Bible as ChildBible;
+use \BibleQuery as ChildBibleQuery;
+use \TranslationQuery as ChildTranslationQuery;
+use \Verse as ChildVerse;
+use \VerseQuery as ChildVerseQuery;
 use \Exception;
 use \PDO;
-use Map\TagVoteTableMap;
+use Map\TranslationTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -21,18 +23,18 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
 /**
- * Base class that represents a row from the 'defender_tag_vote' table.
+ * Base class that represents a row from the 'defender_translation' table.
  *
  *
  *
 * @package    propel.generator..Base
 */
-abstract class TagVote implements ActiveRecordInterface
+abstract class Translation implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Map\\TagVoteTableMap';
+    const TABLE_MAP = '\\Map\\TranslationTableMap';
 
 
     /**
@@ -62,11 +64,32 @@ abstract class TagVote implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the tag_id field.
+     * The value for the bible_id field.
      *
      * @var        int
      */
-    protected $tag_id;
+    protected $bible_id;
+
+    /**
+     * The value for the text field.
+     *
+     * @var        string
+     */
+    protected $text;
+
+    /**
+     * The value for the verse_id field.
+     *
+     * @var        int
+     */
+    protected $verse_id;
+
+    /**
+     * The value for the word_count field.
+     *
+     * @var        int
+     */
+    protected $word_count;
 
     /**
      * The value for the id field.
@@ -76,9 +99,14 @@ abstract class TagVote implements ActiveRecordInterface
     protected $id;
 
     /**
-     * @var        ChildTag
+     * @var        ChildBible
      */
-    protected $aTag;
+    protected $aBible;
+
+    /**
+     * @var        ChildVerse
+     */
+    protected $aVerse;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -88,14 +116,8 @@ abstract class TagVote implements ActiveRecordInterface
      */
     protected $alreadyInSave = false;
 
-    // aggregate_column_relation_aggregate_column behavior
     /**
-     * @var ChildTag
-     */
-    protected $oldTagVoteCount;
-
-    /**
-     * Initializes internal state of Base\TagVote object.
+     * Initializes internal state of Base\Translation object.
      */
     public function __construct()
     {
@@ -190,9 +212,9 @@ abstract class TagVote implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>TagVote</code> instance.  If
-     * <code>obj</code> is an instance of <code>TagVote</code>, delegates to
-     * <code>equals(TagVote)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>Translation</code> instance.  If
+     * <code>obj</code> is an instance of <code>Translation</code>, delegates to
+     * <code>equals(Translation)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -258,7 +280,7 @@ abstract class TagVote implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|TagVote The current object, for fluid interface
+     * @return $this|Translation The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -320,13 +342,43 @@ abstract class TagVote implements ActiveRecordInterface
     }
 
     /**
-     * Get the [tag_id] column value.
+     * Get the [bible_id] column value.
      *
      * @return int
      */
-    public function getTagId()
+    public function getBibleId()
     {
-        return $this->tag_id;
+        return $this->bible_id;
+    }
+
+    /**
+     * Get the [text] column value.
+     *
+     * @return string
+     */
+    public function getText()
+    {
+        return $this->text;
+    }
+
+    /**
+     * Get the [verse_id] column value.
+     *
+     * @return int
+     */
+    public function getVerseId()
+    {
+        return $this->verse_id;
+    }
+
+    /**
+     * Get the [word_count] column value.
+     *
+     * @return int
+     */
+    public function getWordCount()
+    {
+        return $this->word_count;
     }
 
     /**
@@ -340,34 +392,98 @@ abstract class TagVote implements ActiveRecordInterface
     }
 
     /**
-     * Set the value of [tag_id] column.
+     * Set the value of [bible_id] column.
      *
      * @param int $v new value
-     * @return $this|\TagVote The current object (for fluent API support)
+     * @return $this|\Translation The current object (for fluent API support)
      */
-    public function setTagId($v)
+    public function setBibleId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->tag_id !== $v) {
-            $this->tag_id = $v;
-            $this->modifiedColumns[TagVoteTableMap::COL_TAG_ID] = true;
+        if ($this->bible_id !== $v) {
+            $this->bible_id = $v;
+            $this->modifiedColumns[TranslationTableMap::COL_BIBLE_ID] = true;
         }
 
-        if ($this->aTag !== null && $this->aTag->getId() !== $v) {
-            $this->aTag = null;
+        if ($this->aBible !== null && $this->aBible->getId() !== $v) {
+            $this->aBible = null;
         }
 
         return $this;
-    } // setTagId()
+    } // setBibleId()
+
+    /**
+     * Set the value of [text] column.
+     *
+     * @param string $v new value
+     * @return $this|\Translation The current object (for fluent API support)
+     */
+    public function setText($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->text !== $v) {
+            $this->text = $v;
+            $this->modifiedColumns[TranslationTableMap::COL_TEXT] = true;
+        }
+
+        return $this;
+    } // setText()
+
+    /**
+     * Set the value of [verse_id] column.
+     *
+     * @param int $v new value
+     * @return $this|\Translation The current object (for fluent API support)
+     */
+    public function setVerseId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->verse_id !== $v) {
+            $this->verse_id = $v;
+            $this->modifiedColumns[TranslationTableMap::COL_VERSE_ID] = true;
+        }
+
+        if ($this->aVerse !== null && $this->aVerse->getId() !== $v) {
+            $this->aVerse = null;
+        }
+
+        return $this;
+    } // setVerseId()
+
+    /**
+     * Set the value of [word_count] column.
+     *
+     * @param int $v new value
+     * @return $this|\Translation The current object (for fluent API support)
+     */
+    public function setWordCount($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->word_count !== $v) {
+            $this->word_count = $v;
+            $this->modifiedColumns[TranslationTableMap::COL_WORD_COUNT] = true;
+        }
+
+        return $this;
+    } // setWordCount()
 
     /**
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return $this|\TagVote The current object (for fluent API support)
+     * @return $this|\Translation The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -377,7 +493,7 @@ abstract class TagVote implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[TagVoteTableMap::COL_ID] = true;
+            $this->modifiedColumns[TranslationTableMap::COL_ID] = true;
         }
 
         return $this;
@@ -419,10 +535,19 @@ abstract class TagVote implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TagVoteTableMap::translateFieldName('TagId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->tag_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TranslationTableMap::translateFieldName('BibleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->bible_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TagVoteTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TranslationTableMap::translateFieldName('Text', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->text = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TranslationTableMap::translateFieldName('VerseId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->verse_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TranslationTableMap::translateFieldName('WordCount', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->word_count = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TranslationTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -432,10 +557,10 @@ abstract class TagVote implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 2; // 2 = TagVoteTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = TranslationTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\TagVote'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\Translation'), 0, $e);
         }
     }
 
@@ -454,8 +579,11 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aTag !== null && $this->tag_id !== $this->aTag->getId()) {
-            $this->aTag = null;
+        if ($this->aBible !== null && $this->bible_id !== $this->aBible->getId()) {
+            $this->aBible = null;
+        }
+        if ($this->aVerse !== null && $this->verse_id !== $this->aVerse->getId()) {
+            $this->aVerse = null;
         }
     } // ensureConsistency
 
@@ -480,13 +608,13 @@ abstract class TagVote implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(TagVoteTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(TranslationTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildTagVoteQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildTranslationQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -496,7 +624,8 @@ abstract class TagVote implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aTag = null;
+            $this->aBible = null;
+            $this->aVerse = null;
         } // if (deep)
     }
 
@@ -506,8 +635,8 @@ abstract class TagVote implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see TagVote::setDeleted()
-     * @see TagVote::isDeleted()
+     * @see Translation::setDeleted()
+     * @see Translation::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -516,11 +645,11 @@ abstract class TagVote implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TagVoteTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TranslationTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildTagVoteQuery::create()
+            $deleteQuery = ChildTranslationQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -551,7 +680,7 @@ abstract class TagVote implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TagVoteTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(TranslationTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -570,9 +699,7 @@ abstract class TagVote implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                // aggregate_column_relation_aggregate_column behavior
-                $this->updateRelatedTagVoteCount($con);
-                TagVoteTableMap::addInstanceToPool($this);
+                TranslationTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -603,11 +730,18 @@ abstract class TagVote implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aTag !== null) {
-                if ($this->aTag->isModified() || $this->aTag->isNew()) {
-                    $affectedRows += $this->aTag->save($con);
+            if ($this->aBible !== null) {
+                if ($this->aBible->isModified() || $this->aBible->isNew()) {
+                    $affectedRows += $this->aBible->save($con);
                 }
-                $this->setTag($this->aTag);
+                $this->setBible($this->aBible);
+            }
+
+            if ($this->aVerse !== null) {
+                if ($this->aVerse->isModified() || $this->aVerse->isNew()) {
+                    $affectedRows += $this->aVerse->save($con);
+                }
+                $this->setVerse($this->aVerse);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -641,21 +775,30 @@ abstract class TagVote implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[TagVoteTableMap::COL_ID] = true;
+        $this->modifiedColumns[TranslationTableMap::COL_ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TagVoteTableMap::COL_ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TranslationTableMap::COL_ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(TagVoteTableMap::COL_TAG_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'tag_id';
+        if ($this->isColumnModified(TranslationTableMap::COL_BIBLE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'bible_id';
         }
-        if ($this->isColumnModified(TagVoteTableMap::COL_ID)) {
+        if ($this->isColumnModified(TranslationTableMap::COL_TEXT)) {
+            $modifiedColumns[':p' . $index++]  = 'text';
+        }
+        if ($this->isColumnModified(TranslationTableMap::COL_VERSE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'verse_id';
+        }
+        if ($this->isColumnModified(TranslationTableMap::COL_WORD_COUNT)) {
+            $modifiedColumns[':p' . $index++]  = 'word_count';
+        }
+        if ($this->isColumnModified(TranslationTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
 
         $sql = sprintf(
-            'INSERT INTO defender_tag_vote (%s) VALUES (%s)',
+            'INSERT INTO defender_translation (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -664,8 +807,17 @@ abstract class TagVote implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'tag_id':
-                        $stmt->bindValue($identifier, $this->tag_id, PDO::PARAM_INT);
+                    case 'bible_id':
+                        $stmt->bindValue($identifier, $this->bible_id, PDO::PARAM_INT);
+                        break;
+                    case 'text':
+                        $stmt->bindValue($identifier, $this->text, PDO::PARAM_STR);
+                        break;
+                    case 'verse_id':
+                        $stmt->bindValue($identifier, $this->verse_id, PDO::PARAM_INT);
+                        break;
+                    case 'word_count':
+                        $stmt->bindValue($identifier, $this->word_count, PDO::PARAM_INT);
                         break;
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
@@ -716,7 +868,7 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = TagVoteTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = TranslationTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -733,9 +885,18 @@ abstract class TagVote implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getTagId();
+                return $this->getBibleId();
                 break;
             case 1:
+                return $this->getText();
+                break;
+            case 2:
+                return $this->getVerseId();
+                break;
+            case 3:
+                return $this->getWordCount();
+                break;
+            case 4:
                 return $this->getId();
                 break;
             default:
@@ -762,14 +923,17 @@ abstract class TagVote implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['TagVote'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['Translation'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['TagVote'][$this->hashCode()] = true;
-        $keys = TagVoteTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['Translation'][$this->hashCode()] = true;
+        $keys = TranslationTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getTagId(),
-            $keys[1] => $this->getId(),
+            $keys[0] => $this->getBibleId(),
+            $keys[1] => $this->getText(),
+            $keys[2] => $this->getVerseId(),
+            $keys[3] => $this->getWordCount(),
+            $keys[4] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -777,20 +941,35 @@ abstract class TagVote implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aTag) {
+            if (null !== $this->aBible) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'tag';
+                        $key = 'bible';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'defender_tag';
+                        $key = 'defender_bible';
                         break;
                     default:
-                        $key = 'Tag';
+                        $key = 'Bible';
                 }
 
-                $result[$key] = $this->aTag->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result[$key] = $this->aBible->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aVerse) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'verse';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'defender_verse';
+                        break;
+                    default:
+                        $key = 'Verse';
+                }
+
+                $result[$key] = $this->aVerse->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -806,11 +985,11 @@ abstract class TagVote implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\TagVote
+     * @return $this|\Translation
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = TagVoteTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = TranslationTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -821,15 +1000,24 @@ abstract class TagVote implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\TagVote
+     * @return $this|\Translation
      */
     public function setByPosition($pos, $value)
     {
         switch ($pos) {
             case 0:
-                $this->setTagId($value);
+                $this->setBibleId($value);
                 break;
             case 1:
+                $this->setText($value);
+                break;
+            case 2:
+                $this->setVerseId($value);
+                break;
+            case 3:
+                $this->setWordCount($value);
+                break;
+            case 4:
                 $this->setId($value);
                 break;
         } // switch()
@@ -856,13 +1044,22 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = TagVoteTableMap::getFieldNames($keyType);
+        $keys = TranslationTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setTagId($arr[$keys[0]]);
+            $this->setBibleId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setId($arr[$keys[1]]);
+            $this->setText($arr[$keys[1]]);
+        }
+        if (array_key_exists($keys[2], $arr)) {
+            $this->setVerseId($arr[$keys[2]]);
+        }
+        if (array_key_exists($keys[3], $arr)) {
+            $this->setWordCount($arr[$keys[3]]);
+        }
+        if (array_key_exists($keys[4], $arr)) {
+            $this->setId($arr[$keys[4]]);
         }
     }
 
@@ -883,7 +1080,7 @@ abstract class TagVote implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\TagVote The current object, for fluid interface
+     * @return $this|\Translation The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -903,13 +1100,22 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(TagVoteTableMap::DATABASE_NAME);
+        $criteria = new Criteria(TranslationTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(TagVoteTableMap::COL_TAG_ID)) {
-            $criteria->add(TagVoteTableMap::COL_TAG_ID, $this->tag_id);
+        if ($this->isColumnModified(TranslationTableMap::COL_BIBLE_ID)) {
+            $criteria->add(TranslationTableMap::COL_BIBLE_ID, $this->bible_id);
         }
-        if ($this->isColumnModified(TagVoteTableMap::COL_ID)) {
-            $criteria->add(TagVoteTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(TranslationTableMap::COL_TEXT)) {
+            $criteria->add(TranslationTableMap::COL_TEXT, $this->text);
+        }
+        if ($this->isColumnModified(TranslationTableMap::COL_VERSE_ID)) {
+            $criteria->add(TranslationTableMap::COL_VERSE_ID, $this->verse_id);
+        }
+        if ($this->isColumnModified(TranslationTableMap::COL_WORD_COUNT)) {
+            $criteria->add(TranslationTableMap::COL_WORD_COUNT, $this->word_count);
+        }
+        if ($this->isColumnModified(TranslationTableMap::COL_ID)) {
+            $criteria->add(TranslationTableMap::COL_ID, $this->id);
         }
 
         return $criteria;
@@ -927,8 +1133,8 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildTagVoteQuery::create();
-        $criteria->add(TagVoteTableMap::COL_ID, $this->id);
+        $criteria = ChildTranslationQuery::create();
+        $criteria->add(TranslationTableMap::COL_ID, $this->id);
 
         return $criteria;
     }
@@ -990,14 +1196,17 @@ abstract class TagVote implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \TagVote (or compatible) type.
+     * @param      object $copyObj An object of \Translation (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setTagId($this->getTagId());
+        $copyObj->setBibleId($this->getBibleId());
+        $copyObj->setText($this->getText());
+        $copyObj->setVerseId($this->getVerseId());
+        $copyObj->setWordCount($this->getWordCount());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1013,7 +1222,7 @@ abstract class TagVote implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \TagVote Clone of current object.
+     * @return \Translation Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1027,30 +1236,26 @@ abstract class TagVote implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildTag object.
+     * Declares an association between this object and a ChildBible object.
      *
-     * @param  ChildTag $v
-     * @return $this|\TagVote The current object (for fluent API support)
+     * @param  ChildBible $v
+     * @return $this|\Translation The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setTag(ChildTag $v = null)
+    public function setBible(ChildBible $v = null)
     {
-        // aggregate_column_relation behavior
-        if (null !== $this->aTag && $v !== $this->aTag) {
-            $this->oldTagVoteCount = $this->aTag;
-        }
         if ($v === null) {
-            $this->setTagId(NULL);
+            $this->setBibleId(NULL);
         } else {
-            $this->setTagId($v->getId());
+            $this->setBibleId($v->getId());
         }
 
-        $this->aTag = $v;
+        $this->aBible = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildTag object, it will not be re-added.
+        // If this object has already been added to the ChildBible object, it will not be re-added.
         if ($v !== null) {
-            $v->addTagVote($this);
+            $v->addTranslation($this);
         }
 
 
@@ -1059,26 +1264,77 @@ abstract class TagVote implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildTag object
+     * Get the associated ChildBible object
      *
      * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildTag The associated ChildTag object.
+     * @return ChildBible The associated ChildBible object.
      * @throws PropelException
      */
-    public function getTag(ConnectionInterface $con = null)
+    public function getBible(ConnectionInterface $con = null)
     {
-        if ($this->aTag === null && ($this->tag_id !== null)) {
-            $this->aTag = ChildTagQuery::create()->findPk($this->tag_id, $con);
+        if ($this->aBible === null && ($this->bible_id !== null)) {
+            $this->aBible = ChildBibleQuery::create()->findPk($this->bible_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aTag->addTagVotes($this);
+                $this->aBible->addTranslations($this);
              */
         }
 
-        return $this->aTag;
+        return $this->aBible;
+    }
+
+    /**
+     * Declares an association between this object and a ChildVerse object.
+     *
+     * @param  ChildVerse $v
+     * @return $this|\Translation The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setVerse(ChildVerse $v = null)
+    {
+        if ($v === null) {
+            $this->setVerseId(NULL);
+        } else {
+            $this->setVerseId($v->getId());
+        }
+
+        $this->aVerse = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildVerse object, it will not be re-added.
+        if ($v !== null) {
+            $v->addTranslation($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildVerse object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildVerse The associated ChildVerse object.
+     * @throws PropelException
+     */
+    public function getVerse(ConnectionInterface $con = null)
+    {
+        if ($this->aVerse === null && ($this->verse_id !== null)) {
+            $this->aVerse = ChildVerseQuery::create()->findPk($this->verse_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aVerse->addTranslations($this);
+             */
+        }
+
+        return $this->aVerse;
     }
 
     /**
@@ -1088,10 +1344,16 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->aTag) {
-            $this->aTag->removeTagVote($this);
+        if (null !== $this->aBible) {
+            $this->aBible->removeTranslation($this);
         }
-        $this->tag_id = null;
+        if (null !== $this->aVerse) {
+            $this->aVerse->removeTranslation($this);
+        }
+        $this->bible_id = null;
+        $this->text = null;
+        $this->verse_id = null;
+        $this->word_count = null;
         $this->id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
@@ -1113,7 +1375,8 @@ abstract class TagVote implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aTag = null;
+        $this->aBible = null;
+        $this->aVerse = null;
     }
 
     /**
@@ -1123,25 +1386,7 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(TagVoteTableMap::DEFAULT_STRING_FORMAT);
-    }
-
-    // aggregate_column_relation_aggregate_column behavior
-
-    /**
-     * Update the aggregate column in the related Tag object
-     *
-     * @param ConnectionInterface $con A connection object
-     */
-    protected function updateRelatedTagVoteCount(ConnectionInterface $con)
-    {
-        if ($tag = $this->getTag()) {
-            $tag->updateVoteCount($con);
-        }
-        if ($this->oldTagVoteCount) {
-            $this->oldTagVoteCount->updateVoteCount($con);
-            $this->oldTagVoteCount = null;
-        }
+        return (string) $this->exportTo(TranslationTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

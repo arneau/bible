@@ -52,12 +52,8 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 
 	# Get verses objects
 	$verses_objects = VerseQuery::create()
-		->filterByBook($book_object)
 		->filterByChapterNumber($reference_data['chapter'])
 		->filterByVerseNumber($reference_data['verses'])
-		->useTranslationQuery()
-		->filterByBible($bible_object)
-		->endUse()
 		->find();
 
 	# Define passage data
@@ -74,7 +70,7 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 		],
 	];
 
-	# Define verses data
+	# Handle verse objects
 	foreach ($verses_objects as $verse_object) {
 
 		# Get translation object
@@ -83,13 +79,14 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 			->filterByVerseId($verse_object->getId())
 			->findOne();
 
+		# Get verse tags data
+		$verse_tags_data = getVerseTagsData($verse_object->getId());
 
-		$verse_tags_array = getVerseTagsData($verse_object->getId());
-
+		# Append verse data
 		$passage_data['verses'][] = [
 			'id' => $verse_object->getId(),
 			'number' => $verse_object->getVerseNumber(),
-			'tags' => $verse_tags_array,
+			'tags' => $verse_tags_data,
 			'text' => $translation_object->getText(),
 			'word_count' => $translation_object->getWordCount(),
 		];

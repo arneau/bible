@@ -191,7 +191,7 @@ class TopicTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'tag_count_aggregate' => array('name' => 'tag_count', 'expression' => 'COUNT(topic_id)', 'condition' => '', 'foreign_table' => 'tag', 'foreign_schema' => '', ),
+            'aggregate_column' => array('name' => 'tag_count', 'expression' => 'COUNT(topic_id)', 'condition' => '', 'foreign_table' => 'tag', 'foreign_schema' => '', ),
             'auto_add_pk' => array('name' => 'id', 'autoIncrement' => 'true', 'type' => 'INTEGER', ),
         );
     } // getBehaviors()

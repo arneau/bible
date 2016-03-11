@@ -159,7 +159,7 @@ class TagVoteTableMap extends TableMap
     {
         return array(
             'auto_add_pk' => array('name' => 'id', 'autoIncrement' => 'true', 'type' => 'INTEGER', ),
-            'aggregate_column_relation_vote_count_aggregate' => array('foreign_table' => 'defender_tag', 'update_method' => 'updateVoteCount', 'aggregate_name' => 'VoteCount', ),
+            'aggregate_column_relation_aggregate_column' => array('foreign_table' => 'defender_tag', 'update_method' => 'updateVoteCount', 'aggregate_name' => 'VoteCount', ),
         );
     } // getBehaviors()
 

@@ -2,8 +2,8 @@
 
 namespace Map;
 
-use \Verse;
-use \VerseQuery;
+use \IdeaVerse;
+use \IdeaVerseQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'defender_verse' table.
+ * This class defines the structure of the 'defender_idea_verse' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class VerseTableMap extends TableMap
+class IdeaVerseTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class VerseTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = '.Map.VerseTableMap';
+    const CLASS_NAME = '.Map.IdeaVerseTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class VerseTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'defender_verse';
+    const TABLE_NAME = 'defender_idea_verse';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Verse';
+    const OM_CLASS = '\\IdeaVerse';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Verse';
+    const CLASS_DEFAULT = 'IdeaVerse';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 3;
 
     /**
      * The number of lazy-loaded columns
@@ -69,27 +69,22 @@ class VerseTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /**
-     * the column name for the book_id field
+     * the column name for the idea_id field
      */
-    const COL_BOOK_ID = 'defender_verse.book_id';
+    const COL_IDEA_ID = 'defender_idea_verse.idea_id';
 
     /**
-     * the column name for the chapter_number field
+     * the column name for the verse_id field
      */
-    const COL_CHAPTER_NUMBER = 'defender_verse.chapter_number';
-
-    /**
-     * the column name for the verse_number field
-     */
-    const COL_VERSE_NUMBER = 'defender_verse.verse_number';
+    const COL_VERSE_ID = 'defender_idea_verse.verse_id';
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'defender_verse.id';
+    const COL_ID = 'defender_idea_verse.id';
 
     /**
      * The default string format for model objects of the related table
@@ -103,11 +98,11 @@ class VerseTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('BookId', 'ChapterNumber', 'VerseNumber', 'Id', ),
-        self::TYPE_CAMELNAME     => array('bookId', 'chapterNumber', 'verseNumber', 'id', ),
-        self::TYPE_COLNAME       => array(VerseTableMap::COL_BOOK_ID, VerseTableMap::COL_CHAPTER_NUMBER, VerseTableMap::COL_VERSE_NUMBER, VerseTableMap::COL_ID, ),
-        self::TYPE_FIELDNAME     => array('book_id', 'chapter_number', 'verse_number', 'id', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('IdeaId', 'VerseId', 'Id', ),
+        self::TYPE_CAMELNAME     => array('ideaId', 'verseId', 'id', ),
+        self::TYPE_COLNAME       => array(IdeaVerseTableMap::COL_IDEA_ID, IdeaVerseTableMap::COL_VERSE_ID, IdeaVerseTableMap::COL_ID, ),
+        self::TYPE_FIELDNAME     => array('idea_id', 'verse_id', 'id', ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -117,11 +112,11 @@ class VerseTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('BookId' => 0, 'ChapterNumber' => 1, 'VerseNumber' => 2, 'Id' => 3, ),
-        self::TYPE_CAMELNAME     => array('bookId' => 0, 'chapterNumber' => 1, 'verseNumber' => 2, 'id' => 3, ),
-        self::TYPE_COLNAME       => array(VerseTableMap::COL_BOOK_ID => 0, VerseTableMap::COL_CHAPTER_NUMBER => 1, VerseTableMap::COL_VERSE_NUMBER => 2, VerseTableMap::COL_ID => 3, ),
-        self::TYPE_FIELDNAME     => array('book_id' => 0, 'chapter_number' => 1, 'verse_number' => 2, 'id' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('IdeaId' => 0, 'VerseId' => 1, 'Id' => 2, ),
+        self::TYPE_CAMELNAME     => array('ideaId' => 0, 'verseId' => 1, 'id' => 2, ),
+        self::TYPE_COLNAME       => array(IdeaVerseTableMap::COL_IDEA_ID => 0, IdeaVerseTableMap::COL_VERSE_ID => 1, IdeaVerseTableMap::COL_ID => 2, ),
+        self::TYPE_FIELDNAME     => array('idea_id' => 0, 'verse_id' => 1, 'id' => 2, ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -134,16 +129,15 @@ class VerseTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('defender_verse');
-        $this->setPhpName('Verse');
+        $this->setName('defender_idea_verse');
+        $this->setPhpName('IdeaVerse');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\Verse');
+        $this->setClassName('\\IdeaVerse');
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignKey('book_id', 'BookId', 'INTEGER', 'defender_book', 'id', true, null, null);
-        $this->addColumn('chapter_number', 'ChapterNumber', 'INTEGER', true, null, null);
-        $this->addColumn('verse_number', 'VerseNumber', 'INTEGER', true, null, null);
+        $this->addForeignKey('idea_id', 'IdeaId', 'INTEGER', 'defender_idea', 'id', true, null, null);
+        $this->addForeignKey('verse_id', 'VerseId', 'INTEGER', 'defender_verse', 'id', true, null, null);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
     } // initialize()
 
@@ -152,34 +146,20 @@ class VerseTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Book', '\\Book', RelationMap::MANY_TO_ONE, array (
+        $this->addRelation('Idea', '\\Idea', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
-    0 => ':book_id',
+    0 => ':idea_id',
     1 => ':id',
   ),
 ), null, null, null, false);
-        $this->addRelation('Translation', '\\Translation', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Verse', '\\Verse', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
     0 => ':verse_id',
     1 => ':id',
   ),
-), null, null, 'Translations', false);
-        $this->addRelation('IdeaVerse', '\\IdeaVerse', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':verse_id',
-    1 => ':id',
-  ),
-), null, null, 'IdeaVerses', false);
-        $this->addRelation('Tag', '\\Tag', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':verse_id',
-    1 => ':id',
-  ),
-), null, null, 'Tags', false);
+), null, null, null, false);
     } // buildRelations()
 
     /**
@@ -192,6 +172,7 @@ class VerseTableMap extends TableMap
     {
         return array(
             'auto_add_pk' => array('name' => 'id', 'autoIncrement' => 'true', 'type' => 'INTEGER', ),
+            'aggregate_column_relation_aggregate_column' => array('foreign_table' => 'defender_idea', 'update_method' => 'updateVerseCount', 'aggregate_name' => 'VerseCount', ),
         );
     } // getBehaviors()
 
@@ -211,11 +192,11 @@ class VerseTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return null === $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -234,7 +215,7 @@ class VerseTableMap extends TableMap
     {
         return (int) $row[
             $indexType == TableMap::TYPE_NUM
-                ? 3 + $offset
+                ? 2 + $offset
                 : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
@@ -252,7 +233,7 @@ class VerseTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? VerseTableMap::CLASS_DEFAULT : VerseTableMap::OM_CLASS;
+        return $withPrefix ? IdeaVerseTableMap::CLASS_DEFAULT : IdeaVerseTableMap::OM_CLASS;
     }
 
     /**
@@ -266,22 +247,22 @@ class VerseTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Verse object, last column rank)
+     * @return array           (IdeaVerse object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = VerseTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = VerseTableMap::getInstanceFromPool($key))) {
+        $key = IdeaVerseTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = IdeaVerseTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + VerseTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + IdeaVerseTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = VerseTableMap::OM_CLASS;
-            /** @var Verse $obj */
+            $cls = IdeaVerseTableMap::OM_CLASS;
+            /** @var IdeaVerse $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            VerseTableMap::addInstanceToPool($obj, $key);
+            IdeaVerseTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -304,18 +285,18 @@ class VerseTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = VerseTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = VerseTableMap::getInstanceFromPool($key))) {
+            $key = IdeaVerseTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = IdeaVerseTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Verse $obj */
+                /** @var IdeaVerse $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                VerseTableMap::addInstanceToPool($obj, $key);
+                IdeaVerseTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -336,14 +317,12 @@ class VerseTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(VerseTableMap::COL_BOOK_ID);
-            $criteria->addSelectColumn(VerseTableMap::COL_CHAPTER_NUMBER);
-            $criteria->addSelectColumn(VerseTableMap::COL_VERSE_NUMBER);
-            $criteria->addSelectColumn(VerseTableMap::COL_ID);
+            $criteria->addSelectColumn(IdeaVerseTableMap::COL_IDEA_ID);
+            $criteria->addSelectColumn(IdeaVerseTableMap::COL_VERSE_ID);
+            $criteria->addSelectColumn(IdeaVerseTableMap::COL_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.book_id');
-            $criteria->addSelectColumn($alias . '.chapter_number');
-            $criteria->addSelectColumn($alias . '.verse_number');
+            $criteria->addSelectColumn($alias . '.idea_id');
+            $criteria->addSelectColumn($alias . '.verse_id');
             $criteria->addSelectColumn($alias . '.id');
         }
     }
@@ -357,7 +336,7 @@ class VerseTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(VerseTableMap::DATABASE_NAME)->getTable(VerseTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(IdeaVerseTableMap::DATABASE_NAME)->getTable(IdeaVerseTableMap::TABLE_NAME);
     }
 
     /**
@@ -365,16 +344,16 @@ class VerseTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(VerseTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(VerseTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new VerseTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(IdeaVerseTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(IdeaVerseTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new IdeaVerseTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Verse or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a IdeaVerse or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Verse object or primary key or array of primary keys
+     * @param mixed               $values Criteria or IdeaVerse object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -385,27 +364,27 @@ class VerseTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(VerseTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(IdeaVerseTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Verse) { // it's a model object
+        } elseif ($values instanceof \IdeaVerse) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(VerseTableMap::DATABASE_NAME);
-            $criteria->add(VerseTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(IdeaVerseTableMap::DATABASE_NAME);
+            $criteria->add(IdeaVerseTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = VerseQuery::create()->mergeWith($criteria);
+        $query = IdeaVerseQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            VerseTableMap::clearInstancePool();
+            IdeaVerseTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                VerseTableMap::removeInstanceFromPool($singleval);
+                IdeaVerseTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -413,20 +392,20 @@ class VerseTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the defender_verse table.
+     * Deletes all rows from the defender_idea_verse table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return VerseQuery::create()->doDeleteAll($con);
+        return IdeaVerseQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Verse or Criteria object.
+     * Performs an INSERT on the database, given a IdeaVerse or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Verse object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or IdeaVerse object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -435,22 +414,22 @@ class VerseTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(VerseTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(IdeaVerseTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Verse object
+            $criteria = $criteria->buildCriteria(); // build Criteria from IdeaVerse object
         }
 
-        if ($criteria->containsKey(VerseTableMap::COL_ID) && $criteria->keyContainsValue(VerseTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.VerseTableMap::COL_ID.')');
+        if ($criteria->containsKey(IdeaVerseTableMap::COL_ID) && $criteria->keyContainsValue(IdeaVerseTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.IdeaVerseTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = VerseQuery::create()->mergeWith($criteria);
+        $query = IdeaVerseQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -459,7 +438,7 @@ class VerseTableMap extends TableMap
         });
     }
 
-} // VerseTableMap
+} // IdeaVerseTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-VerseTableMap::buildTableMap();
+IdeaVerseTableMap::buildTableMap();

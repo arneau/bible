@@ -725,7 +725,7 @@ abstract class TagQuery extends ModelCriteria
      */
     protected function basePreDelete(ConnectionInterface $con)
     {
-        // aggregate_column_relation_tag_count_aggregate behavior
+        // aggregate_column_relation_aggregate_column behavior
         $this->findRelatedTopicTagCounts($con);
 
         return $this->preDelete($con);
@@ -739,7 +739,7 @@ abstract class TagQuery extends ModelCriteria
      */
     protected function basePostDelete($affectedRows, ConnectionInterface $con)
     {
-        // aggregate_column_relation_tag_count_aggregate behavior
+        // aggregate_column_relation_aggregate_column behavior
         $this->updateRelatedTopicTagCounts($con);
 
         return $this->postDelete($affectedRows, $con);
@@ -754,7 +754,7 @@ abstract class TagQuery extends ModelCriteria
      */
     protected function basePreUpdate(&$values, ConnectionInterface $con, $forceIndividualSaves = false)
     {
-        // aggregate_column_relation_tag_count_aggregate behavior
+        // aggregate_column_relation_aggregate_column behavior
         $this->findRelatedTopicTagCounts($con);
 
         return $this->preUpdate($values, $con, $forceIndividualSaves);
@@ -768,7 +768,7 @@ abstract class TagQuery extends ModelCriteria
      */
     protected function basePostUpdate($affectedRows, ConnectionInterface $con)
     {
-        // aggregate_column_relation_tag_count_aggregate behavior
+        // aggregate_column_relation_aggregate_column behavior
         $this->updateRelatedTopicTagCounts($con);
 
         return $this->postUpdate($affectedRows, $con);
@@ -835,7 +835,7 @@ abstract class TagQuery extends ModelCriteria
         });
     }
 
-    // aggregate_column_relation_tag_count_aggregate behavior
+    // aggregate_column_relation_aggregate_column behavior
 
     /**
      * Finds the related Topic objects and keep them for later

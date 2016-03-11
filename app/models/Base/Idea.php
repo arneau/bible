@@ -2,17 +2,20 @@
 
 namespace Base;
 
-use \Tag as ChildTag;
-use \TagQuery as ChildTagQuery;
-use \TagVoteQuery as ChildTagVoteQuery;
+use \Idea as ChildIdea;
+use \IdeaQuery as ChildIdeaQuery;
+use \IdeaVerse as ChildIdeaVerse;
+use \IdeaVerseQuery as ChildIdeaVerseQuery;
 use \Exception;
 use \PDO;
-use Map\TagVoteTableMap;
+use Map\IdeaTableMap;
+use Map\IdeaVerseTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -21,18 +24,18 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 
 /**
- * Base class that represents a row from the 'defender_tag_vote' table.
+ * Base class that represents a row from the 'defender_idea' table.
  *
  *
  *
 * @package    propel.generator..Base
 */
-abstract class TagVote implements ActiveRecordInterface
+abstract class Idea implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Map\\TagVoteTableMap';
+    const TABLE_MAP = '\\Map\\IdeaTableMap';
 
 
     /**
@@ -62,11 +65,19 @@ abstract class TagVote implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the tag_id field.
+     * The value for the title field.
      *
+     * @var        string
+     */
+    protected $title;
+
+    /**
+     * The value for the verse_count field.
+     *
+     * Note: this column has a database default value of: 0
      * @var        int
      */
-    protected $tag_id;
+    protected $verse_count;
 
     /**
      * The value for the id field.
@@ -76,9 +87,10 @@ abstract class TagVote implements ActiveRecordInterface
     protected $id;
 
     /**
-     * @var        ChildTag
+     * @var        ObjectCollection|ChildIdeaVerse[] Collection to store aggregation of ChildIdeaVerse objects.
      */
-    protected $aTag;
+    protected $collIdeaVerses;
+    protected $collIdeaVersesPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -88,17 +100,30 @@ abstract class TagVote implements ActiveRecordInterface
      */
     protected $alreadyInSave = false;
 
-    // aggregate_column_relation_aggregate_column behavior
     /**
-     * @var ChildTag
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildIdeaVerse[]
      */
-    protected $oldTagVoteCount;
+    protected $ideaVersesScheduledForDeletion = null;
 
     /**
-     * Initializes internal state of Base\TagVote object.
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->verse_count = 0;
+    }
+
+    /**
+     * Initializes internal state of Base\Idea object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -190,9 +215,9 @@ abstract class TagVote implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>TagVote</code> instance.  If
-     * <code>obj</code> is an instance of <code>TagVote</code>, delegates to
-     * <code>equals(TagVote)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>Idea</code> instance.  If
+     * <code>obj</code> is an instance of <code>Idea</code>, delegates to
+     * <code>equals(Idea)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -258,7 +283,7 @@ abstract class TagVote implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|TagVote The current object, for fluid interface
+     * @return $this|Idea The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -320,13 +345,23 @@ abstract class TagVote implements ActiveRecordInterface
     }
 
     /**
-     * Get the [tag_id] column value.
+     * Get the [title] column value.
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * Get the [verse_count] column value.
      *
      * @return int
      */
-    public function getTagId()
+    public function getVerseCount()
     {
-        return $this->tag_id;
+        return $this->verse_count;
     }
 
     /**
@@ -340,34 +375,50 @@ abstract class TagVote implements ActiveRecordInterface
     }
 
     /**
-     * Set the value of [tag_id] column.
+     * Set the value of [title] column.
+     *
+     * @param string $v new value
+     * @return $this|\Idea The current object (for fluent API support)
+     */
+    public function setTitle($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->title !== $v) {
+            $this->title = $v;
+            $this->modifiedColumns[IdeaTableMap::COL_TITLE] = true;
+        }
+
+        return $this;
+    } // setTitle()
+
+    /**
+     * Set the value of [verse_count] column.
      *
      * @param int $v new value
-     * @return $this|\TagVote The current object (for fluent API support)
+     * @return $this|\Idea The current object (for fluent API support)
      */
-    public function setTagId($v)
+    public function setVerseCount($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->tag_id !== $v) {
-            $this->tag_id = $v;
-            $this->modifiedColumns[TagVoteTableMap::COL_TAG_ID] = true;
-        }
-
-        if ($this->aTag !== null && $this->aTag->getId() !== $v) {
-            $this->aTag = null;
+        if ($this->verse_count !== $v) {
+            $this->verse_count = $v;
+            $this->modifiedColumns[IdeaTableMap::COL_VERSE_COUNT] = true;
         }
 
         return $this;
-    } // setTagId()
+    } // setVerseCount()
 
     /**
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return $this|\TagVote The current object (for fluent API support)
+     * @return $this|\Idea The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -377,7 +428,7 @@ abstract class TagVote implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[TagVoteTableMap::COL_ID] = true;
+            $this->modifiedColumns[IdeaTableMap::COL_ID] = true;
         }
 
         return $this;
@@ -393,6 +444,10 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->verse_count !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -419,10 +474,13 @@ abstract class TagVote implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TagVoteTableMap::translateFieldName('TagId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->tag_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : IdeaTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->title = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TagVoteTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : IdeaTableMap::translateFieldName('VerseCount', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->verse_count = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : IdeaTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -432,10 +490,10 @@ abstract class TagVote implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 2; // 2 = TagVoteTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = IdeaTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\TagVote'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\Idea'), 0, $e);
         }
     }
 
@@ -454,9 +512,6 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aTag !== null && $this->tag_id !== $this->aTag->getId()) {
-            $this->aTag = null;
-        }
     } // ensureConsistency
 
     /**
@@ -480,13 +535,13 @@ abstract class TagVote implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(TagVoteTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(IdeaTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildTagVoteQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildIdeaQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -496,7 +551,8 @@ abstract class TagVote implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aTag = null;
+            $this->collIdeaVerses = null;
+
         } // if (deep)
     }
 
@@ -506,8 +562,8 @@ abstract class TagVote implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see TagVote::setDeleted()
-     * @see TagVote::isDeleted()
+     * @see Idea::setDeleted()
+     * @see Idea::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -516,11 +572,11 @@ abstract class TagVote implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TagVoteTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(IdeaTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildTagVoteQuery::create()
+            $deleteQuery = ChildIdeaQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -551,7 +607,7 @@ abstract class TagVote implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(TagVoteTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(IdeaTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -570,9 +626,7 @@ abstract class TagVote implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                // aggregate_column_relation_aggregate_column behavior
-                $this->updateRelatedTagVoteCount($con);
-                TagVoteTableMap::addInstanceToPool($this);
+                IdeaTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -598,18 +652,6 @@ abstract class TagVote implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their corresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aTag !== null) {
-                if ($this->aTag->isModified() || $this->aTag->isNew()) {
-                    $affectedRows += $this->aTag->save($con);
-                }
-                $this->setTag($this->aTag);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -619,6 +661,23 @@ abstract class TagVote implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->ideaVersesScheduledForDeletion !== null) {
+                if (!$this->ideaVersesScheduledForDeletion->isEmpty()) {
+                    \IdeaVerseQuery::create()
+                        ->filterByPrimaryKeys($this->ideaVersesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->ideaVersesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collIdeaVerses !== null) {
+                foreach ($this->collIdeaVerses as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -641,21 +700,24 @@ abstract class TagVote implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[TagVoteTableMap::COL_ID] = true;
+        $this->modifiedColumns[IdeaTableMap::COL_ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TagVoteTableMap::COL_ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . IdeaTableMap::COL_ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(TagVoteTableMap::COL_TAG_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'tag_id';
+        if ($this->isColumnModified(IdeaTableMap::COL_TITLE)) {
+            $modifiedColumns[':p' . $index++]  = 'title';
         }
-        if ($this->isColumnModified(TagVoteTableMap::COL_ID)) {
+        if ($this->isColumnModified(IdeaTableMap::COL_VERSE_COUNT)) {
+            $modifiedColumns[':p' . $index++]  = 'verse_count';
+        }
+        if ($this->isColumnModified(IdeaTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
 
         $sql = sprintf(
-            'INSERT INTO defender_tag_vote (%s) VALUES (%s)',
+            'INSERT INTO defender_idea (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -664,8 +726,11 @@ abstract class TagVote implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'tag_id':
-                        $stmt->bindValue($identifier, $this->tag_id, PDO::PARAM_INT);
+                    case 'title':
+                        $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
+                        break;
+                    case 'verse_count':
+                        $stmt->bindValue($identifier, $this->verse_count, PDO::PARAM_INT);
                         break;
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
@@ -716,7 +781,7 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = TagVoteTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = IdeaTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -733,9 +798,12 @@ abstract class TagVote implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getTagId();
+                return $this->getTitle();
                 break;
             case 1:
+                return $this->getVerseCount();
+                break;
+            case 2:
                 return $this->getId();
                 break;
             default:
@@ -762,14 +830,15 @@ abstract class TagVote implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['TagVote'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['Idea'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['TagVote'][$this->hashCode()] = true;
-        $keys = TagVoteTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['Idea'][$this->hashCode()] = true;
+        $keys = IdeaTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getTagId(),
-            $keys[1] => $this->getId(),
+            $keys[0] => $this->getTitle(),
+            $keys[1] => $this->getVerseCount(),
+            $keys[2] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -777,20 +846,20 @@ abstract class TagVote implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aTag) {
+            if (null !== $this->collIdeaVerses) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'tag';
+                        $key = 'ideaVerses';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'defender_tag';
+                        $key = 'defender_idea_verses';
                         break;
                     default:
-                        $key = 'Tag';
+                        $key = 'IdeaVerses';
                 }
 
-                $result[$key] = $this->aTag->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result[$key] = $this->collIdeaVerses->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -806,11 +875,11 @@ abstract class TagVote implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\TagVote
+     * @return $this|\Idea
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = TagVoteTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = IdeaTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -821,15 +890,18 @@ abstract class TagVote implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\TagVote
+     * @return $this|\Idea
      */
     public function setByPosition($pos, $value)
     {
         switch ($pos) {
             case 0:
-                $this->setTagId($value);
+                $this->setTitle($value);
                 break;
             case 1:
+                $this->setVerseCount($value);
+                break;
+            case 2:
                 $this->setId($value);
                 break;
         } // switch()
@@ -856,13 +928,16 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = TagVoteTableMap::getFieldNames($keyType);
+        $keys = IdeaTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setTagId($arr[$keys[0]]);
+            $this->setTitle($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setId($arr[$keys[1]]);
+            $this->setVerseCount($arr[$keys[1]]);
+        }
+        if (array_key_exists($keys[2], $arr)) {
+            $this->setId($arr[$keys[2]]);
         }
     }
 
@@ -883,7 +958,7 @@ abstract class TagVote implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\TagVote The current object, for fluid interface
+     * @return $this|\Idea The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -903,13 +978,16 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(TagVoteTableMap::DATABASE_NAME);
+        $criteria = new Criteria(IdeaTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(TagVoteTableMap::COL_TAG_ID)) {
-            $criteria->add(TagVoteTableMap::COL_TAG_ID, $this->tag_id);
+        if ($this->isColumnModified(IdeaTableMap::COL_TITLE)) {
+            $criteria->add(IdeaTableMap::COL_TITLE, $this->title);
         }
-        if ($this->isColumnModified(TagVoteTableMap::COL_ID)) {
-            $criteria->add(TagVoteTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(IdeaTableMap::COL_VERSE_COUNT)) {
+            $criteria->add(IdeaTableMap::COL_VERSE_COUNT, $this->verse_count);
+        }
+        if ($this->isColumnModified(IdeaTableMap::COL_ID)) {
+            $criteria->add(IdeaTableMap::COL_ID, $this->id);
         }
 
         return $criteria;
@@ -927,8 +1005,8 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildTagVoteQuery::create();
-        $criteria->add(TagVoteTableMap::COL_ID, $this->id);
+        $criteria = ChildIdeaQuery::create();
+        $criteria->add(IdeaTableMap::COL_ID, $this->id);
 
         return $criteria;
     }
@@ -990,14 +1068,29 @@ abstract class TagVote implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \TagVote (or compatible) type.
+     * @param      object $copyObj An object of \Idea (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setTagId($this->getTagId());
+        $copyObj->setTitle($this->getTitle());
+        $copyObj->setVerseCount($this->getVerseCount());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getIdeaVerses() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addIdeaVerse($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1013,7 +1106,7 @@ abstract class TagVote implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \TagVote Clone of current object.
+     * @return \Idea Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1026,59 +1119,270 @@ abstract class TagVote implements ActiveRecordInterface
         return $copyObj;
     }
 
+
     /**
-     * Declares an association between this object and a ChildTag object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param  ChildTag $v
-     * @return $this|\TagVote The current object (for fluent API support)
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('IdeaVerse' == $relationName) {
+            return $this->initIdeaVerses();
+        }
+    }
+
+    /**
+     * Clears out the collIdeaVerses collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addIdeaVerses()
+     */
+    public function clearIdeaVerses()
+    {
+        $this->collIdeaVerses = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collIdeaVerses collection loaded partially.
+     */
+    public function resetPartialIdeaVerses($v = true)
+    {
+        $this->collIdeaVersesPartial = $v;
+    }
+
+    /**
+     * Initializes the collIdeaVerses collection.
+     *
+     * By default this just sets the collIdeaVerses collection to an empty array (like clearcollIdeaVerses());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initIdeaVerses($overrideExisting = true)
+    {
+        if (null !== $this->collIdeaVerses && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = IdeaVerseTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collIdeaVerses = new $collectionClassName;
+        $this->collIdeaVerses->setModel('\IdeaVerse');
+    }
+
+    /**
+     * Gets an array of ChildIdeaVerse objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildIdea is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildIdeaVerse[] List of ChildIdeaVerse objects
      * @throws PropelException
      */
-    public function setTag(ChildTag $v = null)
+    public function getIdeaVerses(Criteria $criteria = null, ConnectionInterface $con = null)
     {
-        // aggregate_column_relation behavior
-        if (null !== $this->aTag && $v !== $this->aTag) {
-            $this->oldTagVoteCount = $this->aTag;
-        }
-        if ($v === null) {
-            $this->setTagId(NULL);
-        } else {
-            $this->setTagId($v->getId());
+        $partial = $this->collIdeaVersesPartial && !$this->isNew();
+        if (null === $this->collIdeaVerses || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collIdeaVerses) {
+                // return empty collection
+                $this->initIdeaVerses();
+            } else {
+                $collIdeaVerses = ChildIdeaVerseQuery::create(null, $criteria)
+                    ->filterByIdea($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collIdeaVersesPartial && count($collIdeaVerses)) {
+                        $this->initIdeaVerses(false);
+
+                        foreach ($collIdeaVerses as $obj) {
+                            if (false == $this->collIdeaVerses->contains($obj)) {
+                                $this->collIdeaVerses->append($obj);
+                            }
+                        }
+
+                        $this->collIdeaVersesPartial = true;
+                    }
+
+                    return $collIdeaVerses;
+                }
+
+                if ($partial && $this->collIdeaVerses) {
+                    foreach ($this->collIdeaVerses as $obj) {
+                        if ($obj->isNew()) {
+                            $collIdeaVerses[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collIdeaVerses = $collIdeaVerses;
+                $this->collIdeaVersesPartial = false;
+            }
         }
 
-        $this->aTag = $v;
+        return $this->collIdeaVerses;
+    }
 
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildTag object, it will not be re-added.
-        if ($v !== null) {
-            $v->addTagVote($this);
+    /**
+     * Sets a collection of ChildIdeaVerse objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $ideaVerses A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildIdea The current object (for fluent API support)
+     */
+    public function setIdeaVerses(Collection $ideaVerses, ConnectionInterface $con = null)
+    {
+        /** @var ChildIdeaVerse[] $ideaVersesToDelete */
+        $ideaVersesToDelete = $this->getIdeaVerses(new Criteria(), $con)->diff($ideaVerses);
+
+
+        $this->ideaVersesScheduledForDeletion = $ideaVersesToDelete;
+
+        foreach ($ideaVersesToDelete as $ideaVerseRemoved) {
+            $ideaVerseRemoved->setIdea(null);
         }
 
+        $this->collIdeaVerses = null;
+        foreach ($ideaVerses as $ideaVerse) {
+            $this->addIdeaVerse($ideaVerse);
+        }
+
+        $this->collIdeaVerses = $ideaVerses;
+        $this->collIdeaVersesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related IdeaVerse objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related IdeaVerse objects.
+     * @throws PropelException
+     */
+    public function countIdeaVerses(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collIdeaVersesPartial && !$this->isNew();
+        if (null === $this->collIdeaVerses || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collIdeaVerses) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getIdeaVerses());
+            }
+
+            $query = ChildIdeaVerseQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByIdea($this)
+                ->count($con);
+        }
+
+        return count($this->collIdeaVerses);
+    }
+
+    /**
+     * Method called to associate a ChildIdeaVerse object to this object
+     * through the ChildIdeaVerse foreign key attribute.
+     *
+     * @param  ChildIdeaVerse $l ChildIdeaVerse
+     * @return $this|\Idea The current object (for fluent API support)
+     */
+    public function addIdeaVerse(ChildIdeaVerse $l)
+    {
+        if ($this->collIdeaVerses === null) {
+            $this->initIdeaVerses();
+            $this->collIdeaVersesPartial = true;
+        }
+
+        if (!$this->collIdeaVerses->contains($l)) {
+            $this->doAddIdeaVerse($l);
+
+            if ($this->ideaVersesScheduledForDeletion and $this->ideaVersesScheduledForDeletion->contains($l)) {
+                $this->ideaVersesScheduledForDeletion->remove($this->ideaVersesScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildIdeaVerse $ideaVerse The ChildIdeaVerse object to add.
+     */
+    protected function doAddIdeaVerse(ChildIdeaVerse $ideaVerse)
+    {
+        $this->collIdeaVerses[]= $ideaVerse;
+        $ideaVerse->setIdea($this);
+    }
+
+    /**
+     * @param  ChildIdeaVerse $ideaVerse The ChildIdeaVerse object to remove.
+     * @return $this|ChildIdea The current object (for fluent API support)
+     */
+    public function removeIdeaVerse(ChildIdeaVerse $ideaVerse)
+    {
+        if ($this->getIdeaVerses()->contains($ideaVerse)) {
+            $pos = $this->collIdeaVerses->search($ideaVerse);
+            $this->collIdeaVerses->remove($pos);
+            if (null === $this->ideaVersesScheduledForDeletion) {
+                $this->ideaVersesScheduledForDeletion = clone $this->collIdeaVerses;
+                $this->ideaVersesScheduledForDeletion->clear();
+            }
+            $this->ideaVersesScheduledForDeletion[]= clone $ideaVerse;
+            $ideaVerse->setIdea(null);
+        }
 
         return $this;
     }
 
 
     /**
-     * Get the associated ChildTag object
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Idea is new, it will return
+     * an empty collection; or if this Idea has previously
+     * been saved, it will retrieve related IdeaVerses from storage.
      *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildTag The associated ChildTag object.
-     * @throws PropelException
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Idea.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildIdeaVerse[] List of ChildIdeaVerse objects
      */
-    public function getTag(ConnectionInterface $con = null)
+    public function getIdeaVersesJoinVerse(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        if ($this->aTag === null && ($this->tag_id !== null)) {
-            $this->aTag = ChildTagQuery::create()->findPk($this->tag_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aTag->addTagVotes($this);
-             */
-        }
+        $query = ChildIdeaVerseQuery::create(null, $criteria);
+        $query->joinWith('Verse', $joinBehavior);
 
-        return $this->aTag;
+        return $this->getIdeaVerses($query, $con);
     }
 
     /**
@@ -1088,13 +1392,12 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->aTag) {
-            $this->aTag->removeTagVote($this);
-        }
-        $this->tag_id = null;
+        $this->title = null;
+        $this->verse_count = null;
         $this->id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1111,9 +1414,14 @@ abstract class TagVote implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collIdeaVerses) {
+                foreach ($this->collIdeaVerses as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aTag = null;
+        $this->collIdeaVerses = null;
     }
 
     /**
@@ -1123,25 +1431,34 @@ abstract class TagVote implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(TagVoteTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(IdeaTableMap::DEFAULT_STRING_FORMAT);
     }
 
-    // aggregate_column_relation_aggregate_column behavior
+    // aggregate_column behavior
 
     /**
-     * Update the aggregate column in the related Tag object
+     * Computes the value of the aggregate column verse_count *
+     * @param ConnectionInterface $con A connection object
      *
+     * @return mixed The scalar result from the aggregate query
+     */
+    public function computeVerseCount(ConnectionInterface $con)
+    {
+        $stmt = $con->prepare('SELECT COUNT(idea_id) FROM defender_idea_verse WHERE defender_idea_verse.IDEA_ID = :p1');
+        $stmt->bindValue(':p1', $this->getId());
+        $stmt->execute();
+
+        return $stmt->fetchColumn();
+    }
+
+    /**
+     * Updates the aggregate column verse_count *
      * @param ConnectionInterface $con A connection object
      */
-    protected function updateRelatedTagVoteCount(ConnectionInterface $con)
+    public function updateVerseCount(ConnectionInterface $con)
     {
-        if ($tag = $this->getTag()) {
-            $tag->updateVoteCount($con);
-        }
-        if ($this->oldTagVoteCount) {
-            $this->oldTagVoteCount->updateVoteCount($con);
-            $this->oldTagVoteCount = null;
-        }
+        $this->setVerseCount($this->computeVerseCount($con));
+        $this->save($con);
     }
 
     /**
