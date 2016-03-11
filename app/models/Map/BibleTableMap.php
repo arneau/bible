@@ -146,13 +146,13 @@ class BibleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Verse', '\\Verse', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Translation', '\\Translation', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
     0 => ':bible_id',
     1 => ':id',
   ),
-), null, null, 'Verses', false);
+), null, null, 'Translations', false);
     } // buildRelations()
 
     /**

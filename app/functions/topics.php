@@ -1,16 +1,18 @@
 <?php
 
-function addTopic($topic_name) {
+function addTopic($topic_name, $is_root = false) {
 
 	# Add topic
 	$topic_object = new Topic();
 	$topic_object->setName($topic_name)
+		->setIsRoot($is_root)
 		->save();
 
 	# Return ID
 	return $topic_object->getId();
 
 }
+
 function addTopicsLink($topic_1_id, $topic_2_id, $strength = 1) {
 
 	# Add first link
@@ -38,7 +40,19 @@ function addTopicParent($topic_id, $parent_id) {
 
 }
 
-function getTopicChildrenData($topic_id) {
+function getTopicData($topic_id) {
+
+	# Get topic data
+	$topic_data = TopicQuery::create()
+		->findOneById($topic_id)
+		->toArray();
+
+	# Return topic data
+	return $topic_data;
+
+}
+
+function getTopicChildrenIds($topic_id) {
 
 	# Get topic children ids
 	$topic_children_ids = TopicParentQuery::create()
@@ -49,28 +63,12 @@ function getTopicChildrenData($topic_id) {
 		->find()
 		->toArray();
 
-	# Handle topic children
-	$topic_children_data = [];
-	foreach ($topic_children_ids as $topic_child_id) {
-
-		# Get child data
-		$topic_child_object = TopicQuery::create()
-			->findOneById($topic_child_id);
-
-		# Return child data
-		$topic_children_data[] = [
-			'id' => $topic_child_object->getId(),
-			'name' => $topic_child_object->getName(),
-		];
-
-	}
-
-	# Return topic children data
-	return $topic_children_data;
+	# Return topic children ids
+	return $topic_children_ids;
 
 }
 
-function getTopicLinksData($topic_id) {
+function getTopicLinksIds($topic_id) {
 
 	# Get topic links ids
 	$topic_links_ids = TopicLinkQuery::create()
@@ -82,23 +80,64 @@ function getTopicLinksData($topic_id) {
 		->find()
 		->toArray();
 
-	# Handle topic links
-	$topic_links_data = [];
-	foreach ($topic_links_ids as $topic_link_id) {
+	# Return topic links data
+	return $topic_links_ids;
 
-		# Get link data
-		$topic_link_object = TopicQuery::create()
-			->findOneById($topic_link_id);
+}
 
-		# Return link data
-		$topic_links_data[] = [
-			'id' => $topic_link_object->getId(),
-			'name' => $topic_link_object->getName(),
-		];
+function getTopicsTree() {
 
+	# Get root topics ids
+	$root_topics_ids = TopicQuery::create()
+		->filterByIsRoot(true)
+		->select([
+			'id',
+		])
+		->find()
+		->toArray();
+
+	# Get topics tree
+	$topics_tree = iterateThroughTopics($root_topics_ids);
+
+	# Return topics tree
+	return $topics_tree;
+
+}
+
+function iterateThroughTopics($topics_ids, $level = 0) {
+
+	# Handle topics ids
+	$topics_array = [];
+	foreach ($topics_ids as $topic_id) {
+
+		# Get topic data
+		$topic_data = getTopicData($topic_id);
+
+		# Add level
+		$topic_data['Level'] = $level;
+
+		# Get topic children
+		$topic_children_ids = getTopicChildrenIds($topic_id);
+
+		# Handle topic children
+		if ($topic_children_ids) {
+			$topic_data['Children'] = iterateThroughTopics($topic_children_ids, $level + 1);
+		}
+
+		# Append data to built tree
+		$topics_array[] = $topic_data;
 	}
 
-	# Return topic links data
-	return $topic_links_data;
+	# Return topics array
+	return $topics_array;
+
+}
+
+function getTopicsSelect() {
+
+	# Get topics tree
+	$topics_tree = getTopicsTree();
+
+
 
 }

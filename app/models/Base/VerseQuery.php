@@ -20,20 +20,14 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  *
- * @method     ChildVerseQuery orderByBibleId($order = Criteria::ASC) Order by the bible_id column
  * @method     ChildVerseQuery orderByBookId($order = Criteria::ASC) Order by the book_id column
  * @method     ChildVerseQuery orderByChapterNumber($order = Criteria::ASC) Order by the chapter_number column
- * @method     ChildVerseQuery orderByText($order = Criteria::ASC) Order by the text column
  * @method     ChildVerseQuery orderByVerseNumber($order = Criteria::ASC) Order by the verse_number column
- * @method     ChildVerseQuery orderByWordCount($order = Criteria::ASC) Order by the word_count column
  * @method     ChildVerseQuery orderById($order = Criteria::ASC) Order by the id column
  *
- * @method     ChildVerseQuery groupByBibleId() Group by the bible_id column
  * @method     ChildVerseQuery groupByBookId() Group by the book_id column
  * @method     ChildVerseQuery groupByChapterNumber() Group by the chapter_number column
- * @method     ChildVerseQuery groupByText() Group by the text column
  * @method     ChildVerseQuery groupByVerseNumber() Group by the verse_number column
- * @method     ChildVerseQuery groupByWordCount() Group by the word_count column
  * @method     ChildVerseQuery groupById() Group by the id column
  *
  * @method     ChildVerseQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -43,16 +37,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildVerseQuery leftJoinWith($relation) Adds a LEFT JOIN clause and with to the query
  * @method     ChildVerseQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildVerseQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
- *
- * @method     ChildVerseQuery leftJoinBible($relationAlias = null) Adds a LEFT JOIN clause to the query using the Bible relation
- * @method     ChildVerseQuery rightJoinBible($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Bible relation
- * @method     ChildVerseQuery innerJoinBible($relationAlias = null) Adds a INNER JOIN clause to the query using the Bible relation
- *
- * @method     ChildVerseQuery joinWithBible($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Bible relation
- *
- * @method     ChildVerseQuery leftJoinWithBible() Adds a LEFT JOIN clause and with to the query using the Bible relation
- * @method     ChildVerseQuery rightJoinWithBible() Adds a RIGHT JOIN clause and with to the query using the Bible relation
- * @method     ChildVerseQuery innerJoinWithBible() Adds a INNER JOIN clause and with to the query using the Bible relation
  *
  * @method     ChildVerseQuery leftJoinBook($relationAlias = null) Adds a LEFT JOIN clause to the query using the Book relation
  * @method     ChildVerseQuery rightJoinBook($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Book relation
@@ -64,6 +48,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildVerseQuery rightJoinWithBook() Adds a RIGHT JOIN clause and with to the query using the Book relation
  * @method     ChildVerseQuery innerJoinWithBook() Adds a INNER JOIN clause and with to the query using the Book relation
  *
+ * @method     ChildVerseQuery leftJoinTranslation($relationAlias = null) Adds a LEFT JOIN clause to the query using the Translation relation
+ * @method     ChildVerseQuery rightJoinTranslation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Translation relation
+ * @method     ChildVerseQuery innerJoinTranslation($relationAlias = null) Adds a INNER JOIN clause to the query using the Translation relation
+ *
+ * @method     ChildVerseQuery joinWithTranslation($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Translation relation
+ *
+ * @method     ChildVerseQuery leftJoinWithTranslation() Adds a LEFT JOIN clause and with to the query using the Translation relation
+ * @method     ChildVerseQuery rightJoinWithTranslation() Adds a RIGHT JOIN clause and with to the query using the Translation relation
+ * @method     ChildVerseQuery innerJoinWithTranslation() Adds a INNER JOIN clause and with to the query using the Translation relation
+ *
  * @method     ChildVerseQuery leftJoinTag($relationAlias = null) Adds a LEFT JOIN clause to the query using the Tag relation
  * @method     ChildVerseQuery rightJoinTag($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Tag relation
  * @method     ChildVerseQuery innerJoinTag($relationAlias = null) Adds a INNER JOIN clause to the query using the Tag relation
@@ -74,37 +68,28 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildVerseQuery rightJoinWithTag() Adds a RIGHT JOIN clause and with to the query using the Tag relation
  * @method     ChildVerseQuery innerJoinWithTag() Adds a INNER JOIN clause and with to the query using the Tag relation
  *
- * @method     \BibleQuery|\BookQuery|\TagQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \BookQuery|\TranslationQuery|\TagQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildVerse findOne(ConnectionInterface $con = null) Return the first ChildVerse matching the query
  * @method     ChildVerse findOneOrCreate(ConnectionInterface $con = null) Return the first ChildVerse matching the query, or a new ChildVerse object populated from the query conditions when no match is found
  *
- * @method     ChildVerse findOneByBibleId(int $bible_id) Return the first ChildVerse filtered by the bible_id column
  * @method     ChildVerse findOneByBookId(int $book_id) Return the first ChildVerse filtered by the book_id column
  * @method     ChildVerse findOneByChapterNumber(int $chapter_number) Return the first ChildVerse filtered by the chapter_number column
- * @method     ChildVerse findOneByText(string $text) Return the first ChildVerse filtered by the text column
  * @method     ChildVerse findOneByVerseNumber(int $verse_number) Return the first ChildVerse filtered by the verse_number column
- * @method     ChildVerse findOneByWordCount(int $word_count) Return the first ChildVerse filtered by the word_count column
  * @method     ChildVerse findOneById(int $id) Return the first ChildVerse filtered by the id column *
 
  * @method     ChildVerse requirePk($key, ConnectionInterface $con = null) Return the ChildVerse by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildVerse requireOne(ConnectionInterface $con = null) Return the first ChildVerse matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildVerse requireOneByBibleId(int $bible_id) Return the first ChildVerse filtered by the bible_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildVerse requireOneByBookId(int $book_id) Return the first ChildVerse filtered by the book_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildVerse requireOneByChapterNumber(int $chapter_number) Return the first ChildVerse filtered by the chapter_number column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildVerse requireOneByText(string $text) Return the first ChildVerse filtered by the text column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildVerse requireOneByVerseNumber(int $verse_number) Return the first ChildVerse filtered by the verse_number column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildVerse requireOneByWordCount(int $word_count) Return the first ChildVerse filtered by the word_count column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildVerse requireOneById(int $id) Return the first ChildVerse filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildVerse[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildVerse objects based on current ModelCriteria
- * @method     ChildVerse[]|ObjectCollection findByBibleId(int $bible_id) Return ChildVerse objects filtered by the bible_id column
  * @method     ChildVerse[]|ObjectCollection findByBookId(int $book_id) Return ChildVerse objects filtered by the book_id column
  * @method     ChildVerse[]|ObjectCollection findByChapterNumber(int $chapter_number) Return ChildVerse objects filtered by the chapter_number column
- * @method     ChildVerse[]|ObjectCollection findByText(string $text) Return ChildVerse objects filtered by the text column
  * @method     ChildVerse[]|ObjectCollection findByVerseNumber(int $verse_number) Return ChildVerse objects filtered by the verse_number column
- * @method     ChildVerse[]|ObjectCollection findByWordCount(int $word_count) Return ChildVerse objects filtered by the word_count column
  * @method     ChildVerse[]|ObjectCollection findById(int $id) Return ChildVerse objects filtered by the id column
  * @method     ChildVerse[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
@@ -198,7 +183,7 @@ abstract class VerseQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT bible_id, book_id, chapter_number, text, verse_number, word_count, id FROM defender_verse WHERE id = :p0';
+        $sql = 'SELECT book_id, chapter_number, verse_number, id FROM defender_verse WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -289,49 +274,6 @@ abstract class VerseQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the bible_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByBibleId(1234); // WHERE bible_id = 1234
-     * $query->filterByBibleId(array(12, 34)); // WHERE bible_id IN (12, 34)
-     * $query->filterByBibleId(array('min' => 12)); // WHERE bible_id > 12
-     * </code>
-     *
-     * @see       filterByBible()
-     *
-     * @param     mixed $bibleId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildVerseQuery The current query, for fluid interface
-     */
-    public function filterByBibleId($bibleId = null, $comparison = null)
-    {
-        if (is_array($bibleId)) {
-            $useMinMax = false;
-            if (isset($bibleId['min'])) {
-                $this->addUsingAlias(VerseTableMap::COL_BIBLE_ID, $bibleId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($bibleId['max'])) {
-                $this->addUsingAlias(VerseTableMap::COL_BIBLE_ID, $bibleId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(VerseTableMap::COL_BIBLE_ID, $bibleId, $comparison);
-    }
-
-    /**
      * Filter the query on the book_id column
      *
      * Example usage:
@@ -416,35 +358,6 @@ abstract class VerseQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the text column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByText('fooValue');   // WHERE text = 'fooValue'
-     * $query->filterByText('%fooValue%'); // WHERE text LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $text The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildVerseQuery The current query, for fluid interface
-     */
-    public function filterByText($text = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($text)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $text)) {
-                $text = str_replace('*', '%', $text);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(VerseTableMap::COL_TEXT, $text, $comparison);
-    }
-
-    /**
      * Filter the query on the verse_number column
      *
      * Example usage:
@@ -486,47 +399,6 @@ abstract class VerseQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the word_count column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByWordCount(1234); // WHERE word_count = 1234
-     * $query->filterByWordCount(array(12, 34)); // WHERE word_count IN (12, 34)
-     * $query->filterByWordCount(array('min' => 12)); // WHERE word_count > 12
-     * </code>
-     *
-     * @param     mixed $wordCount The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildVerseQuery The current query, for fluid interface
-     */
-    public function filterByWordCount($wordCount = null, $comparison = null)
-    {
-        if (is_array($wordCount)) {
-            $useMinMax = false;
-            if (isset($wordCount['min'])) {
-                $this->addUsingAlias(VerseTableMap::COL_WORD_COUNT, $wordCount['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($wordCount['max'])) {
-                $this->addUsingAlias(VerseTableMap::COL_WORD_COUNT, $wordCount['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(VerseTableMap::COL_WORD_COUNT, $wordCount, $comparison);
-    }
-
-    /**
      * Filter the query on the id column
      *
      * Example usage:
@@ -565,83 +437,6 @@ abstract class VerseQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(VerseTableMap::COL_ID, $id, $comparison);
-    }
-
-    /**
-     * Filter the query by a related \Bible object
-     *
-     * @param \Bible|ObjectCollection $bible The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return ChildVerseQuery The current query, for fluid interface
-     */
-    public function filterByBible($bible, $comparison = null)
-    {
-        if ($bible instanceof \Bible) {
-            return $this
-                ->addUsingAlias(VerseTableMap::COL_BIBLE_ID, $bible->getId(), $comparison);
-        } elseif ($bible instanceof ObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(VerseTableMap::COL_BIBLE_ID, $bible->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByBible() only accepts arguments of type \Bible or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Bible relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return $this|ChildVerseQuery The current query, for fluid interface
-     */
-    public function joinBible($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Bible');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Bible');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Bible relation Bible object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return \BibleQuery A secondary query class using the current class as primary query
-     */
-    public function useBibleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinBible($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Bible', '\BibleQuery');
     }
 
     /**
@@ -719,6 +514,79 @@ abstract class VerseQuery extends ModelCriteria
         return $this
             ->joinBook($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Book', '\BookQuery');
+    }
+
+    /**
+     * Filter the query by a related \Translation object
+     *
+     * @param \Translation|ObjectCollection $translation the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildVerseQuery The current query, for fluid interface
+     */
+    public function filterByTranslation($translation, $comparison = null)
+    {
+        if ($translation instanceof \Translation) {
+            return $this
+                ->addUsingAlias(VerseTableMap::COL_ID, $translation->getVerseId(), $comparison);
+        } elseif ($translation instanceof ObjectCollection) {
+            return $this
+                ->useTranslationQuery()
+                ->filterByPrimaryKeys($translation->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTranslation() only accepts arguments of type \Translation or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Translation relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildVerseQuery The current query, for fluid interface
+     */
+    public function joinTranslation($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Translation');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Translation');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Translation relation Translation object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \TranslationQuery A secondary query class using the current class as primary query
+     */
+    public function useTranslationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinTranslation($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Translation', '\TranslationQuery');
     }
 
     /**

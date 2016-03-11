@@ -50,12 +50,14 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 		->filterByName($reference_data['book'])
 		->findOne();
 
-	# Get verses array
-	$verses_array = VerseQuery::create()
-		->filterByBible($bible_object)
+	# Get verses objects
+	$verses_objects = VerseQuery::create()
 		->filterByBook($book_object)
 		->filterByChapterNumber($reference_data['chapter'])
 		->filterByVerseNumber($reference_data['verses'])
+		->useTranslationQuery()
+		->filterByBible($bible_object)
+		->endUse()
 		->find();
 
 	# Define passage data
@@ -73,39 +75,56 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 	];
 
 	# Define verses data
-	foreach ($verses_array as $verse_object) {
+	foreach ($verses_objects as $verse_object) {
 
-		$verse_tags_objects = TagQuery::create()
-			->filterByVerse($verse_object)
-			->orderByVoteCount('DESC')
-			->find();
+		# Get translation object
+		$translation_object = TranslationQuery::create()
+			->filterByBible($bible_object)
+			->filterByVerseId($verse_object->getId())
+			->findOne();
 
-		$verse_tags_array = [];
 
-		foreach ($verse_tags_objects as $verse_tag_object) {
-
-			$verse_tag_keyword_object = $verse_tag_object->getKeyword();
-
-			$verse_tags_array[] = [
-				'id' => $verse_tag_object->getId(),
-				'keyword_id' => $verse_tag_keyword_object->getId(),
-				'value' => $verse_tag_keyword_object->getValue(),
-				'vote_count' => $verse_tag_object->getVoteCount(),
-			];
-
-		}
+		$verse_tags_array = getVerseTagsData($verse_object->getId());
 
 		$passage_data['verses'][] = [
 			'id' => $verse_object->getId(),
 			'number' => $verse_object->getVerseNumber(),
 			'tags' => $verse_tags_array,
-			'text' => $verse_object->getText(),
-			'word_count' => $verse_object->getWordCount(),
+			'text' => $translation_object->getText(),
+			'word_count' => $translation_object->getWordCount(),
 		];
 
 	}
 
 	# Return passage data
 	return $passage_data;
+
+}
+
+function getVerseTagsData($verse_id) {
+
+	# Get verse tags objects
+	$verse_tags_objects = TagQuery::create()
+		->filterByVerseId($verse_id)
+		->orderByVoteCount('DESC')
+		->find();
+
+	# Handle verse tags objects
+	$verse_tags_data = [];
+	foreach ($verse_tags_objects as $verse_tag_object) {
+
+		$verse_tag_keyword_object = $verse_tag_object->getKeyword();
+
+		$verse_tags_data[] = [
+			'id' => $verse_tag_object->getId(),
+			'keyword_id' => $verse_tag_keyword_object->getId(),
+			'value' => $verse_tag_keyword_object->getValue(),
+			'vote_count' => $verse_tag_object->getVoteCount(),
+		];
+
+	}
+
+	# Return verse tag data
+	return $verse_tags_data;
 
 }

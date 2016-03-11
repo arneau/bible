@@ -2,17 +2,18 @@
 
 namespace Base;
 
-use \Bible as ChildBible;
-use \BibleQuery as ChildBibleQuery;
 use \Book as ChildBook;
 use \BookQuery as ChildBookQuery;
 use \Tag as ChildTag;
 use \TagQuery as ChildTagQuery;
+use \Translation as ChildTranslation;
+use \TranslationQuery as ChildTranslationQuery;
 use \Verse as ChildVerse;
 use \VerseQuery as ChildVerseQuery;
 use \Exception;
 use \PDO;
 use Map\TagTableMap;
+use Map\TranslationTableMap;
 use Map\VerseTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -69,13 +70,6 @@ abstract class Verse implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the bible_id field.
-     *
-     * @var        int
-     */
-    protected $bible_id;
-
-    /**
      * The value for the book_id field.
      *
      * @var        int
@@ -90,25 +84,11 @@ abstract class Verse implements ActiveRecordInterface
     protected $chapter_number;
 
     /**
-     * The value for the text field.
-     *
-     * @var        string
-     */
-    protected $text;
-
-    /**
      * The value for the verse_number field.
      *
      * @var        int
      */
     protected $verse_number;
-
-    /**
-     * The value for the word_count field.
-     *
-     * @var        int
-     */
-    protected $word_count;
 
     /**
      * The value for the id field.
@@ -118,14 +98,15 @@ abstract class Verse implements ActiveRecordInterface
     protected $id;
 
     /**
-     * @var        ChildBible
-     */
-    protected $aBible;
-
-    /**
      * @var        ChildBook
      */
     protected $aBook;
+
+    /**
+     * @var        ObjectCollection|ChildTranslation[] Collection to store aggregation of ChildTranslation objects.
+     */
+    protected $collTranslations;
+    protected $collTranslationsPartial;
 
     /**
      * @var        ObjectCollection|ChildTag[] Collection to store aggregation of ChildTag objects.
@@ -140,6 +121,12 @@ abstract class Verse implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildTranslation[]
+     */
+    protected $translationsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -373,16 +360,6 @@ abstract class Verse implements ActiveRecordInterface
     }
 
     /**
-     * Get the [bible_id] column value.
-     *
-     * @return int
-     */
-    public function getBibleId()
-    {
-        return $this->bible_id;
-    }
-
-    /**
      * Get the [book_id] column value.
      *
      * @return int
@@ -403,16 +380,6 @@ abstract class Verse implements ActiveRecordInterface
     }
 
     /**
-     * Get the [text] column value.
-     *
-     * @return string
-     */
-    public function getText()
-    {
-        return $this->text;
-    }
-
-    /**
      * Get the [verse_number] column value.
      *
      * @return int
@@ -420,16 +387,6 @@ abstract class Verse implements ActiveRecordInterface
     public function getVerseNumber()
     {
         return $this->verse_number;
-    }
-
-    /**
-     * Get the [word_count] column value.
-     *
-     * @return int
-     */
-    public function getWordCount()
-    {
-        return $this->word_count;
     }
 
     /**
@@ -441,30 +398,6 @@ abstract class Verse implements ActiveRecordInterface
     {
         return $this->id;
     }
-
-    /**
-     * Set the value of [bible_id] column.
-     *
-     * @param int $v new value
-     * @return $this|\Verse The current object (for fluent API support)
-     */
-    public function setBibleId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->bible_id !== $v) {
-            $this->bible_id = $v;
-            $this->modifiedColumns[VerseTableMap::COL_BIBLE_ID] = true;
-        }
-
-        if ($this->aBible !== null && $this->aBible->getId() !== $v) {
-            $this->aBible = null;
-        }
-
-        return $this;
-    } // setBibleId()
 
     /**
      * Set the value of [book_id] column.
@@ -511,26 +444,6 @@ abstract class Verse implements ActiveRecordInterface
     } // setChapterNumber()
 
     /**
-     * Set the value of [text] column.
-     *
-     * @param string $v new value
-     * @return $this|\Verse The current object (for fluent API support)
-     */
-    public function setText($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->text !== $v) {
-            $this->text = $v;
-            $this->modifiedColumns[VerseTableMap::COL_TEXT] = true;
-        }
-
-        return $this;
-    } // setText()
-
-    /**
      * Set the value of [verse_number] column.
      *
      * @param int $v new value
@@ -549,26 +462,6 @@ abstract class Verse implements ActiveRecordInterface
 
         return $this;
     } // setVerseNumber()
-
-    /**
-     * Set the value of [word_count] column.
-     *
-     * @param int $v new value
-     * @return $this|\Verse The current object (for fluent API support)
-     */
-    public function setWordCount($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->word_count !== $v) {
-            $this->word_count = $v;
-            $this->modifiedColumns[VerseTableMap::COL_WORD_COUNT] = true;
-        }
-
-        return $this;
-    } // setWordCount()
 
     /**
      * Set the value of [id] column.
@@ -626,25 +519,16 @@ abstract class Verse implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : VerseTableMap::translateFieldName('BibleId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->bible_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : VerseTableMap::translateFieldName('BookId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : VerseTableMap::translateFieldName('BookId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->book_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : VerseTableMap::translateFieldName('ChapterNumber', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : VerseTableMap::translateFieldName('ChapterNumber', TableMap::TYPE_PHPNAME, $indexType)];
             $this->chapter_number = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : VerseTableMap::translateFieldName('Text', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->text = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : VerseTableMap::translateFieldName('VerseNumber', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : VerseTableMap::translateFieldName('VerseNumber', TableMap::TYPE_PHPNAME, $indexType)];
             $this->verse_number = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : VerseTableMap::translateFieldName('WordCount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->word_count = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : VerseTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : VerseTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -654,7 +538,7 @@ abstract class Verse implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = VerseTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = VerseTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Verse'), 0, $e);
@@ -676,9 +560,6 @@ abstract class Verse implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aBible !== null && $this->bible_id !== $this->aBible->getId()) {
-            $this->aBible = null;
-        }
         if ($this->aBook !== null && $this->book_id !== $this->aBook->getId()) {
             $this->aBook = null;
         }
@@ -721,8 +602,9 @@ abstract class Verse implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aBible = null;
             $this->aBook = null;
+            $this->collTranslations = null;
+
             $this->collTags = null;
 
         } // if (deep)
@@ -829,13 +711,6 @@ abstract class Verse implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aBible !== null) {
-                if ($this->aBible->isModified() || $this->aBible->isNew()) {
-                    $affectedRows += $this->aBible->save($con);
-                }
-                $this->setBible($this->aBible);
-            }
-
             if ($this->aBook !== null) {
                 if ($this->aBook->isModified() || $this->aBook->isNew()) {
                     $affectedRows += $this->aBook->save($con);
@@ -852,6 +727,23 @@ abstract class Verse implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->translationsScheduledForDeletion !== null) {
+                if (!$this->translationsScheduledForDeletion->isEmpty()) {
+                    \TranslationQuery::create()
+                        ->filterByPrimaryKeys($this->translationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->translationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTranslations !== null) {
+                foreach ($this->collTranslations as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             if ($this->tagsScheduledForDeletion !== null) {
@@ -897,23 +789,14 @@ abstract class Verse implements ActiveRecordInterface
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(VerseTableMap::COL_BIBLE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'bible_id';
-        }
         if ($this->isColumnModified(VerseTableMap::COL_BOOK_ID)) {
             $modifiedColumns[':p' . $index++]  = 'book_id';
         }
         if ($this->isColumnModified(VerseTableMap::COL_CHAPTER_NUMBER)) {
             $modifiedColumns[':p' . $index++]  = 'chapter_number';
         }
-        if ($this->isColumnModified(VerseTableMap::COL_TEXT)) {
-            $modifiedColumns[':p' . $index++]  = 'text';
-        }
         if ($this->isColumnModified(VerseTableMap::COL_VERSE_NUMBER)) {
             $modifiedColumns[':p' . $index++]  = 'verse_number';
-        }
-        if ($this->isColumnModified(VerseTableMap::COL_WORD_COUNT)) {
-            $modifiedColumns[':p' . $index++]  = 'word_count';
         }
         if ($this->isColumnModified(VerseTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
@@ -929,23 +812,14 @@ abstract class Verse implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'bible_id':
-                        $stmt->bindValue($identifier, $this->bible_id, PDO::PARAM_INT);
-                        break;
                     case 'book_id':
                         $stmt->bindValue($identifier, $this->book_id, PDO::PARAM_INT);
                         break;
                     case 'chapter_number':
                         $stmt->bindValue($identifier, $this->chapter_number, PDO::PARAM_INT);
                         break;
-                    case 'text':
-                        $stmt->bindValue($identifier, $this->text, PDO::PARAM_STR);
-                        break;
                     case 'verse_number':
                         $stmt->bindValue($identifier, $this->verse_number, PDO::PARAM_INT);
-                        break;
-                    case 'word_count':
-                        $stmt->bindValue($identifier, $this->word_count, PDO::PARAM_INT);
                         break;
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
@@ -1013,24 +887,15 @@ abstract class Verse implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getBibleId();
-                break;
-            case 1:
                 return $this->getBookId();
                 break;
-            case 2:
+            case 1:
                 return $this->getChapterNumber();
                 break;
-            case 3:
-                return $this->getText();
-                break;
-            case 4:
+            case 2:
                 return $this->getVerseNumber();
                 break;
-            case 5:
-                return $this->getWordCount();
-                break;
-            case 6:
+            case 3:
                 return $this->getId();
                 break;
             default:
@@ -1063,13 +928,10 @@ abstract class Verse implements ActiveRecordInterface
         $alreadyDumpedObjects['Verse'][$this->hashCode()] = true;
         $keys = VerseTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getBibleId(),
-            $keys[1] => $this->getBookId(),
-            $keys[2] => $this->getChapterNumber(),
-            $keys[3] => $this->getText(),
-            $keys[4] => $this->getVerseNumber(),
-            $keys[5] => $this->getWordCount(),
-            $keys[6] => $this->getId(),
+            $keys[0] => $this->getBookId(),
+            $keys[1] => $this->getChapterNumber(),
+            $keys[2] => $this->getVerseNumber(),
+            $keys[3] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1077,21 +939,6 @@ abstract class Verse implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aBible) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'bible';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'defender_bible';
-                        break;
-                    default:
-                        $key = 'Bible';
-                }
-
-                $result[$key] = $this->aBible->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
             if (null !== $this->aBook) {
 
                 switch ($keyType) {
@@ -1106,6 +953,21 @@ abstract class Verse implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->aBook->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collTranslations) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'translations';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'defender_translations';
+                        break;
+                    default:
+                        $key = 'Translations';
+                }
+
+                $result[$key] = $this->collTranslations->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collTags) {
 
@@ -1157,24 +1019,15 @@ abstract class Verse implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setBibleId($value);
-                break;
-            case 1:
                 $this->setBookId($value);
                 break;
-            case 2:
+            case 1:
                 $this->setChapterNumber($value);
                 break;
-            case 3:
-                $this->setText($value);
-                break;
-            case 4:
+            case 2:
                 $this->setVerseNumber($value);
                 break;
-            case 5:
-                $this->setWordCount($value);
-                break;
-            case 6:
+            case 3:
                 $this->setId($value);
                 break;
         } // switch()
@@ -1204,25 +1057,16 @@ abstract class Verse implements ActiveRecordInterface
         $keys = VerseTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setBibleId($arr[$keys[0]]);
+            $this->setBookId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setBookId($arr[$keys[1]]);
+            $this->setChapterNumber($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setChapterNumber($arr[$keys[2]]);
+            $this->setVerseNumber($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setText($arr[$keys[3]]);
-        }
-        if (array_key_exists($keys[4], $arr)) {
-            $this->setVerseNumber($arr[$keys[4]]);
-        }
-        if (array_key_exists($keys[5], $arr)) {
-            $this->setWordCount($arr[$keys[5]]);
-        }
-        if (array_key_exists($keys[6], $arr)) {
-            $this->setId($arr[$keys[6]]);
+            $this->setId($arr[$keys[3]]);
         }
     }
 
@@ -1265,23 +1109,14 @@ abstract class Verse implements ActiveRecordInterface
     {
         $criteria = new Criteria(VerseTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(VerseTableMap::COL_BIBLE_ID)) {
-            $criteria->add(VerseTableMap::COL_BIBLE_ID, $this->bible_id);
-        }
         if ($this->isColumnModified(VerseTableMap::COL_BOOK_ID)) {
             $criteria->add(VerseTableMap::COL_BOOK_ID, $this->book_id);
         }
         if ($this->isColumnModified(VerseTableMap::COL_CHAPTER_NUMBER)) {
             $criteria->add(VerseTableMap::COL_CHAPTER_NUMBER, $this->chapter_number);
         }
-        if ($this->isColumnModified(VerseTableMap::COL_TEXT)) {
-            $criteria->add(VerseTableMap::COL_TEXT, $this->text);
-        }
         if ($this->isColumnModified(VerseTableMap::COL_VERSE_NUMBER)) {
             $criteria->add(VerseTableMap::COL_VERSE_NUMBER, $this->verse_number);
-        }
-        if ($this->isColumnModified(VerseTableMap::COL_WORD_COUNT)) {
-            $criteria->add(VerseTableMap::COL_WORD_COUNT, $this->word_count);
         }
         if ($this->isColumnModified(VerseTableMap::COL_ID)) {
             $criteria->add(VerseTableMap::COL_ID, $this->id);
@@ -1372,17 +1207,20 @@ abstract class Verse implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setBibleId($this->getBibleId());
         $copyObj->setBookId($this->getBookId());
         $copyObj->setChapterNumber($this->getChapterNumber());
-        $copyObj->setText($this->getText());
         $copyObj->setVerseNumber($this->getVerseNumber());
-        $copyObj->setWordCount($this->getWordCount());
 
         if ($deepCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
+
+            foreach ($this->getTranslations() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTranslation($relObj->copy($deepCopy));
+                }
+            }
 
             foreach ($this->getTags() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -1418,57 +1256,6 @@ abstract class Verse implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
-    }
-
-    /**
-     * Declares an association between this object and a ChildBible object.
-     *
-     * @param  ChildBible $v
-     * @return $this|\Verse The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setBible(ChildBible $v = null)
-    {
-        if ($v === null) {
-            $this->setBibleId(NULL);
-        } else {
-            $this->setBibleId($v->getId());
-        }
-
-        $this->aBible = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildBible object, it will not be re-added.
-        if ($v !== null) {
-            $v->addVerse($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildBible object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildBible The associated ChildBible object.
-     * @throws PropelException
-     */
-    public function getBible(ConnectionInterface $con = null)
-    {
-        if ($this->aBible === null && ($this->bible_id !== null)) {
-            $this->aBible = ChildBibleQuery::create()->findPk($this->bible_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aBible->addVerses($this);
-             */
-        }
-
-        return $this->aBible;
     }
 
     /**
@@ -1533,9 +1320,262 @@ abstract class Verse implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
+        if ('Translation' == $relationName) {
+            return $this->initTranslations();
+        }
         if ('Tag' == $relationName) {
             return $this->initTags();
         }
+    }
+
+    /**
+     * Clears out the collTranslations collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTranslations()
+     */
+    public function clearTranslations()
+    {
+        $this->collTranslations = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collTranslations collection loaded partially.
+     */
+    public function resetPartialTranslations($v = true)
+    {
+        $this->collTranslationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collTranslations collection.
+     *
+     * By default this just sets the collTranslations collection to an empty array (like clearcollTranslations());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTranslations($overrideExisting = true)
+    {
+        if (null !== $this->collTranslations && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = TranslationTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collTranslations = new $collectionClassName;
+        $this->collTranslations->setModel('\Translation');
+    }
+
+    /**
+     * Gets an array of ChildTranslation objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildVerse is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildTranslation[] List of ChildTranslation objects
+     * @throws PropelException
+     */
+    public function getTranslations(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTranslationsPartial && !$this->isNew();
+        if (null === $this->collTranslations || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTranslations) {
+                // return empty collection
+                $this->initTranslations();
+            } else {
+                $collTranslations = ChildTranslationQuery::create(null, $criteria)
+                    ->filterByVerse($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collTranslationsPartial && count($collTranslations)) {
+                        $this->initTranslations(false);
+
+                        foreach ($collTranslations as $obj) {
+                            if (false == $this->collTranslations->contains($obj)) {
+                                $this->collTranslations->append($obj);
+                            }
+                        }
+
+                        $this->collTranslationsPartial = true;
+                    }
+
+                    return $collTranslations;
+                }
+
+                if ($partial && $this->collTranslations) {
+                    foreach ($this->collTranslations as $obj) {
+                        if ($obj->isNew()) {
+                            $collTranslations[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTranslations = $collTranslations;
+                $this->collTranslationsPartial = false;
+            }
+        }
+
+        return $this->collTranslations;
+    }
+
+    /**
+     * Sets a collection of ChildTranslation objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $translations A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildVerse The current object (for fluent API support)
+     */
+    public function setTranslations(Collection $translations, ConnectionInterface $con = null)
+    {
+        /** @var ChildTranslation[] $translationsToDelete */
+        $translationsToDelete = $this->getTranslations(new Criteria(), $con)->diff($translations);
+
+
+        $this->translationsScheduledForDeletion = $translationsToDelete;
+
+        foreach ($translationsToDelete as $translationRemoved) {
+            $translationRemoved->setVerse(null);
+        }
+
+        $this->collTranslations = null;
+        foreach ($translations as $translation) {
+            $this->addTranslation($translation);
+        }
+
+        $this->collTranslations = $translations;
+        $this->collTranslationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Translation objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Translation objects.
+     * @throws PropelException
+     */
+    public function countTranslations(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTranslationsPartial && !$this->isNew();
+        if (null === $this->collTranslations || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTranslations) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getTranslations());
+            }
+
+            $query = ChildTranslationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByVerse($this)
+                ->count($con);
+        }
+
+        return count($this->collTranslations);
+    }
+
+    /**
+     * Method called to associate a ChildTranslation object to this object
+     * through the ChildTranslation foreign key attribute.
+     *
+     * @param  ChildTranslation $l ChildTranslation
+     * @return $this|\Verse The current object (for fluent API support)
+     */
+    public function addTranslation(ChildTranslation $l)
+    {
+        if ($this->collTranslations === null) {
+            $this->initTranslations();
+            $this->collTranslationsPartial = true;
+        }
+
+        if (!$this->collTranslations->contains($l)) {
+            $this->doAddTranslation($l);
+
+            if ($this->translationsScheduledForDeletion and $this->translationsScheduledForDeletion->contains($l)) {
+                $this->translationsScheduledForDeletion->remove($this->translationsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildTranslation $translation The ChildTranslation object to add.
+     */
+    protected function doAddTranslation(ChildTranslation $translation)
+    {
+        $this->collTranslations[]= $translation;
+        $translation->setVerse($this);
+    }
+
+    /**
+     * @param  ChildTranslation $translation The ChildTranslation object to remove.
+     * @return $this|ChildVerse The current object (for fluent API support)
+     */
+    public function removeTranslation(ChildTranslation $translation)
+    {
+        if ($this->getTranslations()->contains($translation)) {
+            $pos = $this->collTranslations->search($translation);
+            $this->collTranslations->remove($pos);
+            if (null === $this->translationsScheduledForDeletion) {
+                $this->translationsScheduledForDeletion = clone $this->collTranslations;
+                $this->translationsScheduledForDeletion->clear();
+            }
+            $this->translationsScheduledForDeletion[]= clone $translation;
+            $translation->setVerse(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Verse is new, it will return
+     * an empty collection; or if this Verse has previously
+     * been saved, it will retrieve related Translations from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Verse.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildTranslation[] List of ChildTranslation objects
+     */
+    public function getTranslationsJoinBible(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildTranslationQuery::create(null, $criteria);
+        $query->joinWith('Bible', $joinBehavior);
+
+        return $this->getTranslations($query, $con);
     }
 
     /**
@@ -1795,18 +1835,12 @@ abstract class Verse implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->aBible) {
-            $this->aBible->removeVerse($this);
-        }
         if (null !== $this->aBook) {
             $this->aBook->removeVerse($this);
         }
-        $this->bible_id = null;
         $this->book_id = null;
         $this->chapter_number = null;
-        $this->text = null;
         $this->verse_number = null;
-        $this->word_count = null;
         $this->id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
@@ -1826,6 +1860,11 @@ abstract class Verse implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collTranslations) {
+                foreach ($this->collTranslations as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collTags) {
                 foreach ($this->collTags as $o) {
                     $o->clearAllReferences($deep);
@@ -1833,8 +1872,8 @@ abstract class Verse implements ActiveRecordInterface
             }
         } // if ($deep)
 
+        $this->collTranslations = null;
         $this->collTags = null;
-        $this->aBible = null;
         $this->aBook = null;
     }
 

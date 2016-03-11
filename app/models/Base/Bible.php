@@ -4,12 +4,12 @@ namespace Base;
 
 use \Bible as ChildBible;
 use \BibleQuery as ChildBibleQuery;
-use \Verse as ChildVerse;
-use \VerseQuery as ChildVerseQuery;
+use \Translation as ChildTranslation;
+use \TranslationQuery as ChildTranslationQuery;
 use \Exception;
 use \PDO;
 use Map\BibleTableMap;
-use Map\VerseTableMap;
+use Map\TranslationTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -86,10 +86,10 @@ abstract class Bible implements ActiveRecordInterface
     protected $id;
 
     /**
-     * @var        ObjectCollection|ChildVerse[] Collection to store aggregation of ChildVerse objects.
+     * @var        ObjectCollection|ChildTranslation[] Collection to store aggregation of ChildTranslation objects.
      */
-    protected $collVerses;
-    protected $collVersesPartial;
+    protected $collTranslations;
+    protected $collTranslationsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -101,9 +101,9 @@ abstract class Bible implements ActiveRecordInterface
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildVerse[]
+     * @var ObjectCollection|ChildTranslation[]
      */
-    protected $versesScheduledForDeletion = null;
+    protected $translationsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Base\Bible object.
@@ -533,7 +533,7 @@ abstract class Bible implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collVerses = null;
+            $this->collTranslations = null;
 
         } // if (deep)
     }
@@ -645,17 +645,17 @@ abstract class Bible implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->versesScheduledForDeletion !== null) {
-                if (!$this->versesScheduledForDeletion->isEmpty()) {
-                    \VerseQuery::create()
-                        ->filterByPrimaryKeys($this->versesScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->translationsScheduledForDeletion !== null) {
+                if (!$this->translationsScheduledForDeletion->isEmpty()) {
+                    \TranslationQuery::create()
+                        ->filterByPrimaryKeys($this->translationsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->versesScheduledForDeletion = null;
+                    $this->translationsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collVerses !== null) {
-                foreach ($this->collVerses as $referrerFK) {
+            if ($this->collTranslations !== null) {
+                foreach ($this->collTranslations as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -828,20 +828,20 @@ abstract class Bible implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collVerses) {
+            if (null !== $this->collTranslations) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'verses';
+                        $key = 'translations';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'defender_verses';
+                        $key = 'defender_translations';
                         break;
                     default:
-                        $key = 'Verses';
+                        $key = 'Translations';
                 }
 
-                $result[$key] = $this->collVerses->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->collTranslations->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1065,9 +1065,9 @@ abstract class Bible implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getVerses() as $relObj) {
+            foreach ($this->getTranslations() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addVerse($relObj->copy($deepCopy));
+                    $copyObj->addTranslation($relObj->copy($deepCopy));
                 }
             }
 
@@ -1112,37 +1112,37 @@ abstract class Bible implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('Verse' == $relationName) {
-            return $this->initVerses();
+        if ('Translation' == $relationName) {
+            return $this->initTranslations();
         }
     }
 
     /**
-     * Clears out the collVerses collection
+     * Clears out the collTranslations collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addVerses()
+     * @see        addTranslations()
      */
-    public function clearVerses()
+    public function clearTranslations()
     {
-        $this->collVerses = null; // important to set this to NULL since that means it is uninitialized
+        $this->collTranslations = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collVerses collection loaded partially.
+     * Reset is the collTranslations collection loaded partially.
      */
-    public function resetPartialVerses($v = true)
+    public function resetPartialTranslations($v = true)
     {
-        $this->collVersesPartial = $v;
+        $this->collTranslationsPartial = $v;
     }
 
     /**
-     * Initializes the collVerses collection.
+     * Initializes the collTranslations collection.
      *
-     * By default this just sets the collVerses collection to an empty array (like clearcollVerses());
+     * By default this just sets the collTranslations collection to an empty array (like clearcollTranslations());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1151,20 +1151,20 @@ abstract class Bible implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initVerses($overrideExisting = true)
+    public function initTranslations($overrideExisting = true)
     {
-        if (null !== $this->collVerses && !$overrideExisting) {
+        if (null !== $this->collTranslations && !$overrideExisting) {
             return;
         }
 
-        $collectionClassName = VerseTableMap::getTableMap()->getCollectionClassName();
+        $collectionClassName = TranslationTableMap::getTableMap()->getCollectionClassName();
 
-        $this->collVerses = new $collectionClassName;
-        $this->collVerses->setModel('\Verse');
+        $this->collTranslations = new $collectionClassName;
+        $this->collTranslations->setModel('\Translation');
     }
 
     /**
-     * Gets an array of ChildVerse objects which contain a foreign key that references this object.
+     * Gets an array of ChildTranslation objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1174,108 +1174,108 @@ abstract class Bible implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildVerse[] List of ChildVerse objects
+     * @return ObjectCollection|ChildTranslation[] List of ChildTranslation objects
      * @throws PropelException
      */
-    public function getVerses(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function getTranslations(Criteria $criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collVersesPartial && !$this->isNew();
-        if (null === $this->collVerses || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collVerses) {
+        $partial = $this->collTranslationsPartial && !$this->isNew();
+        if (null === $this->collTranslations || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTranslations) {
                 // return empty collection
-                $this->initVerses();
+                $this->initTranslations();
             } else {
-                $collVerses = ChildVerseQuery::create(null, $criteria)
+                $collTranslations = ChildTranslationQuery::create(null, $criteria)
                     ->filterByBible($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collVersesPartial && count($collVerses)) {
-                        $this->initVerses(false);
+                    if (false !== $this->collTranslationsPartial && count($collTranslations)) {
+                        $this->initTranslations(false);
 
-                        foreach ($collVerses as $obj) {
-                            if (false == $this->collVerses->contains($obj)) {
-                                $this->collVerses->append($obj);
+                        foreach ($collTranslations as $obj) {
+                            if (false == $this->collTranslations->contains($obj)) {
+                                $this->collTranslations->append($obj);
                             }
                         }
 
-                        $this->collVersesPartial = true;
+                        $this->collTranslationsPartial = true;
                     }
 
-                    return $collVerses;
+                    return $collTranslations;
                 }
 
-                if ($partial && $this->collVerses) {
-                    foreach ($this->collVerses as $obj) {
+                if ($partial && $this->collTranslations) {
+                    foreach ($this->collTranslations as $obj) {
                         if ($obj->isNew()) {
-                            $collVerses[] = $obj;
+                            $collTranslations[] = $obj;
                         }
                     }
                 }
 
-                $this->collVerses = $collVerses;
-                $this->collVersesPartial = false;
+                $this->collTranslations = $collTranslations;
+                $this->collTranslationsPartial = false;
             }
         }
 
-        return $this->collVerses;
+        return $this->collTranslations;
     }
 
     /**
-     * Sets a collection of ChildVerse objects related by a one-to-many relationship
+     * Sets a collection of ChildTranslation objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $verses A Propel collection.
+     * @param      Collection $translations A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return $this|ChildBible The current object (for fluent API support)
      */
-    public function setVerses(Collection $verses, ConnectionInterface $con = null)
+    public function setTranslations(Collection $translations, ConnectionInterface $con = null)
     {
-        /** @var ChildVerse[] $versesToDelete */
-        $versesToDelete = $this->getVerses(new Criteria(), $con)->diff($verses);
+        /** @var ChildTranslation[] $translationsToDelete */
+        $translationsToDelete = $this->getTranslations(new Criteria(), $con)->diff($translations);
 
 
-        $this->versesScheduledForDeletion = $versesToDelete;
+        $this->translationsScheduledForDeletion = $translationsToDelete;
 
-        foreach ($versesToDelete as $verseRemoved) {
-            $verseRemoved->setBible(null);
+        foreach ($translationsToDelete as $translationRemoved) {
+            $translationRemoved->setBible(null);
         }
 
-        $this->collVerses = null;
-        foreach ($verses as $verse) {
-            $this->addVerse($verse);
+        $this->collTranslations = null;
+        foreach ($translations as $translation) {
+            $this->addTranslation($translation);
         }
 
-        $this->collVerses = $verses;
-        $this->collVersesPartial = false;
+        $this->collTranslations = $translations;
+        $this->collTranslationsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Verse objects.
+     * Returns the number of related Translation objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related Verse objects.
+     * @return int             Count of related Translation objects.
      * @throws PropelException
      */
-    public function countVerses(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countTranslations(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collVersesPartial && !$this->isNew();
-        if (null === $this->collVerses || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collVerses) {
+        $partial = $this->collTranslationsPartial && !$this->isNew();
+        if (null === $this->collTranslations || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTranslations) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getVerses());
+                return count($this->getTranslations());
             }
 
-            $query = ChildVerseQuery::create(null, $criteria);
+            $query = ChildTranslationQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1285,28 +1285,28 @@ abstract class Bible implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collVerses);
+        return count($this->collTranslations);
     }
 
     /**
-     * Method called to associate a ChildVerse object to this object
-     * through the ChildVerse foreign key attribute.
+     * Method called to associate a ChildTranslation object to this object
+     * through the ChildTranslation foreign key attribute.
      *
-     * @param  ChildVerse $l ChildVerse
+     * @param  ChildTranslation $l ChildTranslation
      * @return $this|\Bible The current object (for fluent API support)
      */
-    public function addVerse(ChildVerse $l)
+    public function addTranslation(ChildTranslation $l)
     {
-        if ($this->collVerses === null) {
-            $this->initVerses();
-            $this->collVersesPartial = true;
+        if ($this->collTranslations === null) {
+            $this->initTranslations();
+            $this->collTranslationsPartial = true;
         }
 
-        if (!$this->collVerses->contains($l)) {
-            $this->doAddVerse($l);
+        if (!$this->collTranslations->contains($l)) {
+            $this->doAddTranslation($l);
 
-            if ($this->versesScheduledForDeletion and $this->versesScheduledForDeletion->contains($l)) {
-                $this->versesScheduledForDeletion->remove($this->versesScheduledForDeletion->search($l));
+            if ($this->translationsScheduledForDeletion and $this->translationsScheduledForDeletion->contains($l)) {
+                $this->translationsScheduledForDeletion->remove($this->translationsScheduledForDeletion->search($l));
             }
         }
 
@@ -1314,29 +1314,29 @@ abstract class Bible implements ActiveRecordInterface
     }
 
     /**
-     * @param ChildVerse $verse The ChildVerse object to add.
+     * @param ChildTranslation $translation The ChildTranslation object to add.
      */
-    protected function doAddVerse(ChildVerse $verse)
+    protected function doAddTranslation(ChildTranslation $translation)
     {
-        $this->collVerses[]= $verse;
-        $verse->setBible($this);
+        $this->collTranslations[]= $translation;
+        $translation->setBible($this);
     }
 
     /**
-     * @param  ChildVerse $verse The ChildVerse object to remove.
+     * @param  ChildTranslation $translation The ChildTranslation object to remove.
      * @return $this|ChildBible The current object (for fluent API support)
      */
-    public function removeVerse(ChildVerse $verse)
+    public function removeTranslation(ChildTranslation $translation)
     {
-        if ($this->getVerses()->contains($verse)) {
-            $pos = $this->collVerses->search($verse);
-            $this->collVerses->remove($pos);
-            if (null === $this->versesScheduledForDeletion) {
-                $this->versesScheduledForDeletion = clone $this->collVerses;
-                $this->versesScheduledForDeletion->clear();
+        if ($this->getTranslations()->contains($translation)) {
+            $pos = $this->collTranslations->search($translation);
+            $this->collTranslations->remove($pos);
+            if (null === $this->translationsScheduledForDeletion) {
+                $this->translationsScheduledForDeletion = clone $this->collTranslations;
+                $this->translationsScheduledForDeletion->clear();
             }
-            $this->versesScheduledForDeletion[]= clone $verse;
-            $verse->setBible(null);
+            $this->translationsScheduledForDeletion[]= clone $translation;
+            $translation->setBible(null);
         }
 
         return $this;
@@ -1348,7 +1348,7 @@ abstract class Bible implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this Bible is new, it will return
      * an empty collection; or if this Bible has previously
-     * been saved, it will retrieve related Verses from storage.
+     * been saved, it will retrieve related Translations from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1357,14 +1357,14 @@ abstract class Bible implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildVerse[] List of ChildVerse objects
+     * @return ObjectCollection|ChildTranslation[] List of ChildTranslation objects
      */
-    public function getVersesJoinBook(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getTranslationsJoinVerse(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildVerseQuery::create(null, $criteria);
-        $query->joinWith('Book', $joinBehavior);
+        $query = ChildTranslationQuery::create(null, $criteria);
+        $query->joinWith('Verse', $joinBehavior);
 
-        return $this->getVerses($query, $con);
+        return $this->getTranslations($query, $con);
     }
 
     /**
@@ -1395,14 +1395,14 @@ abstract class Bible implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collVerses) {
-                foreach ($this->collVerses as $o) {
+            if ($this->collTranslations) {
+                foreach ($this->collTranslations as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
-        $this->collVerses = null;
+        $this->collTranslations = null;
     }
 
     /**

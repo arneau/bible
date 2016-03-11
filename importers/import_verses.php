@@ -308,13 +308,16 @@ foreach ($books_array as $book_data) {
 
 			$word_count = substr_count($verse_data->verse, ' ') + 1;
 
+			$translation = new Translation();
+			$translation->setBible($bible_object)
+				->setText($verse_data->verse)
+				->setWordCount($word_count);
+
 			$verse_object = new Verse();
-			$verse_object->setBible($bible_object)
+			$verse_object->addTranslation($translation)
 				->setBook($book_object)
 				->setChapterNumber($current_chapter)
-				->setText($verse_data->verse)
 				->setVerseNumber($verse_data->verse_nr)
-				->setWordCount($word_count)
 				->save();
 
 		}

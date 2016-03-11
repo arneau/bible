@@ -36,17 +36,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildBibleQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildBibleQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
- * @method     ChildBibleQuery leftJoinVerse($relationAlias = null) Adds a LEFT JOIN clause to the query using the Verse relation
- * @method     ChildBibleQuery rightJoinVerse($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Verse relation
- * @method     ChildBibleQuery innerJoinVerse($relationAlias = null) Adds a INNER JOIN clause to the query using the Verse relation
+ * @method     ChildBibleQuery leftJoinTranslation($relationAlias = null) Adds a LEFT JOIN clause to the query using the Translation relation
+ * @method     ChildBibleQuery rightJoinTranslation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Translation relation
+ * @method     ChildBibleQuery innerJoinTranslation($relationAlias = null) Adds a INNER JOIN clause to the query using the Translation relation
  *
- * @method     ChildBibleQuery joinWithVerse($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Verse relation
+ * @method     ChildBibleQuery joinWithTranslation($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Translation relation
  *
- * @method     ChildBibleQuery leftJoinWithVerse() Adds a LEFT JOIN clause and with to the query using the Verse relation
- * @method     ChildBibleQuery rightJoinWithVerse() Adds a RIGHT JOIN clause and with to the query using the Verse relation
- * @method     ChildBibleQuery innerJoinWithVerse() Adds a INNER JOIN clause and with to the query using the Verse relation
+ * @method     ChildBibleQuery leftJoinWithTranslation() Adds a LEFT JOIN clause and with to the query using the Translation relation
+ * @method     ChildBibleQuery rightJoinWithTranslation() Adds a RIGHT JOIN clause and with to the query using the Translation relation
+ * @method     ChildBibleQuery innerJoinWithTranslation() Adds a INNER JOIN clause and with to the query using the Translation relation
  *
- * @method     \VerseQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \TranslationQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildBible findOne(ConnectionInterface $con = null) Return the first ChildBible matching the query
  * @method     ChildBible findOneOrCreate(ConnectionInterface $con = null) Return the first ChildBible matching the query, or a new ChildBible object populated from the query conditions when no match is found
@@ -348,40 +348,40 @@ abstract class BibleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Verse object
+     * Filter the query by a related \Translation object
      *
-     * @param \Verse|ObjectCollection $verse the related object to use as filter
+     * @param \Translation|ObjectCollection $translation the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildBibleQuery The current query, for fluid interface
      */
-    public function filterByVerse($verse, $comparison = null)
+    public function filterByTranslation($translation, $comparison = null)
     {
-        if ($verse instanceof \Verse) {
+        if ($translation instanceof \Translation) {
             return $this
-                ->addUsingAlias(BibleTableMap::COL_ID, $verse->getBibleId(), $comparison);
-        } elseif ($verse instanceof ObjectCollection) {
+                ->addUsingAlias(BibleTableMap::COL_ID, $translation->getBibleId(), $comparison);
+        } elseif ($translation instanceof ObjectCollection) {
             return $this
-                ->useVerseQuery()
-                ->filterByPrimaryKeys($verse->getPrimaryKeys())
+                ->useTranslationQuery()
+                ->filterByPrimaryKeys($translation->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByVerse() only accepts arguments of type \Verse or Collection');
+            throw new PropelException('filterByTranslation() only accepts arguments of type \Translation or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Verse relation
+     * Adds a JOIN clause to the query using the Translation relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return $this|ChildBibleQuery The current query, for fluid interface
      */
-    public function joinVerse($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinTranslation($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Verse');
+        $relationMap = $tableMap->getRelation('Translation');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -396,14 +396,14 @@ abstract class BibleQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Verse');
+            $this->addJoinObject($join, 'Translation');
         }
 
         return $this;
     }
 
     /**
-     * Use the Verse relation Verse object
+     * Use the Translation relation Translation object
      *
      * @see useQuery()
      *
@@ -411,13 +411,13 @@ abstract class BibleQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return \VerseQuery A secondary query class using the current class as primary query
+     * @return \TranslationQuery A secondary query class using the current class as primary query
      */
-    public function useVerseQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useTranslationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinVerse($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Verse', '\VerseQuery');
+            ->joinTranslation($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Translation', '\TranslationQuery');
     }
 
     /**
