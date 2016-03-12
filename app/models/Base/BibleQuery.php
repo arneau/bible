@@ -46,7 +46,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildBibleQuery rightJoinWithTranslation() Adds a RIGHT JOIN clause and with to the query using the Translation relation
  * @method     ChildBibleQuery innerJoinWithTranslation() Adds a INNER JOIN clause and with to the query using the Translation relation
  *
- * @method     \TranslationQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildBibleQuery leftJoinTagTranslation($relationAlias = null) Adds a LEFT JOIN clause to the query using the TagTranslation relation
+ * @method     ChildBibleQuery rightJoinTagTranslation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TagTranslation relation
+ * @method     ChildBibleQuery innerJoinTagTranslation($relationAlias = null) Adds a INNER JOIN clause to the query using the TagTranslation relation
+ *
+ * @method     ChildBibleQuery joinWithTagTranslation($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the TagTranslation relation
+ *
+ * @method     ChildBibleQuery leftJoinWithTagTranslation() Adds a LEFT JOIN clause and with to the query using the TagTranslation relation
+ * @method     ChildBibleQuery rightJoinWithTagTranslation() Adds a RIGHT JOIN clause and with to the query using the TagTranslation relation
+ * @method     ChildBibleQuery innerJoinWithTagTranslation() Adds a INNER JOIN clause and with to the query using the TagTranslation relation
+ *
+ * @method     \TranslationQuery|\TagTranslationQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildBible findOne(ConnectionInterface $con = null) Return the first ChildBible matching the query
  * @method     ChildBible findOneOrCreate(ConnectionInterface $con = null) Return the first ChildBible matching the query, or a new ChildBible object populated from the query conditions when no match is found
@@ -418,6 +428,79 @@ abstract class BibleQuery extends ModelCriteria
         return $this
             ->joinTranslation($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Translation', '\TranslationQuery');
+    }
+
+    /**
+     * Filter the query by a related \TagTranslation object
+     *
+     * @param \TagTranslation|ObjectCollection $tagTranslation the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildBibleQuery The current query, for fluid interface
+     */
+    public function filterByTagTranslation($tagTranslation, $comparison = null)
+    {
+        if ($tagTranslation instanceof \TagTranslation) {
+            return $this
+                ->addUsingAlias(BibleTableMap::COL_ID, $tagTranslation->getBibleId(), $comparison);
+        } elseif ($tagTranslation instanceof ObjectCollection) {
+            return $this
+                ->useTagTranslationQuery()
+                ->filterByPrimaryKeys($tagTranslation->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTagTranslation() only accepts arguments of type \TagTranslation or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the TagTranslation relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildBibleQuery The current query, for fluid interface
+     */
+    public function joinTagTranslation($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('TagTranslation');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'TagTranslation');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the TagTranslation relation TagTranslation object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \TagTranslationQuery A secondary query class using the current class as primary query
+     */
+    public function useTagTranslationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinTagTranslation($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'TagTranslation', '\TagTranslationQuery');
     }
 
     /**

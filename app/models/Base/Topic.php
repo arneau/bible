@@ -2,8 +2,6 @@
 
 namespace Base;
 
-use \Tag as ChildTag;
-use \TagQuery as ChildTagQuery;
 use \Topic as ChildTopic;
 use \TopicLink as ChildTopicLink;
 use \TopicLinkQuery as ChildTopicLinkQuery;
@@ -12,13 +10,15 @@ use \TopicParentQuery as ChildTopicParentQuery;
 use \TopicQuery as ChildTopicQuery;
 use \TopicSynonym as ChildTopicSynonym;
 use \TopicSynonymQuery as ChildTopicSynonymQuery;
+use \TopicTag as ChildTopicTag;
+use \TopicTagQuery as ChildTopicTagQuery;
 use \Exception;
 use \PDO;
-use Map\TagTableMap;
 use Map\TopicLinkTableMap;
 use Map\TopicParentTableMap;
 use Map\TopicSynonymTableMap;
 use Map\TopicTableMap;
+use Map\TopicTagTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -104,12 +104,6 @@ abstract class Topic implements ActiveRecordInterface
     protected $id;
 
     /**
-     * @var        ObjectCollection|ChildTag[] Collection to store aggregation of ChildTag objects.
-     */
-    protected $collTags;
-    protected $collTagsPartial;
-
-    /**
      * @var        ObjectCollection|ChildTopicLink[] Collection to store aggregation of ChildTopicLink objects.
      */
     protected $collTopicLinks;
@@ -120,6 +114,12 @@ abstract class Topic implements ActiveRecordInterface
      */
     protected $collTopicParents;
     protected $collTopicParentsPartial;
+
+    /**
+     * @var        ObjectCollection|ChildTopicTag[] Collection to store aggregation of ChildTopicTag objects.
+     */
+    protected $collTopicTags;
+    protected $collTopicTagsPartial;
 
     /**
      * @var        ObjectCollection|ChildTopicSynonym[] Collection to store aggregation of ChildTopicSynonym objects.
@@ -137,12 +137,6 @@ abstract class Topic implements ActiveRecordInterface
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildTag[]
-     */
-    protected $tagsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
      * @var ObjectCollection|ChildTopicLink[]
      */
     protected $topicLinksScheduledForDeletion = null;
@@ -152,6 +146,12 @@ abstract class Topic implements ActiveRecordInterface
      * @var ObjectCollection|ChildTopicParent[]
      */
     protected $topicParentsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildTopicTag[]
+     */
+    protected $topicTagsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -660,11 +660,11 @@ abstract class Topic implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collTags = null;
-
             $this->collTopicLinks = null;
 
             $this->collTopicParents = null;
+
+            $this->collTopicTags = null;
 
             $this->collTopicSynonyms = null;
 
@@ -778,23 +778,6 @@ abstract class Topic implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->tagsScheduledForDeletion !== null) {
-                if (!$this->tagsScheduledForDeletion->isEmpty()) {
-                    \TagQuery::create()
-                        ->filterByPrimaryKeys($this->tagsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->tagsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collTags !== null) {
-                foreach ($this->collTags as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->topicLinksScheduledForDeletion !== null) {
                 if (!$this->topicLinksScheduledForDeletion->isEmpty()) {
                     \TopicLinkQuery::create()
@@ -823,6 +806,23 @@ abstract class Topic implements ActiveRecordInterface
 
             if ($this->collTopicParents !== null) {
                 foreach ($this->collTopicParents as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->topicTagsScheduledForDeletion !== null) {
+                if (!$this->topicTagsScheduledForDeletion->isEmpty()) {
+                    \TopicTagQuery::create()
+                        ->filterByPrimaryKeys($this->topicTagsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->topicTagsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTopicTags !== null) {
+                foreach ($this->collTopicTags as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1022,21 +1022,6 @@ abstract class Topic implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collTags) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'tags';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'defender_tags';
-                        break;
-                    default:
-                        $key = 'Tags';
-                }
-
-                $result[$key] = $this->collTags->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collTopicLinks) {
 
                 switch ($keyType) {
@@ -1066,6 +1051,21 @@ abstract class Topic implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->collTopicParents->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collTopicTags) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'topicTags';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'defender_topic_tags';
+                        break;
+                    default:
+                        $key = 'TopicTags';
+                }
+
+                $result[$key] = $this->collTopicTags->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collTopicSynonyms) {
 
@@ -1314,12 +1314,6 @@ abstract class Topic implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getTags() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addTag($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getTopicLinks() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTopicLink($relObj->copy($deepCopy));
@@ -1329,6 +1323,12 @@ abstract class Topic implements ActiveRecordInterface
             foreach ($this->getTopicParents() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTopicParent($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getTopicTags() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTopicTag($relObj->copy($deepCopy));
                 }
             }
 
@@ -1379,268 +1379,18 @@ abstract class Topic implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('Tag' == $relationName) {
-            return $this->initTags();
-        }
         if ('TopicLink' == $relationName) {
             return $this->initTopicLinks();
         }
         if ('TopicParent' == $relationName) {
             return $this->initTopicParents();
         }
+        if ('TopicTag' == $relationName) {
+            return $this->initTopicTags();
+        }
         if ('TopicSynonym' == $relationName) {
             return $this->initTopicSynonyms();
         }
-    }
-
-    /**
-     * Clears out the collTags collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addTags()
-     */
-    public function clearTags()
-    {
-        $this->collTags = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collTags collection loaded partially.
-     */
-    public function resetPartialTags($v = true)
-    {
-        $this->collTagsPartial = $v;
-    }
-
-    /**
-     * Initializes the collTags collection.
-     *
-     * By default this just sets the collTags collection to an empty array (like clearcollTags());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initTags($overrideExisting = true)
-    {
-        if (null !== $this->collTags && !$overrideExisting) {
-            return;
-        }
-
-        $collectionClassName = TagTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collTags = new $collectionClassName;
-        $this->collTags->setModel('\Tag');
-    }
-
-    /**
-     * Gets an array of ChildTag objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildTopic is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildTag[] List of ChildTag objects
-     * @throws PropelException
-     */
-    public function getTags(Criteria $criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collTagsPartial && !$this->isNew();
-        if (null === $this->collTags || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collTags) {
-                // return empty collection
-                $this->initTags();
-            } else {
-                $collTags = ChildTagQuery::create(null, $criteria)
-                    ->filterByTopic($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collTagsPartial && count($collTags)) {
-                        $this->initTags(false);
-
-                        foreach ($collTags as $obj) {
-                            if (false == $this->collTags->contains($obj)) {
-                                $this->collTags->append($obj);
-                            }
-                        }
-
-                        $this->collTagsPartial = true;
-                    }
-
-                    return $collTags;
-                }
-
-                if ($partial && $this->collTags) {
-                    foreach ($this->collTags as $obj) {
-                        if ($obj->isNew()) {
-                            $collTags[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collTags = $collTags;
-                $this->collTagsPartial = false;
-            }
-        }
-
-        return $this->collTags;
-    }
-
-    /**
-     * Sets a collection of ChildTag objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $tags A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildTopic The current object (for fluent API support)
-     */
-    public function setTags(Collection $tags, ConnectionInterface $con = null)
-    {
-        /** @var ChildTag[] $tagsToDelete */
-        $tagsToDelete = $this->getTags(new Criteria(), $con)->diff($tags);
-
-
-        $this->tagsScheduledForDeletion = $tagsToDelete;
-
-        foreach ($tagsToDelete as $tagRemoved) {
-            $tagRemoved->setTopic(null);
-        }
-
-        $this->collTags = null;
-        foreach ($tags as $tag) {
-            $this->addTag($tag);
-        }
-
-        $this->collTags = $tags;
-        $this->collTagsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Tag objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Tag objects.
-     * @throws PropelException
-     */
-    public function countTags(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collTagsPartial && !$this->isNew();
-        if (null === $this->collTags || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collTags) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getTags());
-            }
-
-            $query = ChildTagQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByTopic($this)
-                ->count($con);
-        }
-
-        return count($this->collTags);
-    }
-
-    /**
-     * Method called to associate a ChildTag object to this object
-     * through the ChildTag foreign key attribute.
-     *
-     * @param  ChildTag $l ChildTag
-     * @return $this|\Topic The current object (for fluent API support)
-     */
-    public function addTag(ChildTag $l)
-    {
-        if ($this->collTags === null) {
-            $this->initTags();
-            $this->collTagsPartial = true;
-        }
-
-        if (!$this->collTags->contains($l)) {
-            $this->doAddTag($l);
-
-            if ($this->tagsScheduledForDeletion and $this->tagsScheduledForDeletion->contains($l)) {
-                $this->tagsScheduledForDeletion->remove($this->tagsScheduledForDeletion->search($l));
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildTag $tag The ChildTag object to add.
-     */
-    protected function doAddTag(ChildTag $tag)
-    {
-        $this->collTags[]= $tag;
-        $tag->setTopic($this);
-    }
-
-    /**
-     * @param  ChildTag $tag The ChildTag object to remove.
-     * @return $this|ChildTopic The current object (for fluent API support)
-     */
-    public function removeTag(ChildTag $tag)
-    {
-        if ($this->getTags()->contains($tag)) {
-            $pos = $this->collTags->search($tag);
-            $this->collTags->remove($pos);
-            if (null === $this->tagsScheduledForDeletion) {
-                $this->tagsScheduledForDeletion = clone $this->collTags;
-                $this->tagsScheduledForDeletion->clear();
-            }
-            $this->tagsScheduledForDeletion[]= clone $tag;
-            $tag->setTopic(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Topic is new, it will return
-     * an empty collection; or if this Topic has previously
-     * been saved, it will retrieve related Tags from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Topic.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildTag[] List of ChildTag objects
-     */
-    public function getTagsJoinVerse(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildTagQuery::create(null, $criteria);
-        $query->joinWith('Verse', $joinBehavior);
-
-        return $this->getTags($query, $con);
     }
 
     /**
@@ -2094,6 +1844,256 @@ abstract class Topic implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collTopicTags collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTopicTags()
+     */
+    public function clearTopicTags()
+    {
+        $this->collTopicTags = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collTopicTags collection loaded partially.
+     */
+    public function resetPartialTopicTags($v = true)
+    {
+        $this->collTopicTagsPartial = $v;
+    }
+
+    /**
+     * Initializes the collTopicTags collection.
+     *
+     * By default this just sets the collTopicTags collection to an empty array (like clearcollTopicTags());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTopicTags($overrideExisting = true)
+    {
+        if (null !== $this->collTopicTags && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = TopicTagTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collTopicTags = new $collectionClassName;
+        $this->collTopicTags->setModel('\TopicTag');
+    }
+
+    /**
+     * Gets an array of ChildTopicTag objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildTopic is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildTopicTag[] List of ChildTopicTag objects
+     * @throws PropelException
+     */
+    public function getTopicTags(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTopicTagsPartial && !$this->isNew();
+        if (null === $this->collTopicTags || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTopicTags) {
+                // return empty collection
+                $this->initTopicTags();
+            } else {
+                $collTopicTags = ChildTopicTagQuery::create(null, $criteria)
+                    ->filterByTopic($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collTopicTagsPartial && count($collTopicTags)) {
+                        $this->initTopicTags(false);
+
+                        foreach ($collTopicTags as $obj) {
+                            if (false == $this->collTopicTags->contains($obj)) {
+                                $this->collTopicTags->append($obj);
+                            }
+                        }
+
+                        $this->collTopicTagsPartial = true;
+                    }
+
+                    return $collTopicTags;
+                }
+
+                if ($partial && $this->collTopicTags) {
+                    foreach ($this->collTopicTags as $obj) {
+                        if ($obj->isNew()) {
+                            $collTopicTags[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTopicTags = $collTopicTags;
+                $this->collTopicTagsPartial = false;
+            }
+        }
+
+        return $this->collTopicTags;
+    }
+
+    /**
+     * Sets a collection of ChildTopicTag objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $topicTags A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildTopic The current object (for fluent API support)
+     */
+    public function setTopicTags(Collection $topicTags, ConnectionInterface $con = null)
+    {
+        /** @var ChildTopicTag[] $topicTagsToDelete */
+        $topicTagsToDelete = $this->getTopicTags(new Criteria(), $con)->diff($topicTags);
+
+
+        $this->topicTagsScheduledForDeletion = $topicTagsToDelete;
+
+        foreach ($topicTagsToDelete as $topicTagRemoved) {
+            $topicTagRemoved->setTopic(null);
+        }
+
+        $this->collTopicTags = null;
+        foreach ($topicTags as $topicTag) {
+            $this->addTopicTag($topicTag);
+        }
+
+        $this->collTopicTags = $topicTags;
+        $this->collTopicTagsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related TopicTag objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related TopicTag objects.
+     * @throws PropelException
+     */
+    public function countTopicTags(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTopicTagsPartial && !$this->isNew();
+        if (null === $this->collTopicTags || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTopicTags) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getTopicTags());
+            }
+
+            $query = ChildTopicTagQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTopic($this)
+                ->count($con);
+        }
+
+        return count($this->collTopicTags);
+    }
+
+    /**
+     * Method called to associate a ChildTopicTag object to this object
+     * through the ChildTopicTag foreign key attribute.
+     *
+     * @param  ChildTopicTag $l ChildTopicTag
+     * @return $this|\Topic The current object (for fluent API support)
+     */
+    public function addTopicTag(ChildTopicTag $l)
+    {
+        if ($this->collTopicTags === null) {
+            $this->initTopicTags();
+            $this->collTopicTagsPartial = true;
+        }
+
+        if (!$this->collTopicTags->contains($l)) {
+            $this->doAddTopicTag($l);
+
+            if ($this->topicTagsScheduledForDeletion and $this->topicTagsScheduledForDeletion->contains($l)) {
+                $this->topicTagsScheduledForDeletion->remove($this->topicTagsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildTopicTag $topicTag The ChildTopicTag object to add.
+     */
+    protected function doAddTopicTag(ChildTopicTag $topicTag)
+    {
+        $this->collTopicTags[]= $topicTag;
+        $topicTag->setTopic($this);
+    }
+
+    /**
+     * @param  ChildTopicTag $topicTag The ChildTopicTag object to remove.
+     * @return $this|ChildTopic The current object (for fluent API support)
+     */
+    public function removeTopicTag(ChildTopicTag $topicTag)
+    {
+        if ($this->getTopicTags()->contains($topicTag)) {
+            $pos = $this->collTopicTags->search($topicTag);
+            $this->collTopicTags->remove($pos);
+            if (null === $this->topicTagsScheduledForDeletion) {
+                $this->topicTagsScheduledForDeletion = clone $this->collTopicTags;
+                $this->topicTagsScheduledForDeletion->clear();
+            }
+            $this->topicTagsScheduledForDeletion[]= clone $topicTag;
+            $topicTag->setTopic(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Topic is new, it will return
+     * an empty collection; or if this Topic has previously
+     * been saved, it will retrieve related TopicTags from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Topic.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildTopicTag[] List of ChildTopicTag objects
+     */
+    public function getTopicTagsJoinTag(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildTopicTagQuery::create(null, $criteria);
+        $query->joinWith('Tag', $joinBehavior);
+
+        return $this->getTopicTags($query, $con);
+    }
+
+    /**
      * Clears out the collTopicSynonyms collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2348,11 +2348,6 @@ abstract class Topic implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collTags) {
-                foreach ($this->collTags as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collTopicLinks) {
                 foreach ($this->collTopicLinks as $o) {
                     $o->clearAllReferences($deep);
@@ -2363,6 +2358,11 @@ abstract class Topic implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collTopicTags) {
+                foreach ($this->collTopicTags as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collTopicSynonyms) {
                 foreach ($this->collTopicSynonyms as $o) {
                     $o->clearAllReferences($deep);
@@ -2370,9 +2370,9 @@ abstract class Topic implements ActiveRecordInterface
             }
         } // if ($deep)
 
-        $this->collTags = null;
         $this->collTopicLinks = null;
         $this->collTopicParents = null;
+        $this->collTopicTags = null;
         $this->collTopicSynonyms = null;
     }
 
@@ -2396,7 +2396,7 @@ abstract class Topic implements ActiveRecordInterface
      */
     public function computeTagCount(ConnectionInterface $con)
     {
-        $stmt = $con->prepare('SELECT COUNT(topic_id) FROM defender_tag WHERE defender_tag.TOPIC_ID = :p1');
+        $stmt = $con->prepare('SELECT COUNT(topic_id) FROM defender_topic_tag WHERE defender_topic_tag.TOPIC_ID = :p1');
         $stmt->bindValue(':p1', $this->getId());
         $stmt->execute();
 

@@ -152,13 +152,6 @@ class TopicTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Tag', '\\Tag', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':topic_id',
-    1 => ':id',
-  ),
-), null, null, 'Tags', false);
         $this->addRelation('TopicLink', '\\TopicLink', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
@@ -173,6 +166,13 @@ class TopicTableMap extends TableMap
     1 => ':id',
   ),
 ), 'CASCADE', null, 'TopicParents', false);
+        $this->addRelation('TopicTag', '\\TopicTag', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':topic_id',
+    1 => ':id',
+  ),
+), null, null, 'TopicTags', false);
         $this->addRelation('TopicSynonym', '\\TopicSynonym', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
@@ -191,7 +191,7 @@ class TopicTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'aggregate_column' => array('name' => 'tag_count', 'expression' => 'COUNT(topic_id)', 'condition' => '', 'foreign_table' => 'tag', 'foreign_schema' => '', ),
+            'aggregate_column' => array('name' => 'tag_count', 'expression' => 'COUNT(topic_id)', 'condition' => '', 'foreign_table' => 'topic_tag', 'foreign_schema' => '', ),
             'auto_add_pk' => array('name' => 'id', 'autoIncrement' => 'true', 'type' => 'INTEGER', ),
         );
     } // getBehaviors()

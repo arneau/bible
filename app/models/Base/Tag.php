@@ -2,18 +2,25 @@
 
 namespace Base;
 
+use \LessonTag as ChildLessonTag;
+use \LessonTagQuery as ChildLessonTagQuery;
 use \Tag as ChildTag;
 use \TagQuery as ChildTagQuery;
+use \TagTranslation as ChildTagTranslation;
+use \TagTranslationQuery as ChildTagTranslationQuery;
 use \TagVote as ChildTagVote;
 use \TagVoteQuery as ChildTagVoteQuery;
-use \Topic as ChildTopic;
-use \TopicQuery as ChildTopicQuery;
+use \TopicTag as ChildTopicTag;
+use \TopicTagQuery as ChildTopicTagQuery;
 use \Verse as ChildVerse;
 use \VerseQuery as ChildVerseQuery;
 use \Exception;
 use \PDO;
+use Map\LessonTagTableMap;
 use Map\TagTableMap;
+use Map\TagTranslationTableMap;
 use Map\TagVoteTableMap;
+use Map\TopicTagTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -69,20 +76,6 @@ abstract class Tag implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the relevant_words field.
-     *
-     * @var        string
-     */
-    protected $relevant_words;
-
-    /**
-     * The value for the topic_id field.
-     *
-     * @var        int
-     */
-    protected $topic_id;
-
-    /**
      * The value for the verse_id field.
      *
      * @var        int
@@ -105,20 +98,33 @@ abstract class Tag implements ActiveRecordInterface
     protected $id;
 
     /**
-     * @var        ChildTopic
-     */
-    protected $aTopic;
-
-    /**
      * @var        ChildVerse
      */
     protected $aVerse;
+
+    /**
+     * @var        ObjectCollection|ChildTagTranslation[] Collection to store aggregation of ChildTagTranslation objects.
+     */
+    protected $collTagTranslations;
+    protected $collTagTranslationsPartial;
 
     /**
      * @var        ObjectCollection|ChildTagVote[] Collection to store aggregation of ChildTagVote objects.
      */
     protected $collTagVotes;
     protected $collTagVotesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildTopicTag[] Collection to store aggregation of ChildTopicTag objects.
+     */
+    protected $collTopicTags;
+    protected $collTopicTagsPartial;
+
+    /**
+     * @var        ObjectCollection|ChildLessonTag[] Collection to store aggregation of ChildLessonTag objects.
+     */
+    protected $collLessonTags;
+    protected $collLessonTagsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -128,17 +134,29 @@ abstract class Tag implements ActiveRecordInterface
      */
     protected $alreadyInSave = false;
 
-    // aggregate_column_relation_aggregate_column behavior
     /**
-     * @var ChildTopic
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildTagTranslation[]
      */
-    protected $oldTopicTagCount;
+    protected $tagTranslationsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var ObjectCollection|ChildTagVote[]
      */
     protected $tagVotesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildTopicTag[]
+     */
+    protected $topicTagsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildLessonTag[]
+     */
+    protected $lessonTagsScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -379,26 +397,6 @@ abstract class Tag implements ActiveRecordInterface
     }
 
     /**
-     * Get the [relevant_words] column value.
-     *
-     * @return string
-     */
-    public function getRelevantWords()
-    {
-        return $this->relevant_words;
-    }
-
-    /**
-     * Get the [topic_id] column value.
-     *
-     * @return int
-     */
-    public function getTopicId()
-    {
-        return $this->topic_id;
-    }
-
-    /**
      * Get the [verse_id] column value.
      *
      * @return int
@@ -427,50 +425,6 @@ abstract class Tag implements ActiveRecordInterface
     {
         return $this->id;
     }
-
-    /**
-     * Set the value of [relevant_words] column.
-     *
-     * @param string $v new value
-     * @return $this|\Tag The current object (for fluent API support)
-     */
-    public function setRelevantWords($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->relevant_words !== $v) {
-            $this->relevant_words = $v;
-            $this->modifiedColumns[TagTableMap::COL_RELEVANT_WORDS] = true;
-        }
-
-        return $this;
-    } // setRelevantWords()
-
-    /**
-     * Set the value of [topic_id] column.
-     *
-     * @param int $v new value
-     * @return $this|\Tag The current object (for fluent API support)
-     */
-    public function setTopicId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->topic_id !== $v) {
-            $this->topic_id = $v;
-            $this->modifiedColumns[TagTableMap::COL_TOPIC_ID] = true;
-        }
-
-        if ($this->aTopic !== null && $this->aTopic->getId() !== $v) {
-            $this->aTopic = null;
-        }
-
-        return $this;
-    } // setTopicId()
 
     /**
      * Set the value of [verse_id] column.
@@ -576,19 +530,13 @@ abstract class Tag implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TagTableMap::translateFieldName('RelevantWords', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->relevant_words = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TagTableMap::translateFieldName('TopicId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->topic_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TagTableMap::translateFieldName('VerseId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TagTableMap::translateFieldName('VerseId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->verse_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TagTableMap::translateFieldName('VoteCount', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TagTableMap::translateFieldName('VoteCount', TableMap::TYPE_PHPNAME, $indexType)];
             $this->vote_count = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TagTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TagTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -598,7 +546,7 @@ abstract class Tag implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = TagTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = TagTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Tag'), 0, $e);
@@ -620,9 +568,6 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aTopic !== null && $this->topic_id !== $this->aTopic->getId()) {
-            $this->aTopic = null;
-        }
         if ($this->aVerse !== null && $this->verse_id !== $this->aVerse->getId()) {
             $this->aVerse = null;
         }
@@ -665,9 +610,14 @@ abstract class Tag implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aTopic = null;
             $this->aVerse = null;
+            $this->collTagTranslations = null;
+
             $this->collTagVotes = null;
+
+            $this->collTopicTags = null;
+
+            $this->collLessonTags = null;
 
         } // if (deep)
     }
@@ -742,8 +692,6 @@ abstract class Tag implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                // aggregate_column_relation_aggregate_column behavior
-                $this->updateRelatedTopicTagCount($con);
                 TagTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -775,13 +723,6 @@ abstract class Tag implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aTopic !== null) {
-                if ($this->aTopic->isModified() || $this->aTopic->isNew()) {
-                    $affectedRows += $this->aTopic->save($con);
-                }
-                $this->setTopic($this->aTopic);
-            }
-
             if ($this->aVerse !== null) {
                 if ($this->aVerse->isModified() || $this->aVerse->isNew()) {
                     $affectedRows += $this->aVerse->save($con);
@@ -800,6 +741,23 @@ abstract class Tag implements ActiveRecordInterface
                 $this->resetModified();
             }
 
+            if ($this->tagTranslationsScheduledForDeletion !== null) {
+                if (!$this->tagTranslationsScheduledForDeletion->isEmpty()) {
+                    \TagTranslationQuery::create()
+                        ->filterByPrimaryKeys($this->tagTranslationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->tagTranslationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTagTranslations !== null) {
+                foreach ($this->collTagTranslations as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->tagVotesScheduledForDeletion !== null) {
                 if (!$this->tagVotesScheduledForDeletion->isEmpty()) {
                     \TagVoteQuery::create()
@@ -811,6 +769,40 @@ abstract class Tag implements ActiveRecordInterface
 
             if ($this->collTagVotes !== null) {
                 foreach ($this->collTagVotes as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->topicTagsScheduledForDeletion !== null) {
+                if (!$this->topicTagsScheduledForDeletion->isEmpty()) {
+                    \TopicTagQuery::create()
+                        ->filterByPrimaryKeys($this->topicTagsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->topicTagsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTopicTags !== null) {
+                foreach ($this->collTopicTags as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->lessonTagsScheduledForDeletion !== null) {
+                if (!$this->lessonTagsScheduledForDeletion->isEmpty()) {
+                    \LessonTagQuery::create()
+                        ->filterByPrimaryKeys($this->lessonTagsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->lessonTagsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collLessonTags !== null) {
+                foreach ($this->collLessonTags as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -843,12 +835,6 @@ abstract class Tag implements ActiveRecordInterface
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(TagTableMap::COL_RELEVANT_WORDS)) {
-            $modifiedColumns[':p' . $index++]  = 'relevant_words';
-        }
-        if ($this->isColumnModified(TagTableMap::COL_TOPIC_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'topic_id';
-        }
         if ($this->isColumnModified(TagTableMap::COL_VERSE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'verse_id';
         }
@@ -869,12 +855,6 @@ abstract class Tag implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'relevant_words':
-                        $stmt->bindValue($identifier, $this->relevant_words, PDO::PARAM_STR);
-                        break;
-                    case 'topic_id':
-                        $stmt->bindValue($identifier, $this->topic_id, PDO::PARAM_INT);
-                        break;
                     case 'verse_id':
                         $stmt->bindValue($identifier, $this->verse_id, PDO::PARAM_INT);
                         break;
@@ -947,18 +927,12 @@ abstract class Tag implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getRelevantWords();
-                break;
-            case 1:
-                return $this->getTopicId();
-                break;
-            case 2:
                 return $this->getVerseId();
                 break;
-            case 3:
+            case 1:
                 return $this->getVoteCount();
                 break;
-            case 4:
+            case 2:
                 return $this->getId();
                 break;
             default:
@@ -991,11 +965,9 @@ abstract class Tag implements ActiveRecordInterface
         $alreadyDumpedObjects['Tag'][$this->hashCode()] = true;
         $keys = TagTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getRelevantWords(),
-            $keys[1] => $this->getTopicId(),
-            $keys[2] => $this->getVerseId(),
-            $keys[3] => $this->getVoteCount(),
-            $keys[4] => $this->getId(),
+            $keys[0] => $this->getVerseId(),
+            $keys[1] => $this->getVoteCount(),
+            $keys[2] => $this->getId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1003,21 +975,6 @@ abstract class Tag implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aTopic) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'topic';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'defender_topic';
-                        break;
-                    default:
-                        $key = 'Topic';
-                }
-
-                $result[$key] = $this->aTopic->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
             if (null !== $this->aVerse) {
 
                 switch ($keyType) {
@@ -1033,6 +990,21 @@ abstract class Tag implements ActiveRecordInterface
 
                 $result[$key] = $this->aVerse->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
+            if (null !== $this->collTagTranslations) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'tagTranslations';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'defender_tag_translations';
+                        break;
+                    default:
+                        $key = 'TagTranslations';
+                }
+
+                $result[$key] = $this->collTagTranslations->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collTagVotes) {
 
                 switch ($keyType) {
@@ -1047,6 +1019,36 @@ abstract class Tag implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->collTagVotes->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collTopicTags) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'topicTags';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'defender_topic_tags';
+                        break;
+                    default:
+                        $key = 'TopicTags';
+                }
+
+                $result[$key] = $this->collTopicTags->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collLessonTags) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'lessonTags';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'defender_lesson_tags';
+                        break;
+                    default:
+                        $key = 'LessonTags';
+                }
+
+                $result[$key] = $this->collLessonTags->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1083,18 +1085,12 @@ abstract class Tag implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setRelevantWords($value);
-                break;
-            case 1:
-                $this->setTopicId($value);
-                break;
-            case 2:
                 $this->setVerseId($value);
                 break;
-            case 3:
+            case 1:
                 $this->setVoteCount($value);
                 break;
-            case 4:
+            case 2:
                 $this->setId($value);
                 break;
         } // switch()
@@ -1124,19 +1120,13 @@ abstract class Tag implements ActiveRecordInterface
         $keys = TagTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setRelevantWords($arr[$keys[0]]);
+            $this->setVerseId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setTopicId($arr[$keys[1]]);
+            $this->setVoteCount($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setVerseId($arr[$keys[2]]);
-        }
-        if (array_key_exists($keys[3], $arr)) {
-            $this->setVoteCount($arr[$keys[3]]);
-        }
-        if (array_key_exists($keys[4], $arr)) {
-            $this->setId($arr[$keys[4]]);
+            $this->setId($arr[$keys[2]]);
         }
     }
 
@@ -1179,12 +1169,6 @@ abstract class Tag implements ActiveRecordInterface
     {
         $criteria = new Criteria(TagTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(TagTableMap::COL_RELEVANT_WORDS)) {
-            $criteria->add(TagTableMap::COL_RELEVANT_WORDS, $this->relevant_words);
-        }
-        if ($this->isColumnModified(TagTableMap::COL_TOPIC_ID)) {
-            $criteria->add(TagTableMap::COL_TOPIC_ID, $this->topic_id);
-        }
         if ($this->isColumnModified(TagTableMap::COL_VERSE_ID)) {
             $criteria->add(TagTableMap::COL_VERSE_ID, $this->verse_id);
         }
@@ -1280,8 +1264,6 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setRelevantWords($this->getRelevantWords());
-        $copyObj->setTopicId($this->getTopicId());
         $copyObj->setVerseId($this->getVerseId());
         $copyObj->setVoteCount($this->getVoteCount());
 
@@ -1290,9 +1272,27 @@ abstract class Tag implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
+            foreach ($this->getTagTranslations() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTagTranslation($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getTagVotes() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTagVote($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getTopicTags() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTopicTag($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getLessonTags() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addLessonTag($relObj->copy($deepCopy));
                 }
             }
 
@@ -1324,61 +1324,6 @@ abstract class Tag implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
-    }
-
-    /**
-     * Declares an association between this object and a ChildTopic object.
-     *
-     * @param  ChildTopic $v
-     * @return $this|\Tag The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setTopic(ChildTopic $v = null)
-    {
-        // aggregate_column_relation behavior
-        if (null !== $this->aTopic && $v !== $this->aTopic) {
-            $this->oldTopicTagCount = $this->aTopic;
-        }
-        if ($v === null) {
-            $this->setTopicId(NULL);
-        } else {
-            $this->setTopicId($v->getId());
-        }
-
-        $this->aTopic = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildTopic object, it will not be re-added.
-        if ($v !== null) {
-            $v->addTag($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildTopic object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildTopic The associated ChildTopic object.
-     * @throws PropelException
-     */
-    public function getTopic(ConnectionInterface $con = null)
-    {
-        if ($this->aTopic === null && ($this->topic_id !== null)) {
-            $this->aTopic = ChildTopicQuery::create()->findPk($this->topic_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aTopic->addTags($this);
-             */
-        }
-
-        return $this->aTopic;
     }
 
     /**
@@ -1443,9 +1388,268 @@ abstract class Tag implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
+        if ('TagTranslation' == $relationName) {
+            return $this->initTagTranslations();
+        }
         if ('TagVote' == $relationName) {
             return $this->initTagVotes();
         }
+        if ('TopicTag' == $relationName) {
+            return $this->initTopicTags();
+        }
+        if ('LessonTag' == $relationName) {
+            return $this->initLessonTags();
+        }
+    }
+
+    /**
+     * Clears out the collTagTranslations collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTagTranslations()
+     */
+    public function clearTagTranslations()
+    {
+        $this->collTagTranslations = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collTagTranslations collection loaded partially.
+     */
+    public function resetPartialTagTranslations($v = true)
+    {
+        $this->collTagTranslationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collTagTranslations collection.
+     *
+     * By default this just sets the collTagTranslations collection to an empty array (like clearcollTagTranslations());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTagTranslations($overrideExisting = true)
+    {
+        if (null !== $this->collTagTranslations && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = TagTranslationTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collTagTranslations = new $collectionClassName;
+        $this->collTagTranslations->setModel('\TagTranslation');
+    }
+
+    /**
+     * Gets an array of ChildTagTranslation objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildTag is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildTagTranslation[] List of ChildTagTranslation objects
+     * @throws PropelException
+     */
+    public function getTagTranslations(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTagTranslationsPartial && !$this->isNew();
+        if (null === $this->collTagTranslations || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTagTranslations) {
+                // return empty collection
+                $this->initTagTranslations();
+            } else {
+                $collTagTranslations = ChildTagTranslationQuery::create(null, $criteria)
+                    ->filterByTag($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collTagTranslationsPartial && count($collTagTranslations)) {
+                        $this->initTagTranslations(false);
+
+                        foreach ($collTagTranslations as $obj) {
+                            if (false == $this->collTagTranslations->contains($obj)) {
+                                $this->collTagTranslations->append($obj);
+                            }
+                        }
+
+                        $this->collTagTranslationsPartial = true;
+                    }
+
+                    return $collTagTranslations;
+                }
+
+                if ($partial && $this->collTagTranslations) {
+                    foreach ($this->collTagTranslations as $obj) {
+                        if ($obj->isNew()) {
+                            $collTagTranslations[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTagTranslations = $collTagTranslations;
+                $this->collTagTranslationsPartial = false;
+            }
+        }
+
+        return $this->collTagTranslations;
+    }
+
+    /**
+     * Sets a collection of ChildTagTranslation objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $tagTranslations A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildTag The current object (for fluent API support)
+     */
+    public function setTagTranslations(Collection $tagTranslations, ConnectionInterface $con = null)
+    {
+        /** @var ChildTagTranslation[] $tagTranslationsToDelete */
+        $tagTranslationsToDelete = $this->getTagTranslations(new Criteria(), $con)->diff($tagTranslations);
+
+
+        $this->tagTranslationsScheduledForDeletion = $tagTranslationsToDelete;
+
+        foreach ($tagTranslationsToDelete as $tagTranslationRemoved) {
+            $tagTranslationRemoved->setTag(null);
+        }
+
+        $this->collTagTranslations = null;
+        foreach ($tagTranslations as $tagTranslation) {
+            $this->addTagTranslation($tagTranslation);
+        }
+
+        $this->collTagTranslations = $tagTranslations;
+        $this->collTagTranslationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related TagTranslation objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related TagTranslation objects.
+     * @throws PropelException
+     */
+    public function countTagTranslations(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTagTranslationsPartial && !$this->isNew();
+        if (null === $this->collTagTranslations || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTagTranslations) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getTagTranslations());
+            }
+
+            $query = ChildTagTranslationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTag($this)
+                ->count($con);
+        }
+
+        return count($this->collTagTranslations);
+    }
+
+    /**
+     * Method called to associate a ChildTagTranslation object to this object
+     * through the ChildTagTranslation foreign key attribute.
+     *
+     * @param  ChildTagTranslation $l ChildTagTranslation
+     * @return $this|\Tag The current object (for fluent API support)
+     */
+    public function addTagTranslation(ChildTagTranslation $l)
+    {
+        if ($this->collTagTranslations === null) {
+            $this->initTagTranslations();
+            $this->collTagTranslationsPartial = true;
+        }
+
+        if (!$this->collTagTranslations->contains($l)) {
+            $this->doAddTagTranslation($l);
+
+            if ($this->tagTranslationsScheduledForDeletion and $this->tagTranslationsScheduledForDeletion->contains($l)) {
+                $this->tagTranslationsScheduledForDeletion->remove($this->tagTranslationsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildTagTranslation $tagTranslation The ChildTagTranslation object to add.
+     */
+    protected function doAddTagTranslation(ChildTagTranslation $tagTranslation)
+    {
+        $this->collTagTranslations[]= $tagTranslation;
+        $tagTranslation->setTag($this);
+    }
+
+    /**
+     * @param  ChildTagTranslation $tagTranslation The ChildTagTranslation object to remove.
+     * @return $this|ChildTag The current object (for fluent API support)
+     */
+    public function removeTagTranslation(ChildTagTranslation $tagTranslation)
+    {
+        if ($this->getTagTranslations()->contains($tagTranslation)) {
+            $pos = $this->collTagTranslations->search($tagTranslation);
+            $this->collTagTranslations->remove($pos);
+            if (null === $this->tagTranslationsScheduledForDeletion) {
+                $this->tagTranslationsScheduledForDeletion = clone $this->collTagTranslations;
+                $this->tagTranslationsScheduledForDeletion->clear();
+            }
+            $this->tagTranslationsScheduledForDeletion[]= clone $tagTranslation;
+            $tagTranslation->setTag(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Tag is new, it will return
+     * an empty collection; or if this Tag has previously
+     * been saved, it will retrieve related TagTranslations from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Tag.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildTagTranslation[] List of ChildTagTranslation objects
+     */
+    public function getTagTranslationsJoinBible(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildTagTranslationQuery::create(null, $criteria);
+        $query->joinWith('Bible', $joinBehavior);
+
+        return $this->getTagTranslations($query, $con);
     }
 
     /**
@@ -1674,20 +1878,515 @@ abstract class Tag implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collTopicTags collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTopicTags()
+     */
+    public function clearTopicTags()
+    {
+        $this->collTopicTags = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collTopicTags collection loaded partially.
+     */
+    public function resetPartialTopicTags($v = true)
+    {
+        $this->collTopicTagsPartial = $v;
+    }
+
+    /**
+     * Initializes the collTopicTags collection.
+     *
+     * By default this just sets the collTopicTags collection to an empty array (like clearcollTopicTags());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTopicTags($overrideExisting = true)
+    {
+        if (null !== $this->collTopicTags && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = TopicTagTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collTopicTags = new $collectionClassName;
+        $this->collTopicTags->setModel('\TopicTag');
+    }
+
+    /**
+     * Gets an array of ChildTopicTag objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildTag is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildTopicTag[] List of ChildTopicTag objects
+     * @throws PropelException
+     */
+    public function getTopicTags(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTopicTagsPartial && !$this->isNew();
+        if (null === $this->collTopicTags || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTopicTags) {
+                // return empty collection
+                $this->initTopicTags();
+            } else {
+                $collTopicTags = ChildTopicTagQuery::create(null, $criteria)
+                    ->filterByTag($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collTopicTagsPartial && count($collTopicTags)) {
+                        $this->initTopicTags(false);
+
+                        foreach ($collTopicTags as $obj) {
+                            if (false == $this->collTopicTags->contains($obj)) {
+                                $this->collTopicTags->append($obj);
+                            }
+                        }
+
+                        $this->collTopicTagsPartial = true;
+                    }
+
+                    return $collTopicTags;
+                }
+
+                if ($partial && $this->collTopicTags) {
+                    foreach ($this->collTopicTags as $obj) {
+                        if ($obj->isNew()) {
+                            $collTopicTags[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTopicTags = $collTopicTags;
+                $this->collTopicTagsPartial = false;
+            }
+        }
+
+        return $this->collTopicTags;
+    }
+
+    /**
+     * Sets a collection of ChildTopicTag objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $topicTags A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildTag The current object (for fluent API support)
+     */
+    public function setTopicTags(Collection $topicTags, ConnectionInterface $con = null)
+    {
+        /** @var ChildTopicTag[] $topicTagsToDelete */
+        $topicTagsToDelete = $this->getTopicTags(new Criteria(), $con)->diff($topicTags);
+
+
+        $this->topicTagsScheduledForDeletion = $topicTagsToDelete;
+
+        foreach ($topicTagsToDelete as $topicTagRemoved) {
+            $topicTagRemoved->setTag(null);
+        }
+
+        $this->collTopicTags = null;
+        foreach ($topicTags as $topicTag) {
+            $this->addTopicTag($topicTag);
+        }
+
+        $this->collTopicTags = $topicTags;
+        $this->collTopicTagsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related TopicTag objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related TopicTag objects.
+     * @throws PropelException
+     */
+    public function countTopicTags(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTopicTagsPartial && !$this->isNew();
+        if (null === $this->collTopicTags || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTopicTags) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getTopicTags());
+            }
+
+            $query = ChildTopicTagQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTag($this)
+                ->count($con);
+        }
+
+        return count($this->collTopicTags);
+    }
+
+    /**
+     * Method called to associate a ChildTopicTag object to this object
+     * through the ChildTopicTag foreign key attribute.
+     *
+     * @param  ChildTopicTag $l ChildTopicTag
+     * @return $this|\Tag The current object (for fluent API support)
+     */
+    public function addTopicTag(ChildTopicTag $l)
+    {
+        if ($this->collTopicTags === null) {
+            $this->initTopicTags();
+            $this->collTopicTagsPartial = true;
+        }
+
+        if (!$this->collTopicTags->contains($l)) {
+            $this->doAddTopicTag($l);
+
+            if ($this->topicTagsScheduledForDeletion and $this->topicTagsScheduledForDeletion->contains($l)) {
+                $this->topicTagsScheduledForDeletion->remove($this->topicTagsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildTopicTag $topicTag The ChildTopicTag object to add.
+     */
+    protected function doAddTopicTag(ChildTopicTag $topicTag)
+    {
+        $this->collTopicTags[]= $topicTag;
+        $topicTag->setTag($this);
+    }
+
+    /**
+     * @param  ChildTopicTag $topicTag The ChildTopicTag object to remove.
+     * @return $this|ChildTag The current object (for fluent API support)
+     */
+    public function removeTopicTag(ChildTopicTag $topicTag)
+    {
+        if ($this->getTopicTags()->contains($topicTag)) {
+            $pos = $this->collTopicTags->search($topicTag);
+            $this->collTopicTags->remove($pos);
+            if (null === $this->topicTagsScheduledForDeletion) {
+                $this->topicTagsScheduledForDeletion = clone $this->collTopicTags;
+                $this->topicTagsScheduledForDeletion->clear();
+            }
+            $this->topicTagsScheduledForDeletion[]= clone $topicTag;
+            $topicTag->setTag(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Tag is new, it will return
+     * an empty collection; or if this Tag has previously
+     * been saved, it will retrieve related TopicTags from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Tag.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildTopicTag[] List of ChildTopicTag objects
+     */
+    public function getTopicTagsJoinTopic(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildTopicTagQuery::create(null, $criteria);
+        $query->joinWith('Topic', $joinBehavior);
+
+        return $this->getTopicTags($query, $con);
+    }
+
+    /**
+     * Clears out the collLessonTags collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addLessonTags()
+     */
+    public function clearLessonTags()
+    {
+        $this->collLessonTags = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collLessonTags collection loaded partially.
+     */
+    public function resetPartialLessonTags($v = true)
+    {
+        $this->collLessonTagsPartial = $v;
+    }
+
+    /**
+     * Initializes the collLessonTags collection.
+     *
+     * By default this just sets the collLessonTags collection to an empty array (like clearcollLessonTags());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initLessonTags($overrideExisting = true)
+    {
+        if (null !== $this->collLessonTags && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = LessonTagTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collLessonTags = new $collectionClassName;
+        $this->collLessonTags->setModel('\LessonTag');
+    }
+
+    /**
+     * Gets an array of ChildLessonTag objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildTag is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildLessonTag[] List of ChildLessonTag objects
+     * @throws PropelException
+     */
+    public function getLessonTags(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collLessonTagsPartial && !$this->isNew();
+        if (null === $this->collLessonTags || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collLessonTags) {
+                // return empty collection
+                $this->initLessonTags();
+            } else {
+                $collLessonTags = ChildLessonTagQuery::create(null, $criteria)
+                    ->filterByTag($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collLessonTagsPartial && count($collLessonTags)) {
+                        $this->initLessonTags(false);
+
+                        foreach ($collLessonTags as $obj) {
+                            if (false == $this->collLessonTags->contains($obj)) {
+                                $this->collLessonTags->append($obj);
+                            }
+                        }
+
+                        $this->collLessonTagsPartial = true;
+                    }
+
+                    return $collLessonTags;
+                }
+
+                if ($partial && $this->collLessonTags) {
+                    foreach ($this->collLessonTags as $obj) {
+                        if ($obj->isNew()) {
+                            $collLessonTags[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collLessonTags = $collLessonTags;
+                $this->collLessonTagsPartial = false;
+            }
+        }
+
+        return $this->collLessonTags;
+    }
+
+    /**
+     * Sets a collection of ChildLessonTag objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $lessonTags A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildTag The current object (for fluent API support)
+     */
+    public function setLessonTags(Collection $lessonTags, ConnectionInterface $con = null)
+    {
+        /** @var ChildLessonTag[] $lessonTagsToDelete */
+        $lessonTagsToDelete = $this->getLessonTags(new Criteria(), $con)->diff($lessonTags);
+
+
+        $this->lessonTagsScheduledForDeletion = $lessonTagsToDelete;
+
+        foreach ($lessonTagsToDelete as $lessonTagRemoved) {
+            $lessonTagRemoved->setTag(null);
+        }
+
+        $this->collLessonTags = null;
+        foreach ($lessonTags as $lessonTag) {
+            $this->addLessonTag($lessonTag);
+        }
+
+        $this->collLessonTags = $lessonTags;
+        $this->collLessonTagsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related LessonTag objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related LessonTag objects.
+     * @throws PropelException
+     */
+    public function countLessonTags(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collLessonTagsPartial && !$this->isNew();
+        if (null === $this->collLessonTags || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collLessonTags) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getLessonTags());
+            }
+
+            $query = ChildLessonTagQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTag($this)
+                ->count($con);
+        }
+
+        return count($this->collLessonTags);
+    }
+
+    /**
+     * Method called to associate a ChildLessonTag object to this object
+     * through the ChildLessonTag foreign key attribute.
+     *
+     * @param  ChildLessonTag $l ChildLessonTag
+     * @return $this|\Tag The current object (for fluent API support)
+     */
+    public function addLessonTag(ChildLessonTag $l)
+    {
+        if ($this->collLessonTags === null) {
+            $this->initLessonTags();
+            $this->collLessonTagsPartial = true;
+        }
+
+        if (!$this->collLessonTags->contains($l)) {
+            $this->doAddLessonTag($l);
+
+            if ($this->lessonTagsScheduledForDeletion and $this->lessonTagsScheduledForDeletion->contains($l)) {
+                $this->lessonTagsScheduledForDeletion->remove($this->lessonTagsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildLessonTag $lessonTag The ChildLessonTag object to add.
+     */
+    protected function doAddLessonTag(ChildLessonTag $lessonTag)
+    {
+        $this->collLessonTags[]= $lessonTag;
+        $lessonTag->setTag($this);
+    }
+
+    /**
+     * @param  ChildLessonTag $lessonTag The ChildLessonTag object to remove.
+     * @return $this|ChildTag The current object (for fluent API support)
+     */
+    public function removeLessonTag(ChildLessonTag $lessonTag)
+    {
+        if ($this->getLessonTags()->contains($lessonTag)) {
+            $pos = $this->collLessonTags->search($lessonTag);
+            $this->collLessonTags->remove($pos);
+            if (null === $this->lessonTagsScheduledForDeletion) {
+                $this->lessonTagsScheduledForDeletion = clone $this->collLessonTags;
+                $this->lessonTagsScheduledForDeletion->clear();
+            }
+            $this->lessonTagsScheduledForDeletion[]= clone $lessonTag;
+            $lessonTag->setTag(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Tag is new, it will return
+     * an empty collection; or if this Tag has previously
+     * been saved, it will retrieve related LessonTags from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Tag.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildLessonTag[] List of ChildLessonTag objects
+     */
+    public function getLessonTagsJoinLesson(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildLessonTagQuery::create(null, $criteria);
+        $query->joinWith('Lesson', $joinBehavior);
+
+        return $this->getLessonTags($query, $con);
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
      */
     public function clear()
     {
-        if (null !== $this->aTopic) {
-            $this->aTopic->removeTag($this);
-        }
         if (null !== $this->aVerse) {
             $this->aVerse->removeTag($this);
         }
-        $this->relevant_words = null;
-        $this->topic_id = null;
         $this->verse_id = null;
         $this->vote_count = null;
         $this->id = null;
@@ -1710,15 +2409,32 @@ abstract class Tag implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collTagTranslations) {
+                foreach ($this->collTagTranslations as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collTagVotes) {
                 foreach ($this->collTagVotes as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collTopicTags) {
+                foreach ($this->collTopicTags as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collLessonTags) {
+                foreach ($this->collLessonTags as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
+        $this->collTagTranslations = null;
         $this->collTagVotes = null;
-        $this->aTopic = null;
+        $this->collTopicTags = null;
+        $this->collLessonTags = null;
         $this->aVerse = null;
     }
 
@@ -1757,24 +2473,6 @@ abstract class Tag implements ActiveRecordInterface
     {
         $this->setVoteCount($this->computeVoteCount($con));
         $this->save($con);
-    }
-
-    // aggregate_column_relation_aggregate_column behavior
-
-    /**
-     * Update the aggregate column in the related Topic object
-     *
-     * @param ConnectionInterface $con A connection object
-     */
-    protected function updateRelatedTopicTagCount(ConnectionInterface $con)
-    {
-        if ($topic = $this->getTopic()) {
-            $topic->updateTagCount($con);
-        }
-        if ($this->oldTopicTagCount) {
-            $this->oldTopicTagCount->updateTagCount($con);
-            $this->oldTopicTagCount = null;
-        }
     }
 
     /**

@@ -166,13 +166,6 @@ class VerseTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'Translations', false);
-        $this->addRelation('IdeaVerse', '\\IdeaVerse', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':verse_id',
-    1 => ':id',
-  ),
-), null, null, 'IdeaVerses', false);
         $this->addRelation('Tag', '\\Tag', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (

@@ -59,7 +59,7 @@ class TagTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 3;
 
     /**
      * The number of lazy-loaded columns
@@ -69,17 +69,7 @@ class TagTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
-
-    /**
-     * the column name for the relevant_words field
-     */
-    const COL_RELEVANT_WORDS = 'defender_tag.relevant_words';
-
-    /**
-     * the column name for the topic_id field
-     */
-    const COL_TOPIC_ID = 'defender_tag.topic_id';
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /**
      * the column name for the verse_id field
@@ -108,11 +98,11 @@ class TagTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('RelevantWords', 'TopicId', 'VerseId', 'VoteCount', 'Id', ),
-        self::TYPE_CAMELNAME     => array('relevantWords', 'topicId', 'verseId', 'voteCount', 'id', ),
-        self::TYPE_COLNAME       => array(TagTableMap::COL_RELEVANT_WORDS, TagTableMap::COL_TOPIC_ID, TagTableMap::COL_VERSE_ID, TagTableMap::COL_VOTE_COUNT, TagTableMap::COL_ID, ),
-        self::TYPE_FIELDNAME     => array('relevant_words', 'topic_id', 'verse_id', 'vote_count', 'id', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('VerseId', 'VoteCount', 'Id', ),
+        self::TYPE_CAMELNAME     => array('verseId', 'voteCount', 'id', ),
+        self::TYPE_COLNAME       => array(TagTableMap::COL_VERSE_ID, TagTableMap::COL_VOTE_COUNT, TagTableMap::COL_ID, ),
+        self::TYPE_FIELDNAME     => array('verse_id', 'vote_count', 'id', ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -122,11 +112,11 @@ class TagTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('RelevantWords' => 0, 'TopicId' => 1, 'VerseId' => 2, 'VoteCount' => 3, 'Id' => 4, ),
-        self::TYPE_CAMELNAME     => array('relevantWords' => 0, 'topicId' => 1, 'verseId' => 2, 'voteCount' => 3, 'id' => 4, ),
-        self::TYPE_COLNAME       => array(TagTableMap::COL_RELEVANT_WORDS => 0, TagTableMap::COL_TOPIC_ID => 1, TagTableMap::COL_VERSE_ID => 2, TagTableMap::COL_VOTE_COUNT => 3, TagTableMap::COL_ID => 4, ),
-        self::TYPE_FIELDNAME     => array('relevant_words' => 0, 'topic_id' => 1, 'verse_id' => 2, 'vote_count' => 3, 'id' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('VerseId' => 0, 'VoteCount' => 1, 'Id' => 2, ),
+        self::TYPE_CAMELNAME     => array('verseId' => 0, 'voteCount' => 1, 'id' => 2, ),
+        self::TYPE_COLNAME       => array(TagTableMap::COL_VERSE_ID => 0, TagTableMap::COL_VOTE_COUNT => 1, TagTableMap::COL_ID => 2, ),
+        self::TYPE_FIELDNAME     => array('verse_id' => 0, 'vote_count' => 1, 'id' => 2, ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -146,8 +136,6 @@ class TagTableMap extends TableMap
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addColumn('relevant_words', 'RelevantWords', 'VARCHAR', true, 255, null);
-        $this->addForeignKey('topic_id', 'TopicId', 'INTEGER', 'defender_topic', 'id', true, null, null);
         $this->addForeignKey('verse_id', 'VerseId', 'INTEGER', 'defender_verse', 'id', true, null, null);
         $this->addColumn('vote_count', 'VoteCount', 'INTEGER', false, null, 0);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
@@ -158,13 +146,6 @@ class TagTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Topic', '\\Topic', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':topic_id',
-    1 => ':id',
-  ),
-), null, null, null, false);
         $this->addRelation('Verse', '\\Verse', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
@@ -172,6 +153,13 @@ class TagTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, null, false);
+        $this->addRelation('TagTranslation', '\\TagTranslation', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':tag_id',
+    1 => ':id',
+  ),
+), null, null, 'TagTranslations', false);
         $this->addRelation('TagVote', '\\TagVote', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
@@ -179,6 +167,20 @@ class TagTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'TagVotes', false);
+        $this->addRelation('TopicTag', '\\TopicTag', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':tag_id',
+    1 => ':id',
+  ),
+), null, null, 'TopicTags', false);
+        $this->addRelation('LessonTag', '\\LessonTag', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':tag_id',
+    1 => ':id',
+  ),
+), null, null, 'LessonTags', false);
     } // buildRelations()
 
     /**
@@ -192,7 +194,6 @@ class TagTableMap extends TableMap
         return array(
             'aggregate_column' => array('name' => 'vote_count', 'expression' => 'COUNT(tag_id)', 'condition' => '', 'foreign_table' => 'tag_vote', 'foreign_schema' => '', ),
             'auto_add_pk' => array('name' => 'id', 'autoIncrement' => 'true', 'type' => 'INTEGER', ),
-            'aggregate_column_relation_aggregate_column' => array('foreign_table' => 'defender_topic', 'update_method' => 'updateTagCount', 'aggregate_name' => 'TagCount', ),
         );
     } // getBehaviors()
 
@@ -212,11 +213,11 @@ class TagTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 4 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return null === $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -235,7 +236,7 @@ class TagTableMap extends TableMap
     {
         return (int) $row[
             $indexType == TableMap::TYPE_NUM
-                ? 4 + $offset
+                ? 2 + $offset
                 : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
         ];
     }
@@ -337,14 +338,10 @@ class TagTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(TagTableMap::COL_RELEVANT_WORDS);
-            $criteria->addSelectColumn(TagTableMap::COL_TOPIC_ID);
             $criteria->addSelectColumn(TagTableMap::COL_VERSE_ID);
             $criteria->addSelectColumn(TagTableMap::COL_VOTE_COUNT);
             $criteria->addSelectColumn(TagTableMap::COL_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.relevant_words');
-            $criteria->addSelectColumn($alias . '.topic_id');
             $criteria->addSelectColumn($alias . '.verse_id');
             $criteria->addSelectColumn($alias . '.vote_count');
             $criteria->addSelectColumn($alias . '.id');

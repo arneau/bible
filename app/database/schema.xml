@@ -67,7 +67,7 @@
 	<table name="topic">
 		<behavior name="aggregate_column">
 			<parameter name="name" value="tag_count" />
-			<parameter name="foreign_table" value="tag" />
+			<parameter name="foreign_table" value="topic_tag" />
 			<parameter name="expression" value="COUNT(topic_id)" />
 		</behavior>
 		<column defaultValue="0" name="is_root" required="true" type="boolean" />
@@ -87,6 +87,16 @@
 		<column name="topic_id" required="true" type="integer" />
 		<foreign-key foreignTable="topic" onDelete="cascade">
 			<reference foreign="id" local="topic_id" />
+		</foreign-key>
+	</table>
+	<table name="topic_tag">
+		<column name="topic_id" required="true" type="integer" />
+		<column name="tag_id" required="true" type="integer" />
+		<foreign-key foreignTable="topic">
+			<reference foreign="id" local="topic_id" />
+		</foreign-key>
+		<foreign-key foreignTable="tag">
+			<reference foreign="id" local="tag_id" />
 		</foreign-key>
 	</table>
 	<table name="topic_synonym">

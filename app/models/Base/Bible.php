@@ -4,11 +4,14 @@ namespace Base;
 
 use \Bible as ChildBible;
 use \BibleQuery as ChildBibleQuery;
+use \TagTranslation as ChildTagTranslation;
+use \TagTranslationQuery as ChildTagTranslationQuery;
 use \Translation as ChildTranslation;
 use \TranslationQuery as ChildTranslationQuery;
 use \Exception;
 use \PDO;
 use Map\BibleTableMap;
+use Map\TagTranslationTableMap;
 use Map\TranslationTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -92,6 +95,12 @@ abstract class Bible implements ActiveRecordInterface
     protected $collTranslationsPartial;
 
     /**
+     * @var        ObjectCollection|ChildTagTranslation[] Collection to store aggregation of ChildTagTranslation objects.
+     */
+    protected $collTagTranslations;
+    protected $collTagTranslationsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -104,6 +113,12 @@ abstract class Bible implements ActiveRecordInterface
      * @var ObjectCollection|ChildTranslation[]
      */
     protected $translationsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildTagTranslation[]
+     */
+    protected $tagTranslationsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Base\Bible object.
@@ -535,6 +550,8 @@ abstract class Bible implements ActiveRecordInterface
 
             $this->collTranslations = null;
 
+            $this->collTagTranslations = null;
+
         } // if (deep)
     }
 
@@ -656,6 +673,23 @@ abstract class Bible implements ActiveRecordInterface
 
             if ($this->collTranslations !== null) {
                 foreach ($this->collTranslations as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->tagTranslationsScheduledForDeletion !== null) {
+                if (!$this->tagTranslationsScheduledForDeletion->isEmpty()) {
+                    \TagTranslationQuery::create()
+                        ->filterByPrimaryKeys($this->tagTranslationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->tagTranslationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTagTranslations !== null) {
+                foreach ($this->collTagTranslations as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -842,6 +876,21 @@ abstract class Bible implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->collTranslations->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collTagTranslations) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'tagTranslations';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'defender_tag_translations';
+                        break;
+                    default:
+                        $key = 'TagTranslations';
+                }
+
+                $result[$key] = $this->collTagTranslations->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1071,6 +1120,12 @@ abstract class Bible implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getTagTranslations() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTagTranslation($relObj->copy($deepCopy));
+                }
+            }
+
         } // if ($deepCopy)
 
         if ($makeNew) {
@@ -1114,6 +1169,9 @@ abstract class Bible implements ActiveRecordInterface
     {
         if ('Translation' == $relationName) {
             return $this->initTranslations();
+        }
+        if ('TagTranslation' == $relationName) {
+            return $this->initTagTranslations();
         }
     }
 
@@ -1368,6 +1426,256 @@ abstract class Bible implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collTagTranslations collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTagTranslations()
+     */
+    public function clearTagTranslations()
+    {
+        $this->collTagTranslations = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collTagTranslations collection loaded partially.
+     */
+    public function resetPartialTagTranslations($v = true)
+    {
+        $this->collTagTranslationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collTagTranslations collection.
+     *
+     * By default this just sets the collTagTranslations collection to an empty array (like clearcollTagTranslations());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTagTranslations($overrideExisting = true)
+    {
+        if (null !== $this->collTagTranslations && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = TagTranslationTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collTagTranslations = new $collectionClassName;
+        $this->collTagTranslations->setModel('\TagTranslation');
+    }
+
+    /**
+     * Gets an array of ChildTagTranslation objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildBible is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildTagTranslation[] List of ChildTagTranslation objects
+     * @throws PropelException
+     */
+    public function getTagTranslations(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTagTranslationsPartial && !$this->isNew();
+        if (null === $this->collTagTranslations || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTagTranslations) {
+                // return empty collection
+                $this->initTagTranslations();
+            } else {
+                $collTagTranslations = ChildTagTranslationQuery::create(null, $criteria)
+                    ->filterByBible($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collTagTranslationsPartial && count($collTagTranslations)) {
+                        $this->initTagTranslations(false);
+
+                        foreach ($collTagTranslations as $obj) {
+                            if (false == $this->collTagTranslations->contains($obj)) {
+                                $this->collTagTranslations->append($obj);
+                            }
+                        }
+
+                        $this->collTagTranslationsPartial = true;
+                    }
+
+                    return $collTagTranslations;
+                }
+
+                if ($partial && $this->collTagTranslations) {
+                    foreach ($this->collTagTranslations as $obj) {
+                        if ($obj->isNew()) {
+                            $collTagTranslations[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTagTranslations = $collTagTranslations;
+                $this->collTagTranslationsPartial = false;
+            }
+        }
+
+        return $this->collTagTranslations;
+    }
+
+    /**
+     * Sets a collection of ChildTagTranslation objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $tagTranslations A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildBible The current object (for fluent API support)
+     */
+    public function setTagTranslations(Collection $tagTranslations, ConnectionInterface $con = null)
+    {
+        /** @var ChildTagTranslation[] $tagTranslationsToDelete */
+        $tagTranslationsToDelete = $this->getTagTranslations(new Criteria(), $con)->diff($tagTranslations);
+
+
+        $this->tagTranslationsScheduledForDeletion = $tagTranslationsToDelete;
+
+        foreach ($tagTranslationsToDelete as $tagTranslationRemoved) {
+            $tagTranslationRemoved->setBible(null);
+        }
+
+        $this->collTagTranslations = null;
+        foreach ($tagTranslations as $tagTranslation) {
+            $this->addTagTranslation($tagTranslation);
+        }
+
+        $this->collTagTranslations = $tagTranslations;
+        $this->collTagTranslationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related TagTranslation objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related TagTranslation objects.
+     * @throws PropelException
+     */
+    public function countTagTranslations(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTagTranslationsPartial && !$this->isNew();
+        if (null === $this->collTagTranslations || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTagTranslations) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getTagTranslations());
+            }
+
+            $query = ChildTagTranslationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByBible($this)
+                ->count($con);
+        }
+
+        return count($this->collTagTranslations);
+    }
+
+    /**
+     * Method called to associate a ChildTagTranslation object to this object
+     * through the ChildTagTranslation foreign key attribute.
+     *
+     * @param  ChildTagTranslation $l ChildTagTranslation
+     * @return $this|\Bible The current object (for fluent API support)
+     */
+    public function addTagTranslation(ChildTagTranslation $l)
+    {
+        if ($this->collTagTranslations === null) {
+            $this->initTagTranslations();
+            $this->collTagTranslationsPartial = true;
+        }
+
+        if (!$this->collTagTranslations->contains($l)) {
+            $this->doAddTagTranslation($l);
+
+            if ($this->tagTranslationsScheduledForDeletion and $this->tagTranslationsScheduledForDeletion->contains($l)) {
+                $this->tagTranslationsScheduledForDeletion->remove($this->tagTranslationsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildTagTranslation $tagTranslation The ChildTagTranslation object to add.
+     */
+    protected function doAddTagTranslation(ChildTagTranslation $tagTranslation)
+    {
+        $this->collTagTranslations[]= $tagTranslation;
+        $tagTranslation->setBible($this);
+    }
+
+    /**
+     * @param  ChildTagTranslation $tagTranslation The ChildTagTranslation object to remove.
+     * @return $this|ChildBible The current object (for fluent API support)
+     */
+    public function removeTagTranslation(ChildTagTranslation $tagTranslation)
+    {
+        if ($this->getTagTranslations()->contains($tagTranslation)) {
+            $pos = $this->collTagTranslations->search($tagTranslation);
+            $this->collTagTranslations->remove($pos);
+            if (null === $this->tagTranslationsScheduledForDeletion) {
+                $this->tagTranslationsScheduledForDeletion = clone $this->collTagTranslations;
+                $this->tagTranslationsScheduledForDeletion->clear();
+            }
+            $this->tagTranslationsScheduledForDeletion[]= clone $tagTranslation;
+            $tagTranslation->setBible(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Bible is new, it will return
+     * an empty collection; or if this Bible has previously
+     * been saved, it will retrieve related TagTranslations from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Bible.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildTagTranslation[] List of ChildTagTranslation objects
+     */
+    public function getTagTranslationsJoinTag(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildTagTranslationQuery::create(null, $criteria);
+        $query->joinWith('Tag', $joinBehavior);
+
+        return $this->getTagTranslations($query, $con);
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
@@ -1400,9 +1708,15 @@ abstract class Bible implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collTagTranslations) {
+                foreach ($this->collTagTranslations as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         $this->collTranslations = null;
+        $this->collTagTranslations = null;
     }
 
     /**

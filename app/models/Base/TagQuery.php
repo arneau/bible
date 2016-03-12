@@ -20,14 +20,10 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  *
- * @method     ChildTagQuery orderByRelevantWords($order = Criteria::ASC) Order by the relevant_words column
- * @method     ChildTagQuery orderByTopicId($order = Criteria::ASC) Order by the topic_id column
  * @method     ChildTagQuery orderByVerseId($order = Criteria::ASC) Order by the verse_id column
  * @method     ChildTagQuery orderByVoteCount($order = Criteria::ASC) Order by the vote_count column
  * @method     ChildTagQuery orderById($order = Criteria::ASC) Order by the id column
  *
- * @method     ChildTagQuery groupByRelevantWords() Group by the relevant_words column
- * @method     ChildTagQuery groupByTopicId() Group by the topic_id column
  * @method     ChildTagQuery groupByVerseId() Group by the verse_id column
  * @method     ChildTagQuery groupByVoteCount() Group by the vote_count column
  * @method     ChildTagQuery groupById() Group by the id column
@@ -40,16 +36,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTagQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildTagQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
- * @method     ChildTagQuery leftJoinTopic($relationAlias = null) Adds a LEFT JOIN clause to the query using the Topic relation
- * @method     ChildTagQuery rightJoinTopic($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Topic relation
- * @method     ChildTagQuery innerJoinTopic($relationAlias = null) Adds a INNER JOIN clause to the query using the Topic relation
- *
- * @method     ChildTagQuery joinWithTopic($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Topic relation
- *
- * @method     ChildTagQuery leftJoinWithTopic() Adds a LEFT JOIN clause and with to the query using the Topic relation
- * @method     ChildTagQuery rightJoinWithTopic() Adds a RIGHT JOIN clause and with to the query using the Topic relation
- * @method     ChildTagQuery innerJoinWithTopic() Adds a INNER JOIN clause and with to the query using the Topic relation
- *
  * @method     ChildTagQuery leftJoinVerse($relationAlias = null) Adds a LEFT JOIN clause to the query using the Verse relation
  * @method     ChildTagQuery rightJoinVerse($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Verse relation
  * @method     ChildTagQuery innerJoinVerse($relationAlias = null) Adds a INNER JOIN clause to the query using the Verse relation
@@ -59,6 +45,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTagQuery leftJoinWithVerse() Adds a LEFT JOIN clause and with to the query using the Verse relation
  * @method     ChildTagQuery rightJoinWithVerse() Adds a RIGHT JOIN clause and with to the query using the Verse relation
  * @method     ChildTagQuery innerJoinWithVerse() Adds a INNER JOIN clause and with to the query using the Verse relation
+ *
+ * @method     ChildTagQuery leftJoinTagTranslation($relationAlias = null) Adds a LEFT JOIN clause to the query using the TagTranslation relation
+ * @method     ChildTagQuery rightJoinTagTranslation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TagTranslation relation
+ * @method     ChildTagQuery innerJoinTagTranslation($relationAlias = null) Adds a INNER JOIN clause to the query using the TagTranslation relation
+ *
+ * @method     ChildTagQuery joinWithTagTranslation($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the TagTranslation relation
+ *
+ * @method     ChildTagQuery leftJoinWithTagTranslation() Adds a LEFT JOIN clause and with to the query using the TagTranslation relation
+ * @method     ChildTagQuery rightJoinWithTagTranslation() Adds a RIGHT JOIN clause and with to the query using the TagTranslation relation
+ * @method     ChildTagQuery innerJoinWithTagTranslation() Adds a INNER JOIN clause and with to the query using the TagTranslation relation
  *
  * @method     ChildTagQuery leftJoinTagVote($relationAlias = null) Adds a LEFT JOIN clause to the query using the TagVote relation
  * @method     ChildTagQuery rightJoinTagVote($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TagVote relation
@@ -70,13 +66,31 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTagQuery rightJoinWithTagVote() Adds a RIGHT JOIN clause and with to the query using the TagVote relation
  * @method     ChildTagQuery innerJoinWithTagVote() Adds a INNER JOIN clause and with to the query using the TagVote relation
  *
- * @method     \TopicQuery|\VerseQuery|\TagVoteQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildTagQuery leftJoinTopicTag($relationAlias = null) Adds a LEFT JOIN clause to the query using the TopicTag relation
+ * @method     ChildTagQuery rightJoinTopicTag($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TopicTag relation
+ * @method     ChildTagQuery innerJoinTopicTag($relationAlias = null) Adds a INNER JOIN clause to the query using the TopicTag relation
+ *
+ * @method     ChildTagQuery joinWithTopicTag($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the TopicTag relation
+ *
+ * @method     ChildTagQuery leftJoinWithTopicTag() Adds a LEFT JOIN clause and with to the query using the TopicTag relation
+ * @method     ChildTagQuery rightJoinWithTopicTag() Adds a RIGHT JOIN clause and with to the query using the TopicTag relation
+ * @method     ChildTagQuery innerJoinWithTopicTag() Adds a INNER JOIN clause and with to the query using the TopicTag relation
+ *
+ * @method     ChildTagQuery leftJoinLessonTag($relationAlias = null) Adds a LEFT JOIN clause to the query using the LessonTag relation
+ * @method     ChildTagQuery rightJoinLessonTag($relationAlias = null) Adds a RIGHT JOIN clause to the query using the LessonTag relation
+ * @method     ChildTagQuery innerJoinLessonTag($relationAlias = null) Adds a INNER JOIN clause to the query using the LessonTag relation
+ *
+ * @method     ChildTagQuery joinWithLessonTag($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the LessonTag relation
+ *
+ * @method     ChildTagQuery leftJoinWithLessonTag() Adds a LEFT JOIN clause and with to the query using the LessonTag relation
+ * @method     ChildTagQuery rightJoinWithLessonTag() Adds a RIGHT JOIN clause and with to the query using the LessonTag relation
+ * @method     ChildTagQuery innerJoinWithLessonTag() Adds a INNER JOIN clause and with to the query using the LessonTag relation
+ *
+ * @method     \VerseQuery|\TagTranslationQuery|\TagVoteQuery|\TopicTagQuery|\LessonTagQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildTag findOne(ConnectionInterface $con = null) Return the first ChildTag matching the query
  * @method     ChildTag findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTag matching the query, or a new ChildTag object populated from the query conditions when no match is found
  *
- * @method     ChildTag findOneByRelevantWords(string $relevant_words) Return the first ChildTag filtered by the relevant_words column
- * @method     ChildTag findOneByTopicId(int $topic_id) Return the first ChildTag filtered by the topic_id column
  * @method     ChildTag findOneByVerseId(int $verse_id) Return the first ChildTag filtered by the verse_id column
  * @method     ChildTag findOneByVoteCount(int $vote_count) Return the first ChildTag filtered by the vote_count column
  * @method     ChildTag findOneById(int $id) Return the first ChildTag filtered by the id column *
@@ -84,15 +98,11 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTag requirePk($key, ConnectionInterface $con = null) Return the ChildTag by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTag requireOne(ConnectionInterface $con = null) Return the first ChildTag matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildTag requireOneByRelevantWords(string $relevant_words) Return the first ChildTag filtered by the relevant_words column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildTag requireOneByTopicId(int $topic_id) Return the first ChildTag filtered by the topic_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTag requireOneByVerseId(int $verse_id) Return the first ChildTag filtered by the verse_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTag requireOneByVoteCount(int $vote_count) Return the first ChildTag filtered by the vote_count column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTag requireOneById(int $id) Return the first ChildTag filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildTag[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTag objects based on current ModelCriteria
- * @method     ChildTag[]|ObjectCollection findByRelevantWords(string $relevant_words) Return ChildTag objects filtered by the relevant_words column
- * @method     ChildTag[]|ObjectCollection findByTopicId(int $topic_id) Return ChildTag objects filtered by the topic_id column
  * @method     ChildTag[]|ObjectCollection findByVerseId(int $verse_id) Return ChildTag objects filtered by the verse_id column
  * @method     ChildTag[]|ObjectCollection findByVoteCount(int $vote_count) Return ChildTag objects filtered by the vote_count column
  * @method     ChildTag[]|ObjectCollection findById(int $id) Return ChildTag objects filtered by the id column
@@ -188,7 +198,7 @@ abstract class TagQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT relevant_words, topic_id, verse_id, vote_count, id FROM defender_tag WHERE id = :p0';
+        $sql = 'SELECT verse_id, vote_count, id FROM defender_tag WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -276,78 +286,6 @@ abstract class TagQuery extends ModelCriteria
     {
 
         return $this->addUsingAlias(TagTableMap::COL_ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the relevant_words column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByRelevantWords('fooValue');   // WHERE relevant_words = 'fooValue'
-     * $query->filterByRelevantWords('%fooValue%'); // WHERE relevant_words LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $relevantWords The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildTagQuery The current query, for fluid interface
-     */
-    public function filterByRelevantWords($relevantWords = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($relevantWords)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $relevantWords)) {
-                $relevantWords = str_replace('*', '%', $relevantWords);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(TagTableMap::COL_RELEVANT_WORDS, $relevantWords, $comparison);
-    }
-
-    /**
-     * Filter the query on the topic_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByTopicId(1234); // WHERE topic_id = 1234
-     * $query->filterByTopicId(array(12, 34)); // WHERE topic_id IN (12, 34)
-     * $query->filterByTopicId(array('min' => 12)); // WHERE topic_id > 12
-     * </code>
-     *
-     * @see       filterByTopic()
-     *
-     * @param     mixed $topicId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildTagQuery The current query, for fluid interface
-     */
-    public function filterByTopicId($topicId = null, $comparison = null)
-    {
-        if (is_array($topicId)) {
-            $useMinMax = false;
-            if (isset($topicId['min'])) {
-                $this->addUsingAlias(TagTableMap::COL_TOPIC_ID, $topicId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($topicId['max'])) {
-                $this->addUsingAlias(TagTableMap::COL_TOPIC_ID, $topicId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(TagTableMap::COL_TOPIC_ID, $topicId, $comparison);
     }
 
     /**
@@ -476,83 +414,6 @@ abstract class TagQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Topic object
-     *
-     * @param \Topic|ObjectCollection $topic The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @throws \Propel\Runtime\Exception\PropelException
-     *
-     * @return ChildTagQuery The current query, for fluid interface
-     */
-    public function filterByTopic($topic, $comparison = null)
-    {
-        if ($topic instanceof \Topic) {
-            return $this
-                ->addUsingAlias(TagTableMap::COL_TOPIC_ID, $topic->getId(), $comparison);
-        } elseif ($topic instanceof ObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(TagTableMap::COL_TOPIC_ID, $topic->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByTopic() only accepts arguments of type \Topic or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Topic relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return $this|ChildTagQuery The current query, for fluid interface
-     */
-    public function joinTopic($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Topic');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Topic');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Topic relation Topic object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return \TopicQuery A secondary query class using the current class as primary query
-     */
-    public function useTopicQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinTopic($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Topic', '\TopicQuery');
-    }
-
-    /**
      * Filter the query by a related \Verse object
      *
      * @param \Verse|ObjectCollection $verse The related object(s) to use as filter
@@ -630,6 +491,79 @@ abstract class TagQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related \TagTranslation object
+     *
+     * @param \TagTranslation|ObjectCollection $tagTranslation the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTagQuery The current query, for fluid interface
+     */
+    public function filterByTagTranslation($tagTranslation, $comparison = null)
+    {
+        if ($tagTranslation instanceof \TagTranslation) {
+            return $this
+                ->addUsingAlias(TagTableMap::COL_ID, $tagTranslation->getTagId(), $comparison);
+        } elseif ($tagTranslation instanceof ObjectCollection) {
+            return $this
+                ->useTagTranslationQuery()
+                ->filterByPrimaryKeys($tagTranslation->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTagTranslation() only accepts arguments of type \TagTranslation or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the TagTranslation relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildTagQuery The current query, for fluid interface
+     */
+    public function joinTagTranslation($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('TagTranslation');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'TagTranslation');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the TagTranslation relation TagTranslation object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \TagTranslationQuery A secondary query class using the current class as primary query
+     */
+    public function useTagTranslationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinTagTranslation($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'TagTranslation', '\TagTranslationQuery');
+    }
+
+    /**
      * Filter the query by a related \TagVote object
      *
      * @param \TagVote|ObjectCollection $tagVote the related object to use as filter
@@ -703,6 +637,152 @@ abstract class TagQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related \TopicTag object
+     *
+     * @param \TopicTag|ObjectCollection $topicTag the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTagQuery The current query, for fluid interface
+     */
+    public function filterByTopicTag($topicTag, $comparison = null)
+    {
+        if ($topicTag instanceof \TopicTag) {
+            return $this
+                ->addUsingAlias(TagTableMap::COL_ID, $topicTag->getTagId(), $comparison);
+        } elseif ($topicTag instanceof ObjectCollection) {
+            return $this
+                ->useTopicTagQuery()
+                ->filterByPrimaryKeys($topicTag->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTopicTag() only accepts arguments of type \TopicTag or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the TopicTag relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildTagQuery The current query, for fluid interface
+     */
+    public function joinTopicTag($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('TopicTag');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'TopicTag');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the TopicTag relation TopicTag object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \TopicTagQuery A secondary query class using the current class as primary query
+     */
+    public function useTopicTagQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinTopicTag($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'TopicTag', '\TopicTagQuery');
+    }
+
+    /**
+     * Filter the query by a related \LessonTag object
+     *
+     * @param \LessonTag|ObjectCollection $lessonTag the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTagQuery The current query, for fluid interface
+     */
+    public function filterByLessonTag($lessonTag, $comparison = null)
+    {
+        if ($lessonTag instanceof \LessonTag) {
+            return $this
+                ->addUsingAlias(TagTableMap::COL_ID, $lessonTag->getTagId(), $comparison);
+        } elseif ($lessonTag instanceof ObjectCollection) {
+            return $this
+                ->useLessonTagQuery()
+                ->filterByPrimaryKeys($lessonTag->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByLessonTag() only accepts arguments of type \LessonTag or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the LessonTag relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildTagQuery The current query, for fluid interface
+     */
+    public function joinLessonTag($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('LessonTag');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'LessonTag');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the LessonTag relation LessonTag object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \LessonTagQuery A secondary query class using the current class as primary query
+     */
+    public function useLessonTagQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinLessonTag($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'LessonTag', '\LessonTagQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildTag $tag Object to remove from the list of results
@@ -716,62 +796,6 @@ abstract class TagQuery extends ModelCriteria
         }
 
         return $this;
-    }
-
-    /**
-     * Code to execute before every DELETE statement
-     *
-     * @param     ConnectionInterface $con The connection object used by the query
-     */
-    protected function basePreDelete(ConnectionInterface $con)
-    {
-        // aggregate_column_relation_aggregate_column behavior
-        $this->findRelatedTopicTagCounts($con);
-
-        return $this->preDelete($con);
-    }
-
-    /**
-     * Code to execute after every DELETE statement
-     *
-     * @param     int $affectedRows the number of deleted rows
-     * @param     ConnectionInterface $con The connection object used by the query
-     */
-    protected function basePostDelete($affectedRows, ConnectionInterface $con)
-    {
-        // aggregate_column_relation_aggregate_column behavior
-        $this->updateRelatedTopicTagCounts($con);
-
-        return $this->postDelete($affectedRows, $con);
-    }
-
-    /**
-     * Code to execute before every UPDATE statement
-     *
-     * @param     array $values The associative array of columns and values for the update
-     * @param     ConnectionInterface $con The connection object used by the query
-     * @param     boolean $forceIndividualSaves If false (default), the resulting call is a Criteria::doUpdate(), otherwise it is a series of save() calls on all the found objects
-     */
-    protected function basePreUpdate(&$values, ConnectionInterface $con, $forceIndividualSaves = false)
-    {
-        // aggregate_column_relation_aggregate_column behavior
-        $this->findRelatedTopicTagCounts($con);
-
-        return $this->preUpdate($values, $con, $forceIndividualSaves);
-    }
-
-    /**
-     * Code to execute after every UPDATE statement
-     *
-     * @param     int $affectedRows the number of updated rows
-     * @param     ConnectionInterface $con The connection object used by the query
-     */
-    protected function basePostUpdate($affectedRows, ConnectionInterface $con)
-    {
-        // aggregate_column_relation_aggregate_column behavior
-        $this->updateRelatedTopicTagCounts($con);
-
-        return $this->postUpdate($affectedRows, $con);
     }
 
     /**
@@ -833,36 +857,6 @@ abstract class TagQuery extends ModelCriteria
 
             return $affectedRows;
         });
-    }
-
-    // aggregate_column_relation_aggregate_column behavior
-
-    /**
-     * Finds the related Topic objects and keep them for later
-     *
-     * @param ConnectionInterface $con A connection object
-     */
-    protected function findRelatedTopicTagCounts($con)
-    {
-        $criteria = clone $this;
-        if ($this->useAliasInSQL) {
-            $alias = $this->getModelAlias();
-            $criteria->removeAlias($alias);
-        } else {
-            $alias = '';
-        }
-        $this->topicTagCounts = \TopicQuery::create()
-            ->joinTag($alias)
-            ->mergeWith($criteria)
-            ->find($con);
-    }
-
-    protected function updateRelatedTopicTagCounts($con)
-    {
-        foreach ($this->topicTagCounts as $topicTagCount) {
-            $topicTagCount->updateTagCount($con);
-        }
-        $this->topicTagCounts = array();
     }
 
 } // TagQuery

@@ -153,6 +153,13 @@ class BibleTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'Translations', false);
+        $this->addRelation('TagTranslation', '\\TagTranslation', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':bible_id',
+    1 => ':id',
+  ),
+), null, null, 'TagTranslations', false);
     } // buildRelations()
 
     /**
