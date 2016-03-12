@@ -32,43 +32,28 @@
 		</foreign-key>
 	</table>
 
-	<!-- Ideas tables -->
-	<table name="idea">
-		<behavior name="aggregate_column">
-			<parameter name="name" value="verse_count" />
-			<parameter name="foreign_table" value="idea_verse" />
-			<parameter name="expression" value="COUNT(idea_id)" />
-		</behavior>
-		<column name="title" required="true" size="255" type="varchar" />
-		<column defaultValue="0" name="verse_count" type="integer" />
-	</table>
-	<table name="idea_verse">
-		<column name="idea_id" required="true" type="integer" />
-		<column name="verse_id" required="true" type="integer" />
-		<foreign-key foreignTable="idea">
-			<reference foreign="id" local="idea_id" />
-		</foreign-key>
-		<foreign-key foreignTable="verse">
-			<reference foreign="id" local="verse_id" />
-		</foreign-key>
-	</table>
-
-	<!-- Tagging tables -->
+	<!-- Tag tables -->
 	<table name="tag">
 		<behavior name="aggregate_column">
 			<parameter name="name" value="vote_count" />
 			<parameter name="foreign_table" value="tag_vote" />
 			<parameter name="expression" value="COUNT(tag_id)" />
 		</behavior>
-		<column name="relevant_words" required="true" size="255" type="varchar" />
-		<column name="topic_id" required="true" type="integer" />
 		<column name="verse_id" required="true" type="integer" />
 		<column defaultValue="0" name="vote_count" type="integer" />
-		<foreign-key foreignTable="topic">
-			<reference foreign="id" local="topic_id" />
-		</foreign-key>
 		<foreign-key foreignTable="verse">
 			<reference foreign="id" local="verse_id" />
+		</foreign-key>
+	</table>
+	<table name="tag_translation">
+		<column name="bible_id" required="true" type="integer" />
+		<column name="relevant_words" required="true" size="255" type="varchar" />
+		<column name="tag_id" required="true" type="integer" />
+		<foreign-key foreignTable="bible">
+			<reference foreign="id" local="bible_id" />
+		</foreign-key>
+		<foreign-key foreignTable="tag">
+			<reference foreign="id" local="tag_id" />
 		</foreign-key>
 	</table>
 	<table name="tag_vote">
@@ -109,6 +94,28 @@
 		<column name="topic_id" required="true" type="integer" />
 		<foreign-key foreignTable="topic" onDelete="cascade">
 			<reference foreign="id" local="topic_id" />
+		</foreign-key>
+	</table>
+
+	<!-- Lesson tables -->
+	<table name="lesson">
+		<behavior name="aggregate_column">
+			<parameter name="name" value="tag_count" />
+			<parameter name="foreign_table" value="lesson_tag" />
+			<parameter name="expression" value="COUNT(lesson_id)" />
+		</behavior>
+		<behavior name="nested_set" />
+		<column name="concept" required="true" size="1000" type="varchar" />
+		<column defaultValue="0" name="tag_count" type="integer" />
+	</table>
+	<table name="lesson_tag">
+		<column name="lesson_id" required="true" type="integer" />
+		<column name="tag_id" required="true" type="integer" />
+		<foreign-key foreignTable="lesson">
+			<reference foreign="id" local="lesson_id" />
+		</foreign-key>
+		<foreign-key foreignTable="tag">
+			<reference foreign="id" local="tag_id" />
 		</foreign-key>
 	</table>
 
