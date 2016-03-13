@@ -38,6 +38,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTopicQuery rightJoinWith($relation) Adds a RIGHT JOIN clause and with to the query
  * @method     ChildTopicQuery innerJoinWith($relation) Adds a INNER JOIN clause and with to the query
  *
+ * @method     ChildTopicQuery leftJoinTopicLesson($relationAlias = null) Adds a LEFT JOIN clause to the query using the TopicLesson relation
+ * @method     ChildTopicQuery rightJoinTopicLesson($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TopicLesson relation
+ * @method     ChildTopicQuery innerJoinTopicLesson($relationAlias = null) Adds a INNER JOIN clause to the query using the TopicLesson relation
+ *
+ * @method     ChildTopicQuery joinWithTopicLesson($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the TopicLesson relation
+ *
+ * @method     ChildTopicQuery leftJoinWithTopicLesson() Adds a LEFT JOIN clause and with to the query using the TopicLesson relation
+ * @method     ChildTopicQuery rightJoinWithTopicLesson() Adds a RIGHT JOIN clause and with to the query using the TopicLesson relation
+ * @method     ChildTopicQuery innerJoinWithTopicLesson() Adds a INNER JOIN clause and with to the query using the TopicLesson relation
+ *
  * @method     ChildTopicQuery leftJoinTopicLink($relationAlias = null) Adds a LEFT JOIN clause to the query using the TopicLink relation
  * @method     ChildTopicQuery rightJoinTopicLink($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TopicLink relation
  * @method     ChildTopicQuery innerJoinTopicLink($relationAlias = null) Adds a INNER JOIN clause to the query using the TopicLink relation
@@ -78,7 +88,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTopicQuery rightJoinWithTopicSynonym() Adds a RIGHT JOIN clause and with to the query using the TopicSynonym relation
  * @method     ChildTopicQuery innerJoinWithTopicSynonym() Adds a INNER JOIN clause and with to the query using the TopicSynonym relation
  *
- * @method     \TopicLinkQuery|\TopicParentQuery|\TopicTagQuery|\TopicSynonymQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \TopicLessonQuery|\TopicLinkQuery|\TopicParentQuery|\TopicTagQuery|\TopicSynonymQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildTopic findOne(ConnectionInterface $con = null) Return the first ChildTopic matching the query
  * @method     ChildTopic findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTopic matching the query, or a new ChildTopic object populated from the query conditions when no match is found
@@ -419,6 +429,79 @@ abstract class TopicQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TopicTableMap::COL_ID, $id, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \TopicLesson object
+     *
+     * @param \TopicLesson|ObjectCollection $topicLesson the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTopicQuery The current query, for fluid interface
+     */
+    public function filterByTopicLesson($topicLesson, $comparison = null)
+    {
+        if ($topicLesson instanceof \TopicLesson) {
+            return $this
+                ->addUsingAlias(TopicTableMap::COL_ID, $topicLesson->getTopicId(), $comparison);
+        } elseif ($topicLesson instanceof ObjectCollection) {
+            return $this
+                ->useTopicLessonQuery()
+                ->filterByPrimaryKeys($topicLesson->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTopicLesson() only accepts arguments of type \TopicLesson or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the TopicLesson relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildTopicQuery The current query, for fluid interface
+     */
+    public function joinTopicLesson($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('TopicLesson');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'TopicLesson');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the TopicLesson relation TopicLesson object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \TopicLessonQuery A secondary query class using the current class as primary query
+     */
+    public function useTopicLessonQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinTopicLesson($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'TopicLesson', '\TopicLessonQuery');
     }
 
     /**

@@ -152,6 +152,13 @@ class TopicTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('TopicLesson', '\\TopicLesson', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':topic_id',
+    1 => ':id',
+  ),
+), null, null, 'TopicLessons', false);
         $this->addRelation('TopicLink', '\\TopicLink', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (

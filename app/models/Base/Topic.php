@@ -3,6 +3,8 @@
 namespace Base;
 
 use \Topic as ChildTopic;
+use \TopicLesson as ChildTopicLesson;
+use \TopicLessonQuery as ChildTopicLessonQuery;
 use \TopicLink as ChildTopicLink;
 use \TopicLinkQuery as ChildTopicLinkQuery;
 use \TopicParent as ChildTopicParent;
@@ -14,6 +16,7 @@ use \TopicTag as ChildTopicTag;
 use \TopicTagQuery as ChildTopicTagQuery;
 use \Exception;
 use \PDO;
+use Map\TopicLessonTableMap;
 use Map\TopicLinkTableMap;
 use Map\TopicParentTableMap;
 use Map\TopicSynonymTableMap;
@@ -104,6 +107,12 @@ abstract class Topic implements ActiveRecordInterface
     protected $id;
 
     /**
+     * @var        ObjectCollection|ChildTopicLesson[] Collection to store aggregation of ChildTopicLesson objects.
+     */
+    protected $collTopicLessons;
+    protected $collTopicLessonsPartial;
+
+    /**
      * @var        ObjectCollection|ChildTopicLink[] Collection to store aggregation of ChildTopicLink objects.
      */
     protected $collTopicLinks;
@@ -134,6 +143,12 @@ abstract class Topic implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildTopicLesson[]
+     */
+    protected $topicLessonsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -660,6 +675,8 @@ abstract class Topic implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->collTopicLessons = null;
+
             $this->collTopicLinks = null;
 
             $this->collTopicParents = null;
@@ -776,6 +793,23 @@ abstract class Topic implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
+            }
+
+            if ($this->topicLessonsScheduledForDeletion !== null) {
+                if (!$this->topicLessonsScheduledForDeletion->isEmpty()) {
+                    \TopicLessonQuery::create()
+                        ->filterByPrimaryKeys($this->topicLessonsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->topicLessonsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTopicLessons !== null) {
+                foreach ($this->collTopicLessons as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             if ($this->topicLinksScheduledForDeletion !== null) {
@@ -1022,6 +1056,21 @@ abstract class Topic implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
+            if (null !== $this->collTopicLessons) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'topicLessons';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'defender_topic_lessons';
+                        break;
+                    default:
+                        $key = 'TopicLessons';
+                }
+
+                $result[$key] = $this->collTopicLessons->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collTopicLinks) {
 
                 switch ($keyType) {
@@ -1314,6 +1363,12 @@ abstract class Topic implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
+            foreach ($this->getTopicLessons() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTopicLesson($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getTopicLinks() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTopicLink($relObj->copy($deepCopy));
@@ -1379,6 +1434,9 @@ abstract class Topic implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
+        if ('TopicLesson' == $relationName) {
+            return $this->initTopicLessons();
+        }
         if ('TopicLink' == $relationName) {
             return $this->initTopicLinks();
         }
@@ -1391,6 +1449,256 @@ abstract class Topic implements ActiveRecordInterface
         if ('TopicSynonym' == $relationName) {
             return $this->initTopicSynonyms();
         }
+    }
+
+    /**
+     * Clears out the collTopicLessons collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTopicLessons()
+     */
+    public function clearTopicLessons()
+    {
+        $this->collTopicLessons = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collTopicLessons collection loaded partially.
+     */
+    public function resetPartialTopicLessons($v = true)
+    {
+        $this->collTopicLessonsPartial = $v;
+    }
+
+    /**
+     * Initializes the collTopicLessons collection.
+     *
+     * By default this just sets the collTopicLessons collection to an empty array (like clearcollTopicLessons());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTopicLessons($overrideExisting = true)
+    {
+        if (null !== $this->collTopicLessons && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = TopicLessonTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collTopicLessons = new $collectionClassName;
+        $this->collTopicLessons->setModel('\TopicLesson');
+    }
+
+    /**
+     * Gets an array of ChildTopicLesson objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildTopic is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildTopicLesson[] List of ChildTopicLesson objects
+     * @throws PropelException
+     */
+    public function getTopicLessons(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTopicLessonsPartial && !$this->isNew();
+        if (null === $this->collTopicLessons || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTopicLessons) {
+                // return empty collection
+                $this->initTopicLessons();
+            } else {
+                $collTopicLessons = ChildTopicLessonQuery::create(null, $criteria)
+                    ->filterByTopic($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collTopicLessonsPartial && count($collTopicLessons)) {
+                        $this->initTopicLessons(false);
+
+                        foreach ($collTopicLessons as $obj) {
+                            if (false == $this->collTopicLessons->contains($obj)) {
+                                $this->collTopicLessons->append($obj);
+                            }
+                        }
+
+                        $this->collTopicLessonsPartial = true;
+                    }
+
+                    return $collTopicLessons;
+                }
+
+                if ($partial && $this->collTopicLessons) {
+                    foreach ($this->collTopicLessons as $obj) {
+                        if ($obj->isNew()) {
+                            $collTopicLessons[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTopicLessons = $collTopicLessons;
+                $this->collTopicLessonsPartial = false;
+            }
+        }
+
+        return $this->collTopicLessons;
+    }
+
+    /**
+     * Sets a collection of ChildTopicLesson objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $topicLessons A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildTopic The current object (for fluent API support)
+     */
+    public function setTopicLessons(Collection $topicLessons, ConnectionInterface $con = null)
+    {
+        /** @var ChildTopicLesson[] $topicLessonsToDelete */
+        $topicLessonsToDelete = $this->getTopicLessons(new Criteria(), $con)->diff($topicLessons);
+
+
+        $this->topicLessonsScheduledForDeletion = $topicLessonsToDelete;
+
+        foreach ($topicLessonsToDelete as $topicLessonRemoved) {
+            $topicLessonRemoved->setTopic(null);
+        }
+
+        $this->collTopicLessons = null;
+        foreach ($topicLessons as $topicLesson) {
+            $this->addTopicLesson($topicLesson);
+        }
+
+        $this->collTopicLessons = $topicLessons;
+        $this->collTopicLessonsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related TopicLesson objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related TopicLesson objects.
+     * @throws PropelException
+     */
+    public function countTopicLessons(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTopicLessonsPartial && !$this->isNew();
+        if (null === $this->collTopicLessons || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTopicLessons) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getTopicLessons());
+            }
+
+            $query = ChildTopicLessonQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTopic($this)
+                ->count($con);
+        }
+
+        return count($this->collTopicLessons);
+    }
+
+    /**
+     * Method called to associate a ChildTopicLesson object to this object
+     * through the ChildTopicLesson foreign key attribute.
+     *
+     * @param  ChildTopicLesson $l ChildTopicLesson
+     * @return $this|\Topic The current object (for fluent API support)
+     */
+    public function addTopicLesson(ChildTopicLesson $l)
+    {
+        if ($this->collTopicLessons === null) {
+            $this->initTopicLessons();
+            $this->collTopicLessonsPartial = true;
+        }
+
+        if (!$this->collTopicLessons->contains($l)) {
+            $this->doAddTopicLesson($l);
+
+            if ($this->topicLessonsScheduledForDeletion and $this->topicLessonsScheduledForDeletion->contains($l)) {
+                $this->topicLessonsScheduledForDeletion->remove($this->topicLessonsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildTopicLesson $topicLesson The ChildTopicLesson object to add.
+     */
+    protected function doAddTopicLesson(ChildTopicLesson $topicLesson)
+    {
+        $this->collTopicLessons[]= $topicLesson;
+        $topicLesson->setTopic($this);
+    }
+
+    /**
+     * @param  ChildTopicLesson $topicLesson The ChildTopicLesson object to remove.
+     * @return $this|ChildTopic The current object (for fluent API support)
+     */
+    public function removeTopicLesson(ChildTopicLesson $topicLesson)
+    {
+        if ($this->getTopicLessons()->contains($topicLesson)) {
+            $pos = $this->collTopicLessons->search($topicLesson);
+            $this->collTopicLessons->remove($pos);
+            if (null === $this->topicLessonsScheduledForDeletion) {
+                $this->topicLessonsScheduledForDeletion = clone $this->collTopicLessons;
+                $this->topicLessonsScheduledForDeletion->clear();
+            }
+            $this->topicLessonsScheduledForDeletion[]= clone $topicLesson;
+            $topicLesson->setTopic(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Topic is new, it will return
+     * an empty collection; or if this Topic has previously
+     * been saved, it will retrieve related TopicLessons from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Topic.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildTopicLesson[] List of ChildTopicLesson objects
+     */
+    public function getTopicLessonsJoinLesson(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildTopicLessonQuery::create(null, $criteria);
+        $query->joinWith('Lesson', $joinBehavior);
+
+        return $this->getTopicLessons($query, $con);
     }
 
     /**
@@ -2348,6 +2656,11 @@ abstract class Topic implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collTopicLessons) {
+                foreach ($this->collTopicLessons as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collTopicLinks) {
                 foreach ($this->collTopicLinks as $o) {
                     $o->clearAllReferences($deep);
@@ -2370,6 +2683,7 @@ abstract class Topic implements ActiveRecordInterface
             }
         } // if ($deep)
 
+        $this->collTopicLessons = null;
         $this->collTopicLinks = null;
         $this->collTopicParents = null;
         $this->collTopicTags = null;
