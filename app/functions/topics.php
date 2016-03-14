@@ -1,11 +1,15 @@
 <?php
 
-function addTopic($topic_name, $is_root = false) {
+function addTopic($topic_parent_id, $topic_name) {
+
+	# Get parent
+	$parent_object = TopicQuery::create()
+		->findOneById($topic_parent_id);
 
 	# Add topic
 	$topic_object = new Topic();
 	$topic_object->setName($topic_name)
-		->setIsRoot($is_root)
+		->insertAsLastChildOf($parent_object)
 		->save();
 
 	# Return ID
@@ -13,131 +17,32 @@ function addTopic($topic_name, $is_root = false) {
 
 }
 
-function addTopicsLink($topic_1_id, $topic_2_id, $strength = 1) {
+function getTopicsSelectHTML($select_name = 'topic_parent_id', $selected_topic_id = false) {
 
-	# Add first link
-	$topic_link_object = new TopicLink();
-	$topic_link_object->setTopicId($topic_1_id)
-		->setLinkId($topic_2_id)
-		->setStrength($strength)
-		->save();
+	# Get root topic
+	$root_topic = TopicQuery::create()
+		->findRoot();
 
-	# Add second link
-	$topic_link_object = new TopicLink();
-	$topic_link_object->setTopicId($topic_2_id)
-		->setLinkId($topic_1_id)
-		->setStrength($strength)
-		->save();
+	# Get topics
+	$topics_objects = $root_topic->getBranch();
 
-}
+	# Begin HTML to return
+	$html_to_return = '<select name="' . $select_name . '">';
 
-function addTopicParent($topic_id, $parent_id) {
-
-	$topic_parent_object = new TopicParent();
-	$topic_parent_object->setTopicId($topic_id)
-		->setParentId($parent_id)
-		->save();
-
-}
-
-function getTopicData($topic_id) {
-
-	# Get topic data
-	$topic_data = TopicQuery::create()
-		->findOneById($topic_id)
-		->toArray();
-
-	# Return topic data
-	return $topic_data;
-
-}
-
-function getTopicChildrenIds($topic_id) {
-
-	# Get topic children ids
-	$topic_children_ids = TopicParentQuery::create()
-		->filterByParentId($topic_id)
-		->select([
-			'topic_id',
-		])
-		->find()
-		->toArray();
-
-	# Return topic children ids
-	return $topic_children_ids;
-
-}
-
-function getTopicLinksIds($topic_id) {
-
-	# Get topic links ids
-	$topic_links_ids = TopicLinkQuery::create()
-		->filterByTopicId($topic_id)
-		->orderByStrength('DESC')
-		->select([
-			'link_id',
-		])
-		->find()
-		->toArray();
-
-	# Return topic links data
-	return $topic_links_ids;
-
-}
-
-function getTopicsTree() {
-
-	# Get root topics ids
-	$root_topics_ids = TopicQuery::create()
-		->filterByIsRoot(true)
-		->select([
-			'id',
-		])
-		->find()
-		->toArray();
-
-	# Get topics tree
-	$topics_tree = iterateThroughTopics($root_topics_ids);
-
-	# Return topics tree
-	return $topics_tree;
-
-}
-
-function iterateThroughTopics($topics_ids, $level = 0) {
-
-	# Handle topics ids
-	$topics_array = [];
-	foreach ($topics_ids as $topic_id) {
-
-		# Get topic data
-		$topic_data = getTopicData($topic_id);
-
-		# Add level
-		$topic_data['Level'] = $level;
-
-		# Get topic children
-		$topic_children_ids = getTopicChildrenIds($topic_id);
-
-		# Handle topic children
-		if ($topic_children_ids) {
-			$topic_data['Children'] = iterateThroughTopics($topic_children_ids, $level + 1);
+	# Iterate through topics
+	foreach ($topics_objects as $topic_object) {
+		if ($selected_topic_id && $selected_topic_id == $topic_object->getId()) {
+			$selected_attr = 'selected';
+		} else {
+			$selected_attr = '';
 		}
-
-		# Append data to built tree
-		$topics_array[] = $topic_data;
+		$html_to_return .= '<option ' . $selected_attr . ' value="' . $topic_object->getId() . '">' . str_repeat('-', $topic_object->getLevel()) . ' ' . $topic_object->getName() . '</option>';
 	}
 
-	# Return topics array
-	return $topics_array;
+	# End HTML to return
+	$html_to_return .= '</select>';
 
-}
-
-function getTopicsSelect() {
-
-	# Get topics tree
-	$topics_tree = getTopicsTree();
-
-
+	# Return HTML
+	return $html_to_return;
 
 }

@@ -70,7 +70,7 @@
 			<parameter name="foreign_table" value="topic_tag" />
 			<parameter name="expression" value="COUNT(topic_id)" />
 		</behavior>
-		<column defaultValue="0" name="is_root" required="true" type="boolean" />
+		<behavior name="nested_set" />
 		<column name="name" required="true" size="255" type="varchar" />
 		<column defaultValue="0" name="tag_count" required="true" type="integer" />
 	</table>
@@ -84,35 +84,20 @@
 			<reference foreign="id" local="topic_id" />
 		</foreign-key>
 	</table>
-	<table name="topic_link">
-		<column name="link_id" required="true" type="integer" />
-		<column name="strength" required="true" type="integer" />
-		<column name="topic_id" required="true" type="integer" />
-		<foreign-key foreignTable="topic" onDelete="cascade">
-			<reference foreign="id" local="topic_id" />
-		</foreign-key>
-	</table>
-	<table name="topic_parent">
-		<column name="parent_id" required="true" type="integer" />
+	<table name="topic_synonym">
+		<column name="name" required="true" size="255" type="varchar" />
 		<column name="topic_id" required="true" type="integer" />
 		<foreign-key foreignTable="topic" onDelete="cascade">
 			<reference foreign="id" local="topic_id" />
 		</foreign-key>
 	</table>
 	<table name="topic_tag">
-		<column name="topic_id" required="true" type="integer" />
 		<column name="tag_id" required="true" type="integer" />
-		<foreign-key foreignTable="topic">
-			<reference foreign="id" local="topic_id" />
-		</foreign-key>
+		<column name="topic_id" required="true" type="integer" />
 		<foreign-key foreignTable="tag">
 			<reference foreign="id" local="tag_id" />
 		</foreign-key>
-	</table>
-	<table name="topic_synonym">
-		<column name="name" required="true" size="255" type="varchar" />
-		<column name="topic_id" required="true" type="integer" />
-		<foreign-key foreignTable="topic" onDelete="cascade">
+		<foreign-key foreignTable="topic">
 			<reference foreign="id" local="topic_id" />
 		</foreign-key>
 	</table>
@@ -125,8 +110,8 @@
 			<parameter name="expression" value="COUNT(lesson_id)" />
 		</behavior>
 		<behavior name="nested_set" />
-		<column defaultValue="0" name="tag_count" type="integer" />
-		<column name="title" required="true" size="1000" type="varchar" />
+		<column name="summary" required="true" size="1000" type="varchar" />
+		<column defaultValue="0" name="tag_count" required="true" type="integer" />
 	</table>
 	<table name="lesson_tag">
 		<column name="lesson_id" required="true" type="integer" />
