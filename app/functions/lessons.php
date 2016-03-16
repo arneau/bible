@@ -49,7 +49,7 @@ function getLessonsList() {
 
 }
 
-function getLessonsListRecursor($lessons_array, &$lessons_list) {
+function getLessonsListRecursor($lessons_array, &$lessons_list, $level = 0) {
 
 	# Sort lessons alphabetically
 	uasort($lessons_array, function ($a, $b) {
@@ -59,6 +59,9 @@ function getLessonsListRecursor($lessons_array, &$lessons_list) {
 
 	# Handle lessons
 	foreach ($lessons_array as $lesson_data) {
+
+		# Add level to lesson data
+		$lesson_data['Level'] = $level;
 
 		# Append lesson data to lessons list
 		$lessons_list[] = $lesson_data;
@@ -72,20 +75,20 @@ function getLessonsListRecursor($lessons_array, &$lessons_list) {
 
 		# Recurse through lesson children (if applicable)
 		if ($lesson_children_array) {
-			getLessonsListRecursor($lesson_children_array, $lessons_list);
+			getLessonsListRecursor($lesson_children_array, $lessons_list, $level + 1);
 		}
 
 	}
 
 }
 
-function getLessonsSelectHTML($select_name = 'lesson_parent_id', $selected_lesson_id = false) {
+function getLessonsSelectOptions($selected_lesson_id = false) {
 
 	# Get lessons list
-	$lessons_list = getLessonsList();
+	$lessons_list = getLessonsList(false);
 
-	# Begin HTML to return
-	$html_to_return = '<select name="' . $select_name . '"><option value="1">Lessons</option>';
+	# Begin lessons select options string
+	$lessons_select_options = '<option value="1">None</option>';
 
 	# Iterate through lessons
 	foreach ($lessons_list as $lesson_data) {
@@ -94,13 +97,10 @@ function getLessonsSelectHTML($select_name = 'lesson_parent_id', $selected_lesso
 		} else {
 			$selected_attr = '';
 		}
-		$html_to_return .= '<option ' . $selected_attr . ' value="' . $lesson_data['Id'] . '">' . str_repeat('-', $lesson_data['TreeLevel']) . ' ' . $lesson_data['Summary'] . '</option>';
+		$lessons_select_options .= '<option ' . $selected_attr . ' value="' . $lesson_data['Id'] . '">' . str_repeat('--', $lesson_data['Level']) . ' ' . $lesson_data['Summary'] . '</option>';
 	}
 
-	# End HTML to return
-	$html_to_return .= '</select>';
-
-	# Return HTML
-	return $html_to_return;
+	# Return lessons select options string
+	return $lessons_select_options;
 
 }

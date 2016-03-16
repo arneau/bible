@@ -74,6 +74,13 @@
 		<column name="name" required="true" size="255" type="varchar" />
 		<column defaultValue="0" name="tag_count" required="true" type="integer" />
 	</table>
+	<table name="topic_adoptee">
+		<column name="adoptee_id" required="true" type="integer" />
+		<column name="topic_id" required="true" type="integer" />
+		<foreign-key foreignTable="topic" onDelete="cascade">
+			<reference foreign="id" local="topic_id" />
+		</foreign-key>
+	</table>
 	<table name="topic_lesson">
 		<column name="lesson_id" required="true" type="integer" />
 		<column name="topic_id" required="true" type="integer" />

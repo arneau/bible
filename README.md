@@ -39,3 +39,7 @@
 	propel model:build
 ###### 4) Populate Composer autoloader
 	php composer.phar dump-autoload
+
+### Back up database
+	cd backups/
+	mysqldump -u root --databases defender-app > db.sql

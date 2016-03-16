@@ -17,6 +17,20 @@ function addTopic($topic_parent_id, $topic_name) {
 
 }
 
+function addTopicAdoptee($topic_parent_id, $topic_adoptee_id) {
+
+	# Get parent
+	$parent_object = TopicQuery::create()
+		->findOneById($topic_parent_id);
+
+	# Add topic adoptee
+	$topic_adoptee_object = new TopicAdoptee();
+	$topic_adoptee_object->setAdopteeId($topic_adoptee_id)
+		->setTopic($parent_object)
+		->save();
+
+}
+
 function getTopic($topic_id) {
 
 	# Get topic object
@@ -28,7 +42,29 @@ function getTopic($topic_id) {
 
 }
 
-function getTopicsList() {
+function getTopicAdoptees($topic_id) {
+
+	# Get topic adoptees IDs
+	$topic_adoptees_ids_array = TopicAdopteeQuery::create()
+		->filterByTopicId($topic_id)
+		->select([
+			'AdopteeId',
+		])
+		->find()
+		->toArray();
+
+	# Get topic adoptees array
+	$topic_adoptees_array = TopicQuery::create()
+		->filterByPrimaryKeys($topic_adoptees_ids_array)
+		->find()
+		->toArray();
+
+	# Return topic adoptees array
+	return $topic_adoptees_array;
+
+}
+
+function getTopicsList($include_adoptees = true) {
 
 	# Get root topic object
 	$root_topic_object = TopicQuery::create()
@@ -49,7 +85,7 @@ function getTopicsList() {
 
 }
 
-function getTopicsListRecursor($topics_array, &$topics_list) {
+function getTopicsListRecursor($topics_array, &$topics_list, $level = 0) {
 
 	# Sort topics alphabetically
 	uasort($topics_array, function ($a, $b) {
@@ -59,6 +95,9 @@ function getTopicsListRecursor($topics_array, &$topics_list) {
 
 	# Handle topics
 	foreach ($topics_array as $topic_data) {
+
+		# Add level to topic data
+		$topic_data['Level'] = $level;
 
 		# Append topic data to topics list
 		$topics_list[] = $topic_data;
@@ -70,22 +109,28 @@ function getTopicsListRecursor($topics_array, &$topics_list) {
 		$topic_children_array = $topic_object->getChildren()
 			->toArray();
 
+		# Get topic adoptees array
+		$topic_adoptees_array = getTopicAdoptees($topic_data['Id']);
+
+		# Merge topic children and adoptees arrays
+		$topic_dependants_array = array_merge($topic_children_array, $topic_adoptees_array);
+
 		# Recurse through topic children (if applicable)
-		if ($topic_children_array) {
-			getTopicsListRecursor($topic_children_array, $topics_list);
+		if ($topic_dependants_array) {
+			getTopicsListRecursor($topic_dependants_array, $topics_list, $level + 1);
 		}
 
 	}
 
 }
 
-function getTopicsSelectHTML($select_name = 'topic_parent_id', $selected_topic_id = false) {
+function getTopicsSelectOptions($selected_topic_id = false) {
 
 	# Get topics list
-	$topics_list = getTopicsList();
+	$topics_list = getTopicsList(false);
 
-	# Begin HTML to return
-	$html_to_return = '<select name="' . $select_name . '"><option value="1">Topics</option>';
+	# Begin topics select options string
+	$topics_select_options = '<option value="1">None</option>';
 
 	# Iterate through topics
 	foreach ($topics_list as $topic_data) {
@@ -94,13 +139,10 @@ function getTopicsSelectHTML($select_name = 'topic_parent_id', $selected_topic_i
 		} else {
 			$selected_attr = '';
 		}
-		$html_to_return .= '<option ' . $selected_attr . ' value="' . $topic_data['Id'] . '">' . str_repeat('-', $topic_data['TreeLevel']) . ' ' . $topic_data['Name'] . '</option>';
+		$topics_select_options .= '<option ' . $selected_attr . ' value="' . $topic_data['Id'] . '">' . str_repeat('--', $topic_data['Level']) . ' ' . $topic_data['Name'] . '</option>';
 	}
 
-	# End HTML to return
-	$html_to_return .= '</select>';
-
-	# Return HTML
-	return $html_to_return;
+	# Return topics select options string
+	return $topics_select_options;
 
 }
