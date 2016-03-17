@@ -11,7 +11,7 @@ function getReferenceData($reference_string) {
 		# Handle parts
 		$reference_data['book'] = $reference_parts[1];
 		$reference_data['chapter'] = $reference_parts[2];
-		if ($reference_parts[3]) {
+		if (isset($reference_parts[3])) {
 			foreach (explode(',', $reference_parts[3]) as $verses_reference_part) {
 				if (strpos($verses_reference_part, '-')) {
 					$verses_reference_parts = explode('-', $verses_reference_part);
@@ -23,6 +23,8 @@ function getReferenceData($reference_string) {
 					$reference_data['verses'][] = $verses_reference_part;
 				}
 			}
+		} else {
+			$reference_data['verses'] = [];
 		}
 
 		# Return reference data
@@ -36,6 +38,11 @@ function getReferenceData($reference_string) {
 }
 
 function getPassageData($reference_string, $bible_code = 'kjv') {
+
+	# Stop if no reference string provided
+	if (!$reference_string) {
+		return;
+	}
 
 	# Get reference data
 	$reference_data = getReferenceData($reference_string);
@@ -53,7 +60,9 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 	# Get verses objects
 	$verses_objects = VerseQuery::create()
 		->filterByChapterNumber($reference_data['chapter'])
+		->_if($reference_data['verses'])
 		->filterByVerseNumber($reference_data['verses'])
+		->_endif()
 		->find();
 
 	# Define passage data
@@ -68,6 +77,9 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 		'chapter' => [
 			'number' => $reference_data['chapter'],
 		],
+		'reference' => [
+			'string' => $reference_string,
+		],
 	];
 
 	# Handle verse objects
@@ -79,14 +91,16 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 			->filterByVerseId($verse_object->getId())
 			->findOne();
 
-		# Get verse tags data
-		$verse_tags_data = getVerseTagsData($verse_object->getId());
+		# Get verse topics tags data
+		$verse_topics_tags_data = getVerseTopicsTagsData($verse_object->getId());
 
 		# Append verse data
 		$passage_data['verses'][] = [
 			'id' => $verse_object->getId(),
 			'number' => $verse_object->getVerseNumber(),
-			'tags' => $verse_tags_data,
+			'tags' => [
+				'topics' => $verse_topics_tags_data,
+			],
 			'text' => $translation_object->getText(),
 			'word_count' => $translation_object->getWordCount(),
 		];
@@ -98,25 +112,37 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 
 }
 
-function getVerseTagsData($verse_id) {
+function getVerseTopicsTagsData($verse_id) {
 
-	# Get verse tags objects
-	$verse_tags_objects = TagQuery::create()
+	# Get verse topics tags objects
+	$verse_topics_tags_objects = TopicTagQuery::create()
+		->useTagQuery()
 		->filterByVerseId($verse_id)
 		->orderByVoteCount('DESC')
+		->endUse()
 		->find();
 
-	# Handle verse tags objects
-	$verse_tags_data = [];
-	foreach ($verse_tags_objects as $verse_tag_object) {
+	# Handle verse topics tags objects
+	$verse_topics_tags_data = [];
+	foreach ($verse_topics_tags_objects as $verse_topic_tag_object) {
 
-		$verse_tag_keyword_object = $verse_tag_object->getKeyword();
+		# Get topic object
+		$verse_topic_object = $verse_topic_tag_object->getTopic();
 
-		$verse_tags_data[] = [
-			'id' => $verse_tag_object->getId(),
-			'keyword_id' => $verse_tag_keyword_object->getId(),
-			'value' => $verse_tag_keyword_object->getValue(),
-			'vote_count' => $verse_tag_object->getVoteCount(),
+		# Get tag object
+		$verse_tag_object = $verse_topic_tag_object->getTag();
+
+		# Append tag data
+		$verse_topics_tags_data[] = [
+			'id' => $verse_topic_tag_object->getId(),
+			'tag' => [
+				'id' => $verse_tag_object->getId(),
+				'vote_count' => $verse_tag_object->getVoteCount(),
+			],
+			'topic' => [
+				'id' => $verse_topic_object->getId(),
+				'name' => $verse_topic_object->getName(),
+			],
 		];
 
 	}

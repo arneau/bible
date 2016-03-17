@@ -4,10 +4,10 @@ require_once '../vendor/autoload.php';
 require_once '../generated-conf/config.php';
 
 $books_array = [
-	[
-		'chapter_count' => 50,
-		'name' => 'Genesis',
-	],
+//	[
+//		'chapter_count' => 50,
+//		'name' => 'Genesis',
+//	],
 //	[
 //		'chapter_count' => 40,
 //		'name' => 'Exodus',
@@ -80,10 +80,10 @@ $books_array = [
 //		'chapter_count' => 150,
 //		'name' => 'Psalms',
 //	],
-//	[
-//		'chapter_count' => 31,
-//		'name' => 'Proverbs',
-//	],
+	[
+		'chapter_count' => 31,
+		'name' => 'Proverbs',
+	],
 //	[
 //		'chapter_count' => 12,
 //		'name' => 'Ecclesiastes',

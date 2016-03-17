@@ -12,6 +12,12 @@ function addTopic($topic_parent_id, $topic_name) {
 		->insertAsLastChildOf($parent_object)
 		->save();
 
+	# Add topic synonym
+	$topic_synonym_object = new TopicSynonym();
+	$topic_synonym_object->setName($topic_name)
+		->setTopic($topic_object)
+		->save();
+
 	# Return ID
 	return $topic_object->getId();
 
@@ -144,5 +150,19 @@ function getTopicsSelectOptions($selected_topic_id = false) {
 
 	# Return topics select options string
 	return $topics_select_options;
+
+}
+
+function renameTopic($topic_id, $topic_name) {
+
+	# Get topic object
+	$topic_object = getTopic($topic_id);
+
+	# Rename topic and save
+	$topic_object->setName($topic_name)
+		->save();
+
+	# Return topic object
+	return $topic_object;
 
 }

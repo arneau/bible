@@ -15,6 +15,11 @@ if (isset($_GET['add_topic_adoptee'])) {
 	addTopicAdoptee($_GET['topic_parent_id'], $_GET['topic_adoptee_id']);
 }
 
+# Rename topic (if applicable)
+if (isset($_GET['rename_topic'])) {
+	renameTopic($_GET['topic_id'], $_GET['topic_name']);
+}
+
 # Get topics select options
 $topics_select_options = getTopicsSelectOptions($_GET['topic_parent_id']);
 
@@ -47,6 +52,18 @@ echo <<<s
 	</select>
 	<br/>
 	<input name="add_topic_adoptee" type="submit" value="Add topic adoptee" />
+</form>
+<h1>Rename topic</h1>
+<form>
+	<label>Topic</label>
+	<select name="topic_id">
+		$topics_select_options
+	</select>
+	<br/>
+	<label>New name</label>
+	<input name="topic_name" type="text" />
+	<br/>
+	<input name="rename_topic" type="submit" value="Rename topic" />
 </form>
 </body>
 </html>
