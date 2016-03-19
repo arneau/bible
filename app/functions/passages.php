@@ -94,11 +94,15 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 		# Get verse topics tags data
 		$verse_topics_tags_data = getVerseTopicsTagsData($verse_object->getId());
 
+		# Get verse lessons tags data
+		$verse_lessons_tags_data = getVerseLessonsTagsData($verse_object->getId());
+
 		# Append verse data
 		$passage_data['verses'][] = [
 			'id' => $verse_object->getId(),
 			'number' => $verse_object->getVerseNumber(),
 			'tags' => [
+				'lessons' => $verse_lessons_tags_data,
 				'topics' => $verse_topics_tags_data,
 			],
 			'text' => $translation_object->getText(),
@@ -148,6 +152,46 @@ function getVerseTopicsTagsData($verse_id) {
 	}
 
 	# Return verse tag data
-	return $verse_tags_data;
+	return $verse_topics_tags_data;
+
+}
+
+function getVerseLessonsTagsData($verse_id) {
+
+	# Get verse lessons tags objects
+	$verse_lessons_tags_objects = LessonTagQuery::create()
+		->useTagQuery()
+		->filterByVerseId($verse_id)
+		->orderByVoteCount('DESC')
+		->endUse()
+		->find();
+
+	# Handle verse lessons tags objects
+	$verse_lessons_tags_data = [];
+	foreach ($verse_lessons_tags_objects as $verse_lesson_tag_object) {
+
+		# Get lesson object
+		$verse_lesson_object = $verse_lesson_tag_object->getLesson();
+
+		# Get tag object
+		$verse_tag_object = $verse_lesson_tag_object->getTag();
+
+		# Append tag data
+		$verse_lessons_tags_data[] = [
+			'id' => $verse_lesson_tag_object->getId(),
+			'tag' => [
+				'id' => $verse_tag_object->getId(),
+				'vote_count' => $verse_tag_object->getVoteCount(),
+			],
+			'lesson' => [
+				'id' => $verse_lesson_object->getId(),
+				'name' => $verse_lesson_object->getSummary(),
+			],
+		];
+
+	}
+
+	# Return verse tag data
+	return $verse_lessons_tags_data;
 
 }
