@@ -85,7 +85,7 @@ function getLessonsListRecursor($lessons_array, &$lessons_list, $level = 0) {
 function getLessonsSelectOptions($selected_lesson_id = false) {
 
 	# Get lessons list
-	$lessons_list = getLessonsList(false);
+	$lessons_list = getLessonsList();
 
 	# Begin lessons select options string
 	$lessons_select_options = '<option value="1">None</option>';

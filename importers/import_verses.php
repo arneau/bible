@@ -80,10 +80,10 @@ $books_array = [
 //		'chapter_count' => 150,
 //		'name' => 'Psalms',
 //	],
-	[
-		'chapter_count' => 31,
-		'name' => 'Proverbs',
-	],
+//	[
+//		'chapter_count' => 31,
+//		'name' => 'Proverbs',
+//	],
 //	[
 //		'chapter_count' => 12,
 //		'name' => 'Ecclesiastes',
@@ -308,13 +308,13 @@ foreach ($books_array as $book_data) {
 
 			$word_count = substr_count($verse_data->verse, ' ') + 1;
 
-			$translation = new Translation();
-			$translation->setBible($bible_object)
+			$verse_translation_object = new VerseTranslation();
+			$verse_translation_object->setBible($bible_object)
 				->setText($verse_data->verse)
 				->setWordCount($word_count);
 
 			$verse_object = new Verse();
-			$verse_object->addTranslation($translation)
+			$verse_object->addVerseTranslation($verse_translation_object)
 				->setBook($book_object)
 				->setChapterNumber($current_chapter)
 				->setVerseNumber($verse_data->verse_nr)

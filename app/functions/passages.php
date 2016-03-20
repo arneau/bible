@@ -86,7 +86,7 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 	foreach ($verses_objects as $verse_object) {
 
 		# Get translation object
-		$translation_object = TranslationQuery::create()
+		$verse_translation_object = VerseTranslationQuery::create()
 			->filterByBible($bible_object)
 			->filterByVerseId($verse_object->getId())
 			->findOne();
@@ -105,8 +105,8 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 				'lessons' => $verse_lessons_tags_data,
 				'topics' => $verse_topics_tags_data,
 			],
-			'text' => $translation_object->getText(),
-			'word_count' => $translation_object->getWordCount(),
+			'text' => $verse_translation_object->getText(),
+			'word_count' => $verse_translation_object->getWordCount(),
 		];
 
 	}
