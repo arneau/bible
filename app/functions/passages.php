@@ -59,6 +59,7 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 
 	# Get verses objects
 	$verses_objects = VerseQuery::create()
+		->filterByBook($book_object)
 		->filterByChapterNumber($reference_data['chapter'])
 		->_if($reference_data['verses'])
 		->filterByVerseNumber($reference_data['verses'])
