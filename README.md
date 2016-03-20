@@ -41,5 +41,10 @@
 	php composer.phar dump-autoload
 
 ### Back up database
+###### 1) Navigate to backup directory
 	cd backups/
+###### 2) Backup entire database
 	mysqldump -u root --databases defender-app > db.sql
+or
+###### 3) Backup data only
+	mysqldump -u root --databases defender-app --no-create-db --no-create-info > db.sql
