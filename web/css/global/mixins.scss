@@ -1,0 +1,19 @@
+@import 'config';
+
+@mixin width($width) {
+	@if($width == 'medium') {
+		@media (min-width: $medium) {
+			@content;
+		}
+	}
+	@if($width == 'large') {
+		@media (min-width: $large) {
+			@content;
+		}
+	}
+	@if($width == 'xlarge') {
+		@media (min-width: $xlarge) {
+			@content;
+		}
+	}
+}

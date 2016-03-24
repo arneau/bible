@@ -1,0 +1,57 @@
+* {
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-o-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-webkit-text-size-adjust: none;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	vertical-align: top;
+}
+
+body {
+	line-height: 1;
+}
+
+a {
+	color: inherit;
+	outline: none;
+	text-decoration: none;
+
+	img {
+		border: none;
+	}
+}
+
+button {
+	-webkit-appearance: none;
+	-webkit-border-radius: 0;
+
+	::-moz-focus-inner {
+		border: 0;
+		padding: 0;
+	}
+}
+
+input::-moz-focus-inner {
+	border: 0;
+	padding: 0
+}
+
+table {
+	border-collapse: separate;
+	border-spacing: 0;
+	vertical-align: middle;
+
+	th {
+		vertical-align: middle;
+	}
+	td {
+		vertical-align: middle;
+	}
+}
+
+:focus {
+	outline: 0;
+}

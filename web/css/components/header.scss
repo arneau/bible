@@ -1,0 +1,25 @@
+@import '../text/typography';
+
+#header {
+	background: #222;
+	float: left;
+	width: 100%;
+
+	a {
+		@extend %h5_responsive;
+
+		color: #fff;
+		float: left;
+		font-weight: bold;
+		line-height: 70px;
+		padding: 0 10px;
+
+		@include width(medium) {
+			padding: 0 20px;
+		}
+
+		&:hover {
+			background-color: #08c;
+		}
+	}
+}
