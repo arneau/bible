@@ -2,14 +2,31 @@
 
 	h1 {
 		@extend %h1_responsive;
-
-		float: left;
-		margin-bottom: 20px;
-		width: 100%;
 	}
-
-	p {
+	.topic {
+		background-color: #fff;
+		border-left: 10px solid #08c;
+		clear: both;
 		float: left;
-		width: 100%;
+		margin-bottom: 10px;
+		padding: 10px;
+
+		@include width(medium) {
+			padding: 20px;
+		}
+
+		&.adoptee {
+			border-left-color: #ccc;
+		}
+
+		&:not(.adoptee):hover {
+			background-color: #08c;
+			color: #fff;
+			cursor: pointer;
+		}
+
+		h3 {
+			@extend %h3;
+		}
 	}
 }

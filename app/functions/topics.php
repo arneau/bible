@@ -37,6 +37,16 @@ function addTopicAdoptee($topic_parent_id, $topic_adoptee_id) {
 
 }
 
+function deleteTopic($topic_id) {
+
+	# Get topic object
+	$topic_object = getTopic($topic_id);
+
+	# Delete topic
+	$topic_object->delete();
+
+}
+
 function getTopic($topic_id) {
 
 	# Get topic object
@@ -64,6 +74,11 @@ function getTopicAdoptees($topic_id) {
 		->filterByPrimaryKeys($topic_adoptees_ids_array)
 		->find()
 		->toArray();
+
+	# Add IsAdoptee to each adoptee
+	array_walk($topic_adoptees_array, function(&$topic_adoptee_data) {
+		$topic_adoptee_data['IsAdoptee'] = true;
+	});
 
 	# Return topic adoptees array
 	return $topic_adoptees_array;
@@ -150,6 +165,23 @@ function getTopicsSelectOptions($selected_topic_id = false) {
 
 	# Return topics select options string
 	return $topics_select_options;
+
+}
+
+function moveTopic($topic_id, $topic_parent_id) {
+
+	# Get topic object
+	$topic_object = getTopic($topic_id);
+
+	# Get parent topic object
+	$parent_topic_object = getTopic($topic_parent_id);
+
+	# Rename topic and save
+	$topic_object->moveToLastChildOf($parent_topic_object)
+		->save();
+
+	# Return topic object
+	return $topic_object;
 
 }
 
