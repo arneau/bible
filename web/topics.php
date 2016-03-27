@@ -15,6 +15,7 @@ require_once 'components/header.php';
 echo <<<s
 	<div class="page" id="topics_page">
 		<section>
+			<button class="toggle_adoptees">adoptees</button>
 			<h1>Topics</h1>
 		</section>
 s;

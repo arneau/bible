@@ -65,7 +65,7 @@ body {
   font: 1.2em/1.3 "Bree Serif", "serif";
   width: 100%; }
 
-#header a {
+#header a, #topics_page .toggle_adoptees {
   float: left;
   font: 1em/1.5 "Bree Serif", "serif";
   width: 100%; }
@@ -114,6 +114,22 @@ body {
         margin-bottom: 20px;
         padding: 20px; } }
 
+#topics_page.hide_adoptees .adoptee {
+  display: none; }
+#topics_page h1 {
+  width: auto; }
+#topics_page .toggle_adoptees {
+  background: #c00;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  float: right;
+  padding: 10px;
+  width: auto; }
+  #topics_page .toggle_adoptees:before {
+    content: "Hide "; }
+  #topics_page .toggle_adoptees.active:before {
+    content: "Show "; }
 #topics_page .topic {
   background-color: #fff;
   border-left: 10px solid #08c;
