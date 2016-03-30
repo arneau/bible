@@ -47,9 +47,9 @@ foreach ($topics_list as $topic_data) {
 
 	# Echo topic
 	echo <<<s
-			<div class="topic $adoptee_class" style="margin-left: $offset;">
-				<h3>$topic_data[Name]</h3>
-			</div>
+		<div class="topic $adoptee_class" style="margin-left: $offset;">
+			<h3>$topic_data[Name]</h3>
+		</div>
 s;
 
 }

@@ -44,7 +44,10 @@
 ###### 1) Navigate to backup directory
 	cd backups/
 ###### 2) Backup entire database
-	mysqldump -u root --databases defender-app > db.sql
+	mysqldump -u root defender-app > db.sql
 or
 ###### 3) Backup data only
-	mysqldump -u root --databases defender-app --no-create-db --no-create-info > db.sql
+	mysqldump -u root defender-app > db.sql --no-create-db --no-create-info
+or
+###### 4) Backup specific tables' data
+	mysqldump -u root defender-app defender_answer defender_answer_type defender_lesson defender_lesson_note defender_lesson_tag defender_note defender_note_content defender_response defender_statement defender_tag defender_tag_translation defender_tag_vote defender_topic defender_topic_adoptee defender_topic_lesson defender_topic_note defender_topic_synonym defender_topic_tag > db.sql --no-create-db --no-create-info

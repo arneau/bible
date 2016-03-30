@@ -119,13 +119,16 @@ body {
 #topics_page h1 {
   width: auto; }
 #topics_page .toggle_adoptees {
-  background: #c00;
+  background-color: #c00;
   border: 0;
   color: #fff;
   cursor: pointer;
   float: right;
-  padding: 10px;
+  padding: 2px 5px;
   width: auto; }
+  @media (min-width: 550px) {
+    #topics_page .toggle_adoptees {
+      padding: 10px; } }
   #topics_page .toggle_adoptees:before {
     content: "Hide "; }
   #topics_page .toggle_adoptees.active:before {

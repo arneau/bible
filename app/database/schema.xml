@@ -91,6 +91,16 @@
 			<reference foreign="id" local="topic_id" />
 		</foreign-key>
 	</table>
+	<table name="topic_note">
+		<column name="topic_id" required="true" type="integer" />
+		<column name="note_id" required="true" type="integer" />
+		<foreign-key foreignTable="topic">
+			<reference foreign="id" local="topic_id" />
+		</foreign-key>
+		<foreign-key foreignTable="note">
+			<reference foreign="id" local="note_id" />
+		</foreign-key>
+	</table>
 	<table name="topic_synonym">
 		<column name="name" required="true" size="255" type="varchar" />
 		<column name="topic_id" required="true" type="integer" />
@@ -120,6 +130,16 @@
 		<column name="summary" required="true" size="1000" type="varchar" />
 		<column defaultValue="0" name="tag_count" required="true" type="integer" />
 	</table>
+	<table name="lesson_note">
+		<column name="lesson_id" required="true" type="integer" />
+		<column name="note_id" required="true" type="integer" />
+		<foreign-key foreignTable="lesson">
+			<reference foreign="id" local="lesson_id" />
+		</foreign-key>
+		<foreign-key foreignTable="note">
+			<reference foreign="id" local="note_id" />
+		</foreign-key>
+	</table>
 	<table name="lesson_tag">
 		<column name="lesson_id" required="true" type="integer" />
 		<column name="tag_id" required="true" type="integer" />
@@ -128,6 +148,18 @@
 		</foreign-key>
 		<foreign-key foreignTable="tag">
 			<reference foreign="id" local="tag_id" />
+		</foreign-key>
+	</table>
+
+	<!-- Note tables -->
+	<table name="note">
+		<column name="title" required="true" size="255" type="varchar" />
+	</table>
+	<table name="note_content">
+		<column name="note_id" required="true" type="integer" />
+		<column name="value" required="true" type="blob" />
+		<foreign-key foreignTable="note">
+			<reference foreign="id" local="note_id" />
 		</foreign-key>
 	</table>
 
