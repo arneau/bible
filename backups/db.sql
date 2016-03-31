@@ -39,7 +39,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `defender_lesson` WRITE;
 /*!40000 ALTER TABLE `defender_lesson` DISABLE KEYS */;
-INSERT INTO `defender_lesson` VALUES ('Lessons',0,1,2,0,1);
+INSERT INTO `defender_lesson` VALUES ('Lessons',0,1,8,0,1),('God upholds everything',5,2,7,1,2),('God\'s Word upholds',2,3,4,2,3),('By Jesus are all things',1,5,6,2,4);
 /*!40000 ALTER TABLE `defender_lesson` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -58,6 +58,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `defender_lesson_tag` WRITE;
 /*!40000 ALTER TABLE `defender_lesson_tag` DISABLE KEYS */;
+INSERT INTO `defender_lesson_tag` VALUES (2,1,1),(3,2,2),(2,3,3),(3,4,4),(2,5,5),(2,6,6),(2,7,7),(4,8,8);
 /*!40000 ALTER TABLE `defender_lesson_tag` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -103,6 +104,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `defender_tag` WRITE;
 /*!40000 ALTER TABLE `defender_tag` DISABLE KEYS */;
+INSERT INTO `defender_tag` VALUES (30530,0,1),(30530,0,2),(29967,0,3),(29967,0,4),(29483,0,5),(28246,0,6),(28534,0,7),(28534,0,8);
 /*!40000 ALTER TABLE `defender_tag` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -112,6 +114,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `defender_tag_translation` WRITE;
 /*!40000 ALTER TABLE `defender_tag_translation` DISABLE KEYS */;
+INSERT INTO `defender_tag_translation` VALUES (1,'1-30',1,1),(1,'1-30',2,2),(1,'1-43',3,3),(1,'1-43',4,4),(1,'1-12',5,5),(1,'1-19',6,6),(1,'1-33',7,7),(1,'1-33',8,8);
 /*!40000 ALTER TABLE `defender_tag_translation` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -130,7 +133,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `defender_topic` WRITE;
 /*!40000 ALTER TABLE `defender_topic` DISABLE KEYS */;
-INSERT INTO `defender_topic` VALUES ('Topics',0,1,116,0,1),('Beliefs',0,2,7,1,8),('Monotheism',0,3,4,2,9),('Geocentrism',0,5,6,2,10),('Religions',0,8,17,1,11),('Athiesm',0,9,10,2,12),('Budhism',0,11,12,2,13),('Jehovah Witnesses',0,13,14,2,14),('Islam',0,15,16,2,15),('Beings',0,18,27,1,16),('Angels',0,19,20,2,17),('Demons',0,21,22,2,18),('Satan',0,23,26,2,19),('Names',0,24,25,3,20),('God',0,28,71,1,21),('The Father',0,29,34,2,22),('The Son',0,35,48,2,23),('The Holy Spirit',0,49,52,2,24),('Events',0,72,97,1,25),('God\'s Word',0,98,111,1,26),('Attributes',0,99,102,2,27),('Timeline',0,103,110,2,28),('Pre flood',0,104,105,3,30),('Creation',0,73,74,2,32),('The flood',0,75,76,2,33),('The judgement seat of Christ',0,80,81,3,34),('The second coming',0,82,83,3,35),('The day of Christ',0,78,79,3,36),('The day of the Lord',0,86,87,3,37),('The end times',0,77,88,2,38),('The exodus',0,89,90,2,39),('The tribulation',0,84,85,3,40),('Attributes',0,53,70,2,41),('Faithfulness',0,54,55,3,42),('Glory',0,56,57,3,43),('Grace',0,58,59,3,44),('Greatness',0,60,61,3,45),('Mercy',0,62,63,3,46),('Love',0,64,65,3,47),('Strength',0,66,67,3,48),('Voice',0,68,69,3,49),('Attributes',0,30,33,3,50),('Voice',0,31,32,4,51),('Attributes',0,36,39,3,52),('Blood',0,37,38,4,53),('The crucifixion',0,91,92,2,54),('The resurrection',0,93,94,2,55),('Names',0,40,41,3,56),('Life',0,42,47,3,57),('Parables',0,45,46,4,58),('Miracles',0,43,44,4,59),('Gifts',0,50,51,3,60),('Truth',0,100,101,3,61),('Post flood',0,106,107,3,62),('Sojourn of Israel',0,108,109,3,63),('The fall of man',0,95,96,2,64),('Places',0,112,115,1,65),('Sodom and Gomorrah',0,113,114,2,66);
+INSERT INTO `defender_topic` VALUES ('Topics',0,1,118,0,1),('Beliefs',0,2,7,1,8),('Monotheism',0,3,4,2,9),('Geocentrism',0,5,6,2,10),('Religions',0,8,17,1,11),('Athiesm',0,9,10,2,12),('Budhism',0,11,12,2,13),('Jehovah Witnesses',0,13,14,2,14),('Islam',0,15,16,2,15),('Beings',0,18,27,1,16),('Angels',0,19,20,2,17),('Demons',0,21,22,2,18),('Satan',0,23,26,2,19),('Names',0,24,25,3,20),('God',0,28,73,1,21),('The Father',0,29,34,2,22),('The Son',0,35,48,2,23),('The Holy Spirit',0,49,52,2,24),('Events',0,74,99,1,25),('God\'s Word',0,100,113,1,26),('Attributes',0,101,104,2,27),('Timeline',0,105,112,2,28),('Pre flood',0,106,107,3,30),('Creation',0,75,76,2,32),('The flood',0,77,78,2,33),('The judgement seat of Christ',0,82,83,3,34),('The second coming',0,84,85,3,35),('The day of Christ',0,80,81,3,36),('The day of the Lord',0,88,89,3,37),('The end times',0,79,90,2,38),('The exodus',0,91,92,2,39),('The tribulation',0,86,87,3,40),('Attributes',0,53,72,2,41),('Faithfulness',0,54,55,3,42),('Glory',0,56,57,3,43),('Grace',0,58,59,3,44),('Greatness',0,60,61,3,45),('Mercy',0,62,63,3,46),('Love',0,64,65,3,47),('Strength',0,66,67,3,48),('Voice',0,68,69,3,49),('Attributes',0,30,33,3,50),('Voice',0,31,32,4,51),('Attributes',0,36,39,3,52),('Blood',0,37,38,4,53),('The crucifixion',0,93,94,2,54),('The resurrection',0,95,96,2,55),('Names',0,40,41,3,56),('Life',0,42,47,3,57),('Parables',0,45,46,4,58),('Miracles',0,43,44,4,59),('Gifts',0,50,51,3,60),('Truth',0,102,103,3,61),('Post flood',0,108,109,3,62),('Sojourn of Israel',0,110,111,3,63),('The fall of man',0,97,98,2,64),('Places',0,114,117,1,65),('Sodom and Gomorrah',0,115,116,2,66),('Sovereignty',0,70,71,3,67);
 /*!40000 ALTER TABLE `defender_topic` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -168,7 +171,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `defender_topic_synonym` WRITE;
 /*!40000 ALTER TABLE `defender_topic_synonym` DISABLE KEYS */;
-INSERT INTO `defender_topic_synonym` VALUES ('Beliefs',8,7),('Monotheism',9,8),('Geocentrism',10,9),('Religions',11,10),('Athiesm',12,11),('Budhism',13,12),('Jehovah Witnesses',14,13),('Islam',15,14),('Beings',16,15),('Angels',17,16),('Demons',18,17),('Satan',19,18),('Names',20,19),('God',21,20),('The Father',22,21),('The Son',23,22),('The Holy Spirit',24,23),('Events',25,24),('God\'s Word',26,25),('Attributes',27,26),('Timeline',28,27),('Pre flood',30,29),('Creation',32,31),('The flood',33,32),('The judgement seat of Christ',34,33),('The second coming',35,34),('The day of Christ',36,35),('The day of the Lord',37,36),('The end times',38,37),('The exodus',39,38),('The tribulation',40,39),('Attributes',41,40),('Faithfulness',42,41),('Glory',43,42),('Grace',44,43),('Greatness',45,44),('Mercy',46,45),('Love',47,46),('Strength',48,47),('Voice',49,48),('Attributes',50,49),('Voice',51,50),('Attributes',52,51),('Blood',53,52),('The crucifixion',54,53),('The resurrection',55,54),('Names',56,55),('Life',57,56),('Parables',58,57),('Miracles',59,58),('Gifts',60,59),('Truth',61,60),('Post flood',62,61),('Sojourn of Israel',63,62),('The fall of man',64,63),('Places',65,64),('Sodom and Gomorrah',66,65);
+INSERT INTO `defender_topic_synonym` VALUES ('Beliefs',8,7),('Monotheism',9,8),('Geocentrism',10,9),('Religions',11,10),('Athiesm',12,11),('Budhism',13,12),('Jehovah Witnesses',14,13),('Islam',15,14),('Beings',16,15),('Angels',17,16),('Demons',18,17),('Satan',19,18),('Names',20,19),('God',21,20),('The Father',22,21),('The Son',23,22),('The Holy Spirit',24,23),('Events',25,24),('God\'s Word',26,25),('Attributes',27,26),('Timeline',28,27),('Pre flood',30,29),('Creation',32,31),('The flood',33,32),('The judgement seat of Christ',34,33),('The second coming',35,34),('The day of Christ',36,35),('The day of the Lord',37,36),('The end times',38,37),('The exodus',39,38),('The tribulation',40,39),('Attributes',41,40),('Faithfulness',42,41),('Glory',43,42),('Grace',44,43),('Greatness',45,44),('Mercy',46,45),('Love',47,46),('Strength',48,47),('Voice',49,48),('Attributes',50,49),('Voice',51,50),('Attributes',52,51),('Blood',53,52),('The crucifixion',54,53),('The resurrection',55,54),('Names',56,55),('Life',57,56),('Parables',58,57),('Miracles',59,58),('Gifts',60,59),('Truth',61,60),('Post flood',62,61),('Sojourn of Israel',63,62),('The fall of man',64,63),('Places',65,64),('Sodom and Gomorrah',66,65),('Sovereignty',67,66);
 /*!40000 ALTER TABLE `defender_topic_synonym` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -190,4 +193,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-30 21:11:25
+-- Dump completed on 2016-03-31  7:36:05

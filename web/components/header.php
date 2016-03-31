@@ -9,7 +9,7 @@
 <body>
 <div id="header">
 	<a href="topics.php">Topics</a>
-	<a href="topics.php">Lessons</a>
-	<a href="topics.php">Notes</a>
-	<a href="topics.php">Articles</a>
+	<a href="lessons.php">Lessons</a>
+	<a href="#">Notes</a>
+	<a href="#">Articles</a>
 </div>

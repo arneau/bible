@@ -104,3 +104,17 @@ function getLessonsSelectOptions($selected_lesson_id = false) {
 	return $lessons_select_options;
 
 }
+
+function renameLesson($lesson_id, $lesson_summary) {
+
+	# Get lesson object
+	$lesson_object = getLesson($lesson_id);
+
+	# Rename lesson and save
+	$lesson_object->setSummary($lesson_summary)
+		->save();
+
+	# Return lesson object
+	return $lesson_object;
+
+}
