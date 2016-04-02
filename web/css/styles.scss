@@ -1,8 +1,13 @@
+// Import config and mixins
+@import 'global/config';
+@import 'global/mixins';
 // Import global styles
 @import 'global/reset';
+@import 'global/elements';
 // Import component styles
 @import 'components/header';
 // Import page styles
 @import 'pages/page';
 @import 'pages/topics';
 @import 'pages/lessons';
+@import 'pages/lesson';

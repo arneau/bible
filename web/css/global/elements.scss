@@ -1,0 +1,63 @@
+.passage {
+	@extend %blockquote;
+
+	border-left: 5px solid #eee;
+	margin-bottom: 20px;
+	padding: 10px 0 10px 10px;
+
+	@include width(medium) {
+		padding: 20px 0 20px 20px;
+	}
+
+	sup {
+		@extend %sup;
+
+		color: #ddd;
+		font-weight: bold;
+	}
+	mark {
+		@extend %mark;
+
+		background-color: #fd4;
+	}
+	cite {
+		color: #ccc;
+		float: left;
+		font-style: normal;
+		margin-top: 5px;
+		width: 100%;
+
+		span {
+
+			&.reference {
+				color: #17b;
+			}
+			&.bible {
+
+				&:hover {
+
+					&:after {
+						content: " (" attr(data-info) ")";
+					}
+				}
+			}
+			&.vote_up, &.vote_down {
+				cursor: pointer;
+				display: inline-block;
+				padding: 10px 3px;
+
+				&:hover {
+
+					img {
+						background-color: #17b;
+					}
+				}
+
+				img {
+					background: #ccc;
+					width: 12px;
+				}
+			}
+		}
+	}
+}

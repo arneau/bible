@@ -1,0 +1,34 @@
+#lesson_page {
+
+	h1 {
+		@extend %h1_responsive;
+
+		margin-bottom: 20px;
+
+		a {
+			color: #eee;
+			display: inline-block;
+			max-width: 20px;
+			overflow: hidden;
+			transition: all 2s ease 0s;
+			white-space: nowrap;
+
+			&:before {
+				content: "/ ";
+			}
+			&:after {
+				content: " / ";
+			}
+			&:hover {
+				color: #17b;
+				max-width: 100%;
+				width: auto;
+			}
+		}
+	}
+	h3 {
+		@extend %h3_responsive;
+
+		margin-bottom: 20px;
+	}
+}

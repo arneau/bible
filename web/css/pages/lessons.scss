@@ -1,11 +1,4 @@
-#topics_page {
-
-	&.hide_adoptees {
-
-		.adoptee {
-			display: none;
-		}
-	}
+#lessons_page {
 
 	h1 {
 		@extend %h1_responsive;
@@ -13,33 +6,7 @@
 		margin-bottom: 20px;
 		width: auto;
 	}
-	.toggle_adoptees {
-		@extend %h5;
-
-		background-color: #c00;
-		border: 0;
-		color: #fff;
-		cursor: pointer;
-		float: right;
-		padding: 2px 5px;
-		width: auto;
-
-		@include width(medium) {
-			padding: 10px;
-		}
-
-		&:before {
-			content: "Hide ";
-		}
-
-		&.active {
-
-			&:before {
-				content: "Show ";
-			}
-		}
-	}
-	.topic {
+	.lesson {
 		background-color: #fff;
 		border-left: 10px solid #17b;
 		clear: both;
