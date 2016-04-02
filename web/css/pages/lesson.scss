@@ -3,32 +3,19 @@
 	h1 {
 		@extend %h1_responsive;
 
+		color: #e8e8e8;
 		margin-bottom: 20px;
 
-		a {
-			color: #eee;
-			display: inline-block;
-			max-width: 20px;
-			overflow: hidden;
-			transition: all 2s ease 0s;
-			white-space: nowrap;
-
-			&:before {
-				content: "/ ";
-			}
-			&:after {
-				content: " / ";
-			}
-			&:hover {
-				color: #17b;
-				max-width: 100%;
-				width: auto;
-			}
+		span {
+			color: #000;
 		}
 	}
 	h3 {
 		@extend %h3_responsive;
 
 		margin-bottom: 20px;
+	}
+	.passages {
+		border-left: 8px solid #17b;
 	}
 }

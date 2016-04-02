@@ -2,6 +2,7 @@
 
 #header {
 	background: #222;
+	border-bottom: 8px solid #fff;
 	float: left;
 	padding-left: 10px;
 	width: 100%;
@@ -22,8 +23,48 @@
 			padding: 0 20px;
 		}
 
-		&:hover {
-			background-color: #17b;
+		&.apologetics {
+
+			&.active, &:hover {
+				background-color: $purple;
+			}
+		}
+		&.gods_word {
+
+			&.active, &:hover {
+				background-color: $blue;
+			}
+		}
+		&.topics {
+
+			&.active, &:hover {
+				background-color: $green;
+			}
+		}
+		&.lessons {
+
+			&.active, &:hover {
+				background-color: $yellow;
+			}
+		}
+		&.notes {
+
+			&.active, &:hover {
+				background-color: $orange;
+			}
+		}
+		&.articles {
+
+			&.active, &:hover {
+				background-color: $red;
+			}
+		}
+		&.settings {
+			float: right;
+
+			&.active, &:hover {
+				background-color: $pink;
+			}
 		}
 	}
 }

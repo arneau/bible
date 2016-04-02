@@ -8,8 +8,11 @@
 </head>
 <body>
 <div id="header">
-	<a href="topics.php">Topics</a>
-	<a href="lessons.php">Lessons</a>
-	<a href="#">Notes</a>
-	<a href="#">Articles</a>
+	<a class="apologetics" href="#">Apologetics</a>
+	<a class="gods_word" href="#">God's Word</a>
+	<a class="topics" href="topics.php">Topics</a>
+	<a class="lessons" href="lessons.php">Lessons</a>
+	<a class="notes" href="#">Notes</a>
+	<a class="articles" href="#">Articles</a>
+	<a class="settings" href="#">Settings</a>
 </div>

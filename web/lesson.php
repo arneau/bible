@@ -13,14 +13,13 @@ echo <<<s
 	<div class="page" id="lesson_page">
 		<section>
 			<h1>
-				<a href="#">God upholds everything</a>
-				<a href="#">God's Word upholds</a>
-				By Jesus are all things
+				Lesson:
+				<span>By Jesus are all things</span>
 			</h1>
 		</section>
 		<div class="columns">
 			<div class="column">
-				<section>
+				<section class="passages">
 					<h3>Relevant Passages</h3>
 					<blockquote class="passage">
 						<sup>14</sup> <mark>What is man, that he should be clean?</mark> and he which is born of a woman, that he should be righteous?
