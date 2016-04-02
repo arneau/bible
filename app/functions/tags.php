@@ -49,3 +49,14 @@ function addLessonTag($lesson_id, $verse_id, $bible_code, $relevant_words) {
 		->save();
 
 }
+
+function getTag($tag_id) {
+
+	# Get tag object
+	$tag_object = TagQuery::create()
+		->findOneById($tag_id);
+
+	# Return tag object
+	return $tag_object;
+
+}

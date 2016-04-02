@@ -1,3 +1,4 @@
+@charset "UTF-8";
 * {
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
@@ -50,20 +51,18 @@ table {
     .passage {
       padding: 20px 0 20px 20px; } }
   .passage sup {
-    color: #ddd;
+    color: #e4e4e4;
     font-weight: bold; }
   .passage mark {
     background-color: #fd4; }
   .passage cite {
-    color: #ccc;
+    color: #d8d8d8;
     float: left;
     font-style: normal;
     margin-top: 5px;
     width: 100%; }
-    .passage cite span.reference {
-      color: #17b; }
     .passage cite span.bible:hover:after {
-      content: " (" attr(data-info) ")"; }
+      content: " · " attr(data-info); }
     .passage cite span.vote_up, .passage cite span.vote_down {
       cursor: pointer;
       display: inline-block;
@@ -71,7 +70,7 @@ table {
       .passage cite span.vote_up:hover img, .passage cite span.vote_down:hover img {
         background-color: #17b; }
       .passage cite span.vote_up img, .passage cite span.vote_down img {
-        background: #ccc;
+        background: #d8d8d8;
         width: 12px; }
 
 body {

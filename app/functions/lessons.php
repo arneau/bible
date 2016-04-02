@@ -28,6 +28,45 @@ function getLesson($lesson_id) {
 
 }
 
+function getLessonData($lesson_id) {
+
+	# Get lesson object
+	$lesson_object = getLesson($lesson_id);
+
+	# Get lesson data
+	$lesson_data = $lesson_object->toArray();
+
+	# Return lesson data
+	return $lesson_data;
+
+}
+
+function getLessonTags($lesson_id) {
+
+	# Get lesson object
+	$lesson_object = getLesson($lesson_id);
+
+	# Get lesson tags objects
+	$lesson_tags_objects = $lesson_object->getLessonTags();
+
+	# Handle lesson tags objects
+	foreach ($lesson_tags_objects as $lesson_tag_object) {
+
+		# Get tag object
+		$tag_object = $lesson_tag_object->getTag();
+
+		# Get tag data
+		$tag_data = $tag_object->toArray();
+		var_dump($tag_data);
+		die;
+
+	}
+
+	# Return lesson data
+	return $lesson_data;
+
+}
+
 function getLessonsList() {
 
 	# Get root lesson object

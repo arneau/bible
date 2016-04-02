@@ -8,12 +8,16 @@ require_once '../app/functions/functions.php';
 # Display header
 require_once 'components/header.php';
 
+# Get lesson, data, etc
+$lesson_data = getLessonData($_GET['id']);
+//$lessons_passages = getLessonTags($_GET['id']);
+
 # Start page
 echo <<<s
 	<div class="page" id="lesson_page">
 		<section>
 			<h1>
-				By Jesus are all things
+				$lesson_data[Summary]
 				<span>(Lesson)</span>
 			</h1>
 		</section>
@@ -35,14 +39,9 @@ echo <<<s
 							</span>
 						</cite>
 					</blockquote>
-					<blockquote class="passage">
-						<sup>9</sup> Who can say, I have made my heart clean, I am pure from my sin?
-						<cite>Proverbs 20:9 | KJV</cite>
-					</blockquote>
-					<blockquote class="passage">
-						<sup>8</sup> If we say that we have no sin, we deceive ourselves, and the truth is not in us.
-						<cite>1 John 1:8 | KJV</cite>
-					</blockquote>
+s;
+echo getPassageHTMLByVerseId(30530);
+echo <<<s
 				</section>
 			</div>
 			<div class="column">

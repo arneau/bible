@@ -28,9 +28,9 @@ foreach ($lessons_list as $lesson_data) {
 
 	# Echo lesson
 	echo <<<s
-		<div class="lesson" style="margin-left: $offset;">
+		<a class="lesson" href="lesson.php?id=$lesson_data[Id]" style="margin-left: $offset;">
 			<h3>$lesson_data[Summary]</h3>
-		</div>
+		</a>
 s;
 
 }
