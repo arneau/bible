@@ -3,11 +3,10 @@
 	h1 {
 		@extend %h1_responsive;
 
-		color: #e8e8e8;
 		margin-bottom: 20px;
 
 		span {
-			color: #000;
+			color: #e8e8e8;
 		}
 	}
 	h3 {
@@ -16,6 +15,15 @@
 		margin-bottom: 20px;
 	}
 	.passages {
-		border-left: 8px solid #17b;
+		border-left: 8px solid $blue;
+	}
+	.topics {
+		border-left: 8px solid $green;
+	}
+	.lessons {
+		border-left: 8px solid $yellow;
+	}
+	.notes {
+		border-left: 8px solid $orange;
 	}
 }

@@ -13,14 +13,14 @@ echo <<<s
 	<div class="page" id="lesson_page">
 		<section>
 			<h1>
-				Lesson:
-				<span>By Jesus are all things</span>
+				By Jesus are all things
+				<span>(Lesson)</span>
 			</h1>
 		</section>
 		<div class="columns">
 			<div class="column">
 				<section class="passages">
-					<h3>Relevant Passages</h3>
+					<h3>Tagged passages</h3>
 					<blockquote class="passage">
 						<sup>14</sup> <mark>What is man, that he should be clean?</mark> and he which is born of a woman, that he should be righteous?
 						<cite>
@@ -46,8 +46,15 @@ echo <<<s
 				</section>
 			</div>
 			<div class="column">
-				<section>asd</section>
-				<section>asd</section>
+				<section class="topics">
+					<h3>Relevant topics</h3>
+				</section>
+				<section class="lessons">
+					<h3>Lesson family</h3>
+				</section>
+				<section class="notes">
+					<h3>Saved notes</h3>
+				</section>
 			</div>
 		</div>
 	</div>
