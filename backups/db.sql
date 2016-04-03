@@ -39,7 +39,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `defender_lesson` WRITE;
 /*!40000 ALTER TABLE `defender_lesson` DISABLE KEYS */;
-INSERT INTO `defender_lesson` VALUES ('Lessons',0,1,8,0,1),('God upholds everything',5,2,7,1,2),('God\'s Word upholds',2,3,4,2,3),('By Jesus are all things',1,5,6,2,4);
+INSERT INTO `defender_lesson` VALUES ('Lessons',0,1,82,0,1),('God upholds everything',5,2,7,1,2),('God\'s Word upholds',2,3,4,2,3),('By Jesus are all things',1,5,6,2,4),('Fear the Lord',1,8,15,1,5),('The fear of the Lord is the beginning of wisdom',3,9,12,2,6),('And knowledge',1,10,11,3,7),('Fools despise wisdom',3,16,19,1,8),('Fools despise instruction',1,20,21,1,9),('And knowledge',2,17,18,2,10),('Fools despise correction and reproof',1,22,23,1,11),('The Lord gives wisdom',2,24,27,1,12),('His mouth speaks knowledge and understanding',1,25,26,2,13),('Trust in the Lord',1,28,29,1,14),('Don\'t rely on your own understanding',2,30,31,1,15),('Let God be God over everything',2,32,33,1,16),('Fearing the Lord is a blessing',1,13,14,2,17),('Give God your firstfruits',1,34,37,1,18),('Doing so is a blessing',1,35,36,2,19),('Don\'t despise God\'s correction',1,38,41,1,20),('The Lord loves those He corrects',1,39,40,2,21),('Happy is he who finds wisdom',2,51,54,2,22),('Happy is he who gets understanding',1,42,43,1,23),('Seek wisdom as treasure',1,45,50,2,24),('Wisdom is worth more than all riches',2,46,49,3,25),('Nothing to be desired can be compared to wisdom',1,47,48,4,26),('Seek wisdom',0,44,57,1,27),('Blessed is he who finds wisdom',3,55,56,2,28),('And keeps her',1,52,53,3,29),('God created the earth',1,58,65,1,30),('God created the heavens',1,66,69,1,31),('By wisdom',1,59,60,2,32),('By understanding',1,67,68,2,33),('He broke up the depths',1,61,64,2,34),('By his knowledge',1,62,63,3,35),('Keep wisdom',1,70,73,1,36),('Happy is he who keeps her',1,71,72,2,37),('Jesus is God',2,74,81,1,38),('Jesus is Lord',3,75,76,2,39),('Jesus is our Saviour',1,77,78,2,40),('Jesus is the Christ',2,79,80,2,41);
 /*!40000 ALTER TABLE `defender_lesson` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -58,7 +58,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `defender_lesson_tag` WRITE;
 /*!40000 ALTER TABLE `defender_lesson_tag` DISABLE KEYS */;
-INSERT INTO `defender_lesson_tag` VALUES (2,1,1),(3,2,2),(2,3,3),(3,4,4),(2,5,5),(2,6,6),(2,7,7),(4,8,8);
+INSERT INTO `defender_lesson_tag` VALUES (2,1,1),(3,2,2),(2,3,3),(3,4,4),(2,5,5),(2,6,6),(2,7,7),(4,8,8),(6,10,9),(6,11,10),(7,12,11),(6,13,12),(8,14,13),(9,15,14),(10,16,15),(8,17,16),(8,18,17),(10,19,18),(11,20,19),(12,21,20),(13,22,21),(12,23,22),(14,24,23),(15,25,24),(16,26,25),(15,27,26),(5,28,27),(17,29,28),(16,30,29),(18,31,30),(19,32,31),(20,33,32),(21,34,33),(23,35,34),(22,36,35),(24,37,36),(25,38,37),(25,39,38),(26,40,39),(28,41,40),(28,42,41),(28,43,42),(22,44,43),(29,45,44),(30,46,45),(32,47,46),(31,48,47),(33,49,48),(34,50,49),(35,51,50),(36,52,51),(37,53,52),(38,54,53),(38,55,54),(39,56,55),(39,57,56),(39,58,57),(40,59,58),(41,60,59),(41,61,60);
 /*!40000 ALTER TABLE `defender_lesson_tag` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -104,7 +104,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `defender_tag` WRITE;
 /*!40000 ALTER TABLE `defender_tag` DISABLE KEYS */;
-INSERT INTO `defender_tag` VALUES (30530,0,1),(30530,0,2),(29967,0,3),(29967,0,4),(29483,0,5),(28246,0,6),(28534,0,7),(28534,0,8);
+INSERT INTO `defender_tag` VALUES (30530,0,1),(30530,0,2),(29967,0,3),(29967,0,4),(29483,0,5),(28246,0,6),(28534,0,7),(28534,0,8),(15804,0,9),(15804,0,10),(16408,0,11),(16408,0,12),(16649,0,13),(16408,0,14),(16408,0,15),(16423,0,16),(16423,0,17),(16430,0,18),(16430,0,19),(16431,0,20),(16440,0,21),(16440,0,22),(16441,0,23),(16461,0,24),(16461,0,25),(16462,0,26),(16463,0,27),(16463,0,28),(16464,0,29),(16465,0,30),(16465,0,31),(16466,0,32),(16467,0,33),(16468,0,34),(16469,0,35),(16469,0,36),(16438,0,37),(16470,0,38),(16471,0,39),(16471,0,40),(16472,0,41),(16473,0,42),(16474,0,43),(16474,0,44),(16474,0,45),(16475,0,46),(16475,0,47),(16475,0,48),(16475,0,49),(16476,0,50),(16476,0,51),(16477,0,52),(16474,0,53),(24910,0,54),(24911,0,55),(24937,0,56),(24970,0,57),(24985,0,58),(24985,0,59),(24985,0,60),(25000,0,61);
 /*!40000 ALTER TABLE `defender_tag` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -114,7 +114,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `defender_tag_translation` WRITE;
 /*!40000 ALTER TABLE `defender_tag_translation` DISABLE KEYS */;
-INSERT INTO `defender_tag_translation` VALUES (1,'1-30',1,1),(1,'1-30',2,2),(1,'1-43',3,3),(1,'1-43',4,4),(1,'1-12',5,5),(1,'1-19',6,6),(1,'1-33',7,7),(1,'1-33',8,8);
+INSERT INTO `defender_tag_translation` VALUES (1,'2-6,10-17',1,1),(1,'1-30',2,2),(1,'16-24',3,3),(1,'1-43',4,4),(1,'8-12',5,5),(1,'5-6,10-12',6,6),(1,'1-33',7,7),(1,'1-33',8,8),(1,'1-25',10,9),(1,'1-16',11,10),(1,'1-16',12,11),(1,'1-18',13,12),(1,'1-16',14,13),(1,'1-16',15,14),(1,'1-20',16,15),(1,'1-20',17,16),(1,'1-14',18,17),(1,'1-14',19,18),(1,'1-11',20,19),(1,'1-13',21,20),(1,'1-13',22,21),(1,'1-17',23,22),(1,'1-15',24,23),(1,'1-15',25,24),(1,'1-12',26,25),(1,'1-14',27,26),(1,'1-14',28,27),(1,'1-12',29,28),(1,'1-14',30,29),(1,'1-14',31,30),(1,'1-17',32,31),(1,'1-15',33,32),(1,'1-17',34,33),(1,'1-13',35,34),(1,'1-13',36,35),(1,'1-14',37,36),(1,'1-19',38,37),(1,'1-20',39,38),(1,'1-20',40,39),(1,'1-16',41,40),(1,'1-12',42,41),(1,'1-21',43,42),(1,'1-21',44,43),(1,'1-21',45,44),(1,'1-15',46,45),(1,'1-15',47,46),(1,'1-15',48,47),(1,'1-15',49,48),(1,'1-15',50,49),(1,'1-15',51,50),(1,'1-14',52,51),(1,'1-21',53,52),(1,'1-15',54,53),(1,'1-41',55,54),(1,'1-16',56,55),(1,'1-25',57,56),(1,'1-19',58,57),(1,'1-19',59,58),(1,'1-19',60,59),(1,'1-23',61,60);
 /*!40000 ALTER TABLE `defender_tag_translation` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -193,4 +193,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-31  7:36:05
+-- Dump completed on 2016-04-03 17:49:48
