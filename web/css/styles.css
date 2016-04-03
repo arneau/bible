@@ -50,11 +50,17 @@ table {
   @media (min-width: 576px) {
     .passage {
       padding: 20px 0 20px 20px; } }
-  .passage sup {
+  .passage p sup {
     color: #e4e4e4;
-    font-weight: bold; }
-  .passage mark {
-    background-color: #fd4; }
+    font-weight: bold;
+    padding-right: 5px; }
+  .passage p span {
+    display: inline-block; }
+    .passage p span.highlighted {
+      background-color: #fd4;
+      padding: 0 5px; }
+      .passage p span.highlighted + .highlighted {
+        margin-left: -9px; }
   .passage cite {
     color: #d8d8d8;
     float: left;
@@ -66,7 +72,7 @@ table {
     .passage cite span.vote_up, .passage cite span.vote_down {
       cursor: pointer;
       display: inline-block;
-      padding: 10px 3px; }
+      padding: 11px 3px 9px; }
       .passage cite span.vote_up:hover img, .passage cite span.vote_down:hover img {
         background-color: #17b; }
       .passage cite span.vote_up img, .passage cite span.vote_down img {
@@ -117,12 +123,7 @@ body {
   #header a {
     font-size: 1.1em; } }
 
-.passage mark {
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-  padding: 2px 5px; }
-
-.passage sup {
+.passage p sup {
   font-size: 0.7em;
   line-height: 1.6; }
 

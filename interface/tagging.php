@@ -16,7 +16,7 @@ if (isset($_GET['add_lesson_tag'])) {
 }
 
 # Get passage data
-$passage_data = getPassageData($_GET['reference_string']);
+$passage_data = getPassageDataAndVerses($_GET['reference_string']);
 
 # Get topics select options
 $topics_select_options = getTopicsSelectOptions($_GET['topic_parent_id']);
@@ -34,7 +34,7 @@ s;
 foreach ($passage_data['verses'] as $passage_verse_data) {
 echo <<<s
 <p>
-	<b>{$passage_verse_data['text']}</b>
+	<b>{$passage_verse_data['text']['string']}</b>
 </p>
 <p>
 	<b>Topics:</b>
@@ -75,7 +75,7 @@ echo <<<s
 	<br/>
 	<label>Relevant words</label>
 	<input name="relevant_words" type="text" value="1-{$passage_verse_data['word_count']}" />
-	<input name="bible_code" type="hidden" value="{$passage_data['bible']['code']}" />
+	<input name="bible_code" type="hidden" value="{$passage_data['bible']['code']['default']}" />
 	<input name="verse_id" type="hidden" value="{$passage_data['verses'][0]['id']}" />
 	<br/>
 	<input name="add_lesson_tag" type="submit" value="Add tag" />

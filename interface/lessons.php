@@ -10,6 +10,11 @@ if (isset($_GET['lesson_parent_id']) && isset($_GET['lesson_name'])) {
 	addLesson($_GET['lesson_parent_id'], $_GET['lesson_name']);
 }
 
+# Move lesson (if applicable)
+if (isset($_GET['move_lesson'])) {
+	moveLesson($_GET['lesson_id'], $_GET['lesson_parent_id']);
+}
+
 # Rename lesson (if applicable)
 if (isset($_GET['rename_lesson'])) {
 	renameLesson($_GET['lesson_id'], $_GET['lesson_summary']);
@@ -33,6 +38,20 @@ echo <<<s
 	<input name="lesson_name" style="width: 300px;" type="text" />
 	<br/>
 	<input name="add_lesson" type="submit" value="Add lesson" />
+</form>
+<h1>Move lesson</h1>
+<form>
+	<label>Lesson</label>
+	<select name="lesson_id">
+		$lessons_select_options
+	</select>
+	<br/>
+	<label>New parent</label>
+	<select name="lesson_parent_id">
+		$lessons_select_options
+	</select>
+	<br/>
+	<input name="move_lesson" type="submit" value="Move lesson" />
 </form>
 <h1>Rename lesson</h1>
 <form>

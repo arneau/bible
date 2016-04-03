@@ -41,7 +41,7 @@ function getLessonData($lesson_id) {
 
 }
 
-function getLessonTags($lesson_id) {
+function getLessonTags($lesson_id, $bible_code = 'kjv') {
 
 	# Get lesson object
 	$lesson_object = getLesson($lesson_id);
@@ -50,20 +50,35 @@ function getLessonTags($lesson_id) {
 	$lesson_tags_objects = $lesson_object->getLessonTags();
 
 	# Handle lesson tags objects
+	$lesson_tags_to_return = [];
 	foreach ($lesson_tags_objects as $lesson_tag_object) {
 
 		# Get tag object
 		$tag_object = $lesson_tag_object->getTag();
 
-		# Get tag data
-		$tag_data = $tag_object->toArray();
-		var_dump($tag_data);
-		die;
+		# Get tag translation object
+		$tag_translation_object = TagTranslationQuery::create()
+			->filterByBible(getBibleByCode($bible_code))
+			->filterByTag($tag_object)
+			->findOne();
+
+		# Append lesson tag to lesson tags to return
+		$lesson_tags_to_return[] = [
+			'bible' => [
+				'code' => $bible_code,
+			],
+			'id' => $tag_object->getId(),
+			'relevant_words' => $tag_translation_object->getRelevantWords(),
+			'verse' => [
+				'id' => $tag_object->getVerseId(),
+			],
+			'vote_count' => $tag_object->getVoteCount(),
+		];
 
 	}
 
-	# Return lesson data
-	return $lesson_data;
+	# Return lesson tags
+	return $lesson_tags_to_return;
 
 }
 
@@ -141,6 +156,23 @@ function getLessonsSelectOptions($selected_lesson_id = false) {
 
 	# Return lessons select options string
 	return $lessons_select_options;
+
+}
+
+function moveLesson($lesson_id, $lesson_parent_id) {
+
+	# Get lesson object
+	$lesson_object = getLesson($lesson_id);
+
+	# Get parent lesson object
+	$parent_lesson_object = getLesson($lesson_parent_id);
+
+	# Rename lesson and save
+	$lesson_object->moveToLastChildOf($parent_lesson_object)
+		->save();
+
+	# Return lesson object
+	return $lesson_object;
 
 }
 

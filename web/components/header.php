@@ -5,6 +5,7 @@
 	<link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bitter:400,400italic,700">
 	<link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bree+Serif">
 	<link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 </head>
 <body>
 <div id="header">

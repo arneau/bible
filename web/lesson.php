@@ -10,7 +10,7 @@ require_once 'components/header.php';
 
 # Get lesson, data, etc
 $lesson_data = getLessonData($_GET['id']);
-//$lessons_passages = getLessonTags($_GET['id']);
+$lessons_tags = getLessonTags($_GET['id']);
 
 # Start page
 echo <<<s
@@ -25,22 +25,17 @@ echo <<<s
 			<div class="column">
 				<section class="passages">
 					<h3>Tagged passages</h3>
-					<blockquote class="passage">
-						<sup>14</sup> <mark>What is man, that he should be clean?</mark> and he which is born of a woman, that he should be righteous?
-						<cite>
-							<span class="reference">Job 15:14</span> &middot;
-							<span class="bible" data-info="King James Version">KJV</span> &middot;
-							<span class="vote_count">0</span> votes
-							<span class="vote_up">
-								<img src="assets/images/arrow_up.png" />
-							</span>
-							<span class="vote_down">
-								<img src="assets/images/arrow_down.png" />
-							</span>
-						</cite>
-					</blockquote>
 s;
-echo getPassageHTMLByVerseId(30530);
+
+# Display lesson tags
+if ($lessons_tags) {
+
+	foreach ($lessons_tags as $lesson_tag_data) {
+		echo getPassageHTMLByVerseId($lesson_tag_data['verse']['id'], $lesson_tag_data['bible']['code'], $lesson_tag_data['relevant_words']);
+	}
+
+}
+
 echo <<<s
 				</section>
 			</div>

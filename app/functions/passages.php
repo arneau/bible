@@ -24,8 +24,8 @@ function getPassageData($reference_string, $bible_code = 'kjv') {
 	$passage_data = [
 		'bible' => [
 			'code' => [
+				'default' => $bible_object->getCode(),
 				'formatted' => strtoupper($bible_object->getCode()),
-				'value' => $bible_object->getCode(),
 			],
 			'id' => $bible_object->getId(),
 			'name' => $bible_object->getName(),
@@ -78,6 +78,14 @@ function getPassageDataAndVerses($reference_string, $bible_code = 'kjv') {
 		# Get verse lessons tags data
 		$verse_lessons_tags_data = getVerseLessonsTagsData($verse_object->getId());
 
+		# Handle verse words
+		$verse_translation_text_array = explode(' ', $verse_translation_object->getText());
+		foreach ($verse_translation_text_array as $word_number => &$word_value) {
+			$index ++;
+			$word_value = '<span data-verse="' . $verse_object->getId() . '" data-word="' . $index . '">' . $word_value . '</span>';
+		}
+		$verse_translation_text_array = implode(' ', $verse_translation_text_array);
+
 		# Append verse data
 		$passage_data['verses'][] = [
 			'id' => $verse_object->getId(),
@@ -86,7 +94,10 @@ function getPassageDataAndVerses($reference_string, $bible_code = 'kjv') {
 				'lessons' => $verse_lessons_tags_data,
 				'topics' => $verse_topics_tags_data,
 			],
-			'text' => $verse_translation_object->getText(),
+			'text' => [
+				'array' => $verse_translation_text_array,
+				'string' => $verse_translation_object->getText(),
+			],
 			'word_count' => $verse_translation_object->getWordCount(),
 		];
 
@@ -97,19 +108,22 @@ function getPassageDataAndVerses($reference_string, $bible_code = 'kjv') {
 
 }
 
-function getPassageHTML($reference_string, $bible_code = 'kjv', $relevant_words = [], $vote_count = 0) {
+function getPassageHTML($reference_string, $bible_code = 'kjv', $words_to_highlight = [], $vote_count = 0) {
 
 	# Get passage data
 	$passage_data = getPassageDataAndVerses($reference_string, $bible_code);
 
-	# Define passage HTML
+	# Start passage HTML
 	$passage_html = <<<s
 <blockquote class="passage">
-	<sup>{$passage_data[verses][0][number]}</sup> {$passage_data[verses][0][text]}
+	<p>
+		<sup>{$passage_data[verses][0][number]}</sup>
+		{$passage_data[verses][0][text]['array']}
+	</p>
 	<cite>
 		<span class="reference">{$passage_data[reference][string]}</span> &middot;
 		<span class="bible" data-info="{$passage_data[bible][name]}">{$passage_data[bible][code][formatted]}</span> &middot;
-		<span class="vote_count">0</span> votes
+		<span class="vote_count">$vote_count</span> votes
 		<span class="vote_up">
 			<img src="assets/images/arrow_up.png" />
 		</span>
@@ -120,162 +134,185 @@ function getPassageHTML($reference_string, $bible_code = 'kjv', $relevant_words 
 </blockquote>
 s;
 
-	# Return passage HTML
-	return $passage_html;
+	# Add highlighting (if applicable)
+	if ($words_to_highlight) {
 
-}
+		# Get words to highlight array
+		$words_to_highlight_array = getUniqueNumbers($words_to_highlight);
 
-function getPassageHTMLByVerseId($verse_id, $bible_code = 'kjv', $relevant_words = [], $vote_count = 0) {
+		# Handle words to highlight
+		$passage_html .= <<<s
+<script>
+s;
 
-	# Get verse reference
-	$verse_reference = getVerseReference($verse_id);
-
-	# Get passage HTML
-	$passage_html = getPassageHTML($verse_reference, $bible_code, $relevant_words, $vote_count);
-
-	# Return passage HTML
-	return $passage_html;
-
-}
-
-function getReferenceData($reference_string) {
-
-	# Preg match parts
-	preg_match('/(\d?\s?\w*)\s+(\d+):?(.+)?/', $reference_string, $reference_parts);
-
-	# Check parts
-	if ($reference_parts && $reference_parts[1] && $reference_parts[2]) {
-
-		# Handle parts
-		$reference_data['book'] = $reference_parts[1];
-		$reference_data['chapter'] = $reference_parts[2];
-		if (isset($reference_parts[3])) {
-			$reference_data['verses'] = getUniqueNumbers($reference_parts[3]);
-		} else {
-			$reference_data['verses'] = [];
+		foreach ($words_to_highlight_array as $word_to_highlight_number) {
+			$passage_html .= <<<s
+	$('[data-verse={$passage_data[verses][0][id]}][data-word=$word_to_highlight_number]').addClass('highlighted');
+s;
 		}
 
-		# Return reference data
-		return $reference_data;
+		$passage_html .= <<<s
+</script>
+s;
 
-	} else {
+		}
 
-		# Return error
-		return false;
+		# Return passage HTML
+		return $passage_html;
 
 	}
 
-}
+	function getPassageHTMLByVerseId($verse_id, $bible_code = 'kjv', $relevant_words = [], $vote_count = 0) {
 
-function getUniqueNumbers($reference_string) {
+		# Get verse reference
+		$verse_reference = getVerseReference($verse_id);
 
-	# Handle reference string
-	$numbers_to_return = [];
-	foreach (explode(',', $reference_string) as $reference_string_part) {
+		# Get passage HTML
+		$passage_html = getPassageHTML($verse_reference, $bible_code, $relevant_words, $vote_count);
 
-		# Check if reference string part contains range
-		if (strpos($reference_string_part, '-')) {
+		# Return passage HTML
+		return $passage_html;
 
-			# Get reference string part range
-			$reference_string_range = explode('-', $reference_string_part);
+	}
 
-			# Get numbers array
-			$numbers_array = range($reference_string_range[0], $reference_string_range[1]);
+	function getReferenceData($reference_string) {
 
-			# Append numbers array to numbers to return
-			foreach ($numbers_array as $number) {
-				$numbers_to_return[] = $number;
+		# Preg match parts
+		preg_match('/(\d?\s?\w*)\s+(\d+):?(.+)?/', $reference_string, $reference_parts);
+
+		# Check parts
+		if ($reference_parts && $reference_parts[1] && $reference_parts[2]) {
+
+			# Handle parts
+			$reference_data['book'] = $reference_parts[1];
+			$reference_data['chapter'] = $reference_parts[2];
+			if (isset($reference_parts[3])) {
+				$reference_data['verses'] = getUniqueNumbers($reference_parts[3]);
+			} else {
+				$reference_data['verses'] = [];
 			}
 
+			# Return reference data
+			return $reference_data;
+
 		} else {
 
-			# Append number to numbers to return
-			$numbers_to_return[] = $reference_string_part;
+			# Return error
+			return false;
+
 		}
 
 	}
 
-	# Return numbers
-	return $numbers_to_return;
+	function getUniqueNumbers($reference_string) {
 
-}
+		# Handle reference string
+		$numbers_to_return = [];
+		foreach (explode(',', $reference_string) as $reference_string_part) {
 
-function getVerseTopicsTagsData($verse_id) {
+			# Check if reference string part contains range
+			if (strpos($reference_string_part, '-')) {
 
-	# Get verse topics tags objects
-	$verse_topics_tags_objects = TopicTagQuery::create()
-		->useTagQuery()
-		->filterByVerseId($verse_id)
-		->orderByVoteCount('DESC')
-		->endUse()
-		->find();
+				# Get reference string part range
+				$reference_string_range = explode('-', $reference_string_part);
 
-	# Handle verse topics tags objects
-	$verse_topics_tags_data = [];
-	foreach ($verse_topics_tags_objects as $verse_topic_tag_object) {
+				# Get numbers array
+				$numbers_array = range($reference_string_range[0], $reference_string_range[1]);
 
-		# Get topic object
-		$verse_topic_object = $verse_topic_tag_object->getTopic();
+				# Append numbers array to numbers to return
+				foreach ($numbers_array as $number) {
+					$numbers_to_return[] = $number;
+				}
 
-		# Get tag object
-		$verse_tag_object = $verse_topic_tag_object->getTag();
+			} else {
 
-		# Append tag data
-		$verse_topics_tags_data[] = [
-			'id' => $verse_topic_tag_object->getId(),
-			'tag' => [
-				'id' => $verse_tag_object->getId(),
-				'vote_count' => $verse_tag_object->getVoteCount(),
-			],
-			'topic' => [
-				'id' => $verse_topic_object->getId(),
-				'name' => $verse_topic_object->getName(),
-			],
-		];
+				# Append number to numbers to return
+				$numbers_to_return[] = $reference_string_part;
+			}
+
+		}
+
+		# Return numbers
+		return $numbers_to_return;
 
 	}
 
-	# Return verse tag data
-	return $verse_topics_tags_data;
+	function getVerseTopicsTagsData($verse_id) {
 
-}
+		# Get verse topics tags objects
+		$verse_topics_tags_objects = TopicTagQuery::create()
+			->useTagQuery()
+			->filterByVerseId($verse_id)
+			->orderByVoteCount('DESC')
+			->endUse()
+			->find();
 
-function getVerseLessonsTagsData($verse_id) {
+		# Handle verse topics tags objects
+		$verse_topics_tags_data = [];
+		foreach ($verse_topics_tags_objects as $verse_topic_tag_object) {
 
-	# Get verse lessons tags objects
-	$verse_lessons_tags_objects = LessonTagQuery::create()
-		->useTagQuery()
-		->filterByVerseId($verse_id)
-		->orderByVoteCount('DESC')
-		->endUse()
-		->find();
+			# Get topic object
+			$verse_topic_object = $verse_topic_tag_object->getTopic();
 
-	# Handle verse lessons tags objects
-	$verse_lessons_tags_data = [];
-	foreach ($verse_lessons_tags_objects as $verse_lesson_tag_object) {
+			# Get tag object
+			$verse_tag_object = $verse_topic_tag_object->getTag();
 
-		# Get lesson object
-		$verse_lesson_object = $verse_lesson_tag_object->getLesson();
+			# Append tag data
+			$verse_topics_tags_data[] = [
+				'id' => $verse_topic_tag_object->getId(),
+				'tag' => [
+					'id' => $verse_tag_object->getId(),
+					'vote_count' => $verse_tag_object->getVoteCount(),
+				],
+				'topic' => [
+					'id' => $verse_topic_object->getId(),
+					'name' => $verse_topic_object->getName(),
+				],
+			];
 
-		# Get tag object
-		$verse_tag_object = $verse_lesson_tag_object->getTag();
+		}
 
-		# Append tag data
-		$verse_lessons_tags_data[] = [
-			'id' => $verse_lesson_tag_object->getId(),
-			'tag' => [
-				'id' => $verse_tag_object->getId(),
-				'vote_count' => $verse_tag_object->getVoteCount(),
-			],
-			'lesson' => [
-				'id' => $verse_lesson_object->getId(),
-				'name' => $verse_lesson_object->getSummary(),
-			],
-		];
+		# Return verse tag data
+		return $verse_topics_tags_data;
 
 	}
 
-	# Return verse tag data
-	return $verse_lessons_tags_data;
+	function getVerseLessonsTagsData($verse_id) {
 
-}
+		# Get verse lessons tags objects
+		$verse_lessons_tags_objects = LessonTagQuery::create()
+			->useTagQuery()
+			->filterByVerseId($verse_id)
+			->orderByVoteCount('DESC')
+			->endUse()
+			->find();
+
+		# Handle verse lessons tags objects
+		$verse_lessons_tags_data = [];
+		foreach ($verse_lessons_tags_objects as $verse_lesson_tag_object) {
+
+			# Get lesson object
+			$verse_lesson_object = $verse_lesson_tag_object->getLesson();
+
+			# Get tag object
+			$verse_tag_object = $verse_lesson_tag_object->getTag();
+
+			# Append tag data
+			$verse_lessons_tags_data[] = [
+				'id' => $verse_lesson_tag_object->getId(),
+				'tag' => [
+					'id' => $verse_tag_object->getId(),
+					'vote_count' => $verse_tag_object->getVoteCount(),
+				],
+				'lesson' => [
+					'id' => $verse_lesson_object->getId(),
+					'name' => $verse_lesson_object->getSummary(),
+				],
+			];
+
+		}
+
+		# Return verse tag data
+		return $verse_lessons_tags_data;
+
+	}
