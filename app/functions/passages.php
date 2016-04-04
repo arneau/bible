@@ -108,7 +108,31 @@ function getPassageDataAndVerses($reference_string, $bible_code = 'kjv') {
 
 }
 
-function getPassageHTML($reference_string, $bible_code = 'kjv', $words_to_highlight = [], $vote_count = 0) {
+function getPassageHTML($passage_data = []) {
+
+	# Get bible object
+	if ($passage_data['bible_id']) {
+		$bible_object = getBible($passage_data['bible_id']);
+	} elseif ($passage_data['bible_code']) {
+		$bible_object = getBibleByCode($passage_data['bible_code']);
+	} else {
+		$bible_object = getBibleByCode('kjv');
+	}
+
+	# Get verse object
+	if ($passage_data['verse_id']) {
+		$verse_object = getVerse($passage_data['verse_id']);
+	} elseif ($passage_data['tag_id']) {
+		$tag_object = getTag($passage_data['tag_id']);
+		$verse_object = $tag_object->getVerse();
+	}
+
+	# Get verse translation object and data
+	$verse_translation_object = getVerseTranslationByVerseId($verse_object->getId(), $bible_object->getId());
+	$verse_translation_data = getVerseTranslationData($verse_translation_object->getId());
+
+	var_dump($verse_translation_data);
+	die;
 
 	# Get passage data
 	$passage_data = getPassageDataAndVerses($reference_string, $bible_code);
@@ -129,7 +153,8 @@ function getPassageHTML($reference_string, $bible_code = 'kjv', $words_to_highli
 		</span>
 		<span class="vote_down">
 			<img src="assets/images/arrow_down.png" />
-		</span>
+		</span> &middot;
+		<input data-action="update_translation_relevant_words" data-tag-translation="" type="text" value="$words_to_highlight" />
 	</cite>
 </blockquote>
 s;

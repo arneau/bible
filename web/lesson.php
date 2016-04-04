@@ -31,7 +31,7 @@ s;
 if ($lessons_tags) {
 
 	foreach ($lessons_tags as $lesson_tag_data) {
-		echo getPassageHTMLByVerseId($lesson_tag_data['verse']['id'], $lesson_tag_data['bible']['code'], $lesson_tag_data['relevant_words']);
+		echo getTagHTML($lesson_tag_data['id']);
 	}
 
 }

@@ -41,7 +41,7 @@ function getLessonData($lesson_id) {
 
 }
 
-function getLessonTags($lesson_id, $bible_code = 'kjv') {
+function getLessonTags($lesson_id) {
 
 	# Get lesson object
 	$lesson_object = getLesson($lesson_id);
@@ -56,23 +56,9 @@ function getLessonTags($lesson_id, $bible_code = 'kjv') {
 		# Get tag object
 		$tag_object = $lesson_tag_object->getTag();
 
-		# Get tag translation object
-		$tag_translation_object = TagTranslationQuery::create()
-			->filterByBible(getBibleByCode($bible_code))
-			->filterByTag($tag_object)
-			->findOne();
-
 		# Append lesson tag to lesson tags to return
 		$lesson_tags_to_return[] = [
-			'bible' => [
-				'code' => $bible_code,
-			],
 			'id' => $tag_object->getId(),
-			'relevant_words' => $tag_translation_object->getRelevantWords(),
-			'verse' => [
-				'id' => $tag_object->getVerseId(),
-			],
-			'vote_count' => $tag_object->getVoteCount(),
 		];
 
 	}
