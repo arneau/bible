@@ -61,6 +61,22 @@ function getTag($tag_id) {
 
 }
 
+function getTagData($tag_id) {
+
+	# Get tag object
+	$tag_object = getTag($tag_id);
+
+	# Define tag data
+	$tag_data = [
+		'id' => $tag_object->getId(),
+		'vote_count' => $tag_object->getVoteCount(),
+	];
+
+	# Return tag data
+	return $tag_data;
+
+}
+
 function getTagHTML($tag_id, $bible_code = 'kjv') {
 
 	# Get tag object
@@ -75,33 +91,64 @@ function getTagHTML($tag_id, $bible_code = 'kjv') {
 		->filterByTag($tag_object)
 		->findOne();
 
-	# Define passage data
-	$passage_data = [
+	# Define verse HTML data
+	$verse_html_data = [
 		'bible_id' => $bible_object->getId(),
 		'tag_id' => $tag_object->getId(),
 		'tag_translation_id' => $tag_translation_object->getId(),
 	];
 
 	# Get tag HTML
-	$tag_html = getPassageHTML($passage_data);
-
-	# Append lesson tag to lesson tags to return
-	$lesson_tags_to_return[] = [
-		'bible' => [
-			'code' => $bible_code,
-		],
-		'id' => $tag_object->getId(),
-		'relevant_words' => $tag_translation_object->getRelevantWords(),
-		'translation' => [
-			'id' => $tag_translation_object->getId(),
-		],
-		'verse' => [
-			'id' => $tag_object->getVerseId(),
-		],
-		'vote_count' => $tag_object->getVoteCount(),
-	];
+	$tag_html = getVerseHTML($verse_html_data);
 
 	# Return tag HTML
 	return $tag_html;
+
+}
+
+function getTagTranslation($tag_translation_id) {
+
+	# Get tag translation object
+	$tag_translation_object = TagTranslationQuery::create()
+		->findOneById($tag_translation_id);
+
+	# Return tag translation object
+	return $tag_translation_object;
+
+}
+
+function getTagTranslationByTagId($tag_id, $bible_id) {
+
+	# Get tag translation object
+	$tag_translation_object = TagTranslationQuery::create()
+		->filterByTagId($tag_id)
+		->filterByBibleId($bible_id)
+		->findOne();
+
+	# Return tag translation object
+	return $tag_translation_object;
+
+}
+
+function getTagTranslationData($tag_id) {
+
+	# Get tag translation object
+	$tag_translation_object = getTagTranslation($tag_id);
+
+	# Get bible object
+	$bible_object = $tag_translation_object->getBible();
+
+	# Get bible data
+	$bible_data = getBibleData($bible_object->getId());
+
+	# Define tag translation data
+	$tag_translation_data = [
+		'id' => $tag_translation_object->getId(),
+		'bible' => $bible_data,
+		'relevant_words' => $tag_translation_object->getRelevantWords(),
+	];
+
+	# Return tag translation data
+	return $tag_translation_data;
 
 }

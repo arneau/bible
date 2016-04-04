@@ -43,46 +43,46 @@ table {
 :focus {
   outline: 0; }
 
-.passage {
+.verse, .passage {
   border-left: 8px solid #eee;
   margin-bottom: 20px;
   padding: 10px 0 10px 10px; }
   @media (min-width: 576px) {
-    .passage {
+    .verse, .passage {
       padding: 20px 0 20px 20px; } }
-  .passage p sup {
+  .verse p sup, .passage p sup {
     color: #e4e4e4;
     font-weight: bold;
     padding-right: 5px; }
-  .passage p span {
+  .verse p span, .passage p span {
     display: inline-block; }
-    .passage p span.highlighted {
+    .verse p span.highlighted, .passage p span.highlighted {
       background-color: #fd4;
       padding: 0 5px; }
-      .passage p span.highlighted + .highlighted {
+      .verse p span.highlighted + .highlighted, .passage p span.highlighted + .highlighted {
         margin-left: -9px; }
-  .passage cite {
+  .verse cite, .passage cite {
     color: #d8d8d8;
     float: left;
     font-style: normal;
     margin-top: 5px;
     width: 100%; }
-    .passage cite span.bible:hover:after {
+    .verse cite span.bible:hover:after, .passage cite span.bible:hover:after {
       content: " · " attr(data-info); }
-    .passage cite span.vote_up, .passage cite span.vote_down {
+    .verse cite span.vote_up, .verse cite span.vote_down, .passage cite span.vote_up, .passage cite span.vote_down {
       cursor: pointer;
       display: inline-block;
       padding: 11px 3px 9px; }
-      .passage cite span.vote_up:hover img, .passage cite span.vote_down:hover img {
+      .verse cite span.vote_up:hover img, .verse cite span.vote_down:hover img, .passage cite span.vote_up:hover img, .passage cite span.vote_down:hover img {
         background-color: #17b; }
-      .passage cite span.vote_up img, .passage cite span.vote_down img {
+      .verse cite span.vote_up img, .verse cite span.vote_down img, .passage cite span.vote_up img, .passage cite span.vote_down img {
         background: #d8d8d8;
         width: 12px; }
 
 body {
   font-size: 18px; }
 
-.passage {
+.verse, .passage {
   float: left;
   font: 1em/1.6 "Bitter", "serif";
   width: 100%; }
@@ -123,7 +123,7 @@ body {
   #header a {
     font-size: 1.1em; } }
 
-.passage p sup {
+.verse p sup, .passage p sup {
   font-size: 0.7em;
   line-height: 1.6; }
 

@@ -11,6 +11,30 @@ function getVerse($verse_id) {
 
 }
 
+function getVerseData($verse_id) {
+
+	# Get verse object
+	$verse_object = getVerse($verse_id);
+
+	# Get book object
+	$book_object = $verse_object->getBook();
+
+	# Define verse data
+	$verse_data = [
+		'id' => $verse_object->getId(),
+		'book' => [
+			'name' => $book_object->getName(),
+		],
+		'chapter' => $verse_object->getChapterNumber(),
+		'number' => $verse_object->getVerseNumber(),
+	];
+	$verse_data['reference'] = $verse_data['book']['name'] . ' ' . $verse_data['chapter'] . ':' . $verse_data['number'];
+
+	# Return verse data
+	return $verse_data;
+
+}
+
 function getVerseReference($verse_id) {
 
 	# Get verse object
