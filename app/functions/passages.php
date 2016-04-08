@@ -133,7 +133,7 @@ function getReferenceData($reference_string) {
 		$reference_data['book'] = $reference_parts[1];
 		$reference_data['chapter'] = $reference_parts[2];
 		if (isset($reference_parts[3])) {
-			$reference_data['verses'] = getUniqueNumbers($reference_parts[3]);
+			$reference_data['verses'] = getVerseNumbers($reference_parts[3]);
 		} else {
 			$reference_data['verses'] = [];
 		}
@@ -147,39 +147,6 @@ function getReferenceData($reference_string) {
 		return false;
 
 	}
-
-}
-
-function getUniqueNumbers($reference_string) {
-
-	# Handle reference string
-	$numbers_to_return = [];
-	foreach (explode(',', $reference_string) as $reference_string_part) {
-
-		# Check if reference string part contains range
-		if (strpos($reference_string_part, '-')) {
-
-			# Get reference string part range
-			$reference_string_range = explode('-', $reference_string_part);
-
-			# Get numbers array
-			$numbers_array = range($reference_string_range[0], $reference_string_range[1]);
-
-			# Append numbers array to numbers to return
-			foreach ($numbers_array as $number) {
-				$numbers_to_return[] = $number;
-			}
-
-		} else {
-
-			# Append number to numbers to return
-			$numbers_to_return[] = $reference_string_part;
-		}
-
-	}
-
-	# Return numbers
-	return $numbers_to_return;
 
 }
 
@@ -232,7 +199,7 @@ function getVerseHTML($verse_html_data = []) {
 
 	# Start verse HTML
 	$verse_html = <<<s
-<blockquote class="verse">
+<blockquote class="verse" data-tag-translation="{$tag_translation_data['id']}">
 	<p>
 		<sup>{$verse_data['number']}</sup>
 		{$verse_translation_data['text']['formatted']}
@@ -240,47 +207,38 @@ function getVerseHTML($verse_html_data = []) {
 	<cite>
 		<span class="reference">{$verse_data['reference']}</span> &middot;
 		<span class="bible" data-info="{$bible_data['name']}">{$bible_data['code']['formatted']}</span>
+	</cite>
 s;
 
 	# Add tag elements (if applicable)
 	if ($verse_html_data['tag_id']) {
 		$verse_html .= <<<s
-		&middot;
+	<div class="votes">
 		<span class="vote_count">{$tag_data['vote_count']}</span> votes
-		<span class="vote_up">
-			<img src="assets/images/arrow_up.png" />
-		</span>
-		<span class="vote_down">
-			<img src="assets/images/arrow_down.png" />
-		</span> &middot;
-		<input data-action="update_tag_translation_relevant_words" data-tag-translation="{$tag_translation_data['id']}" value="{$tag_translation_data['relevant_words']}" />
+		<span class="vote_up icon-arrow-up"></span>
+		<span class="vote_down icon-arrow-down"></span>
+	</div>
+	<div class="relevant_words">
+		<span class="edit icon-edit" onclick="editTagTranslationRelevantWords({$tag_translation_data['id']});"></span>
+		<span class="confirm icon-confirm" onclick="confirmTagTranslationRelevantWords({$tag_translation_data['id']});"></span>
+	</div>
 s;
 	}
 
 	# Continue verse HTML
 	$verse_html .= <<<s
-	</cite>
 </blockquote>
 s;
 
 	# Add highlighting (if applicable)
 	if ($verse_html_data['tag_id']) {
 
-		# Get words to highlight array
-		$words_to_highlight_array = getUniqueNumbers($tag_translation_data['relevant_words']);
-
 		# Add words to highlight javascript
 		$verse_html .= <<<s
 <script>
-s;
-
-		foreach ($words_to_highlight_array as $word_to_highlight_number) {
-			$verse_html .= <<<s
-	$('[data-verse-translation={$verse_translation_data['id']}][data-word=$word_to_highlight_number]').addClass('highlighted');
-s;
-		}
-
-		$verse_html .= <<<s
+	$(document).ready(function() {
+		highlightTagTranslationWords({$tag_translation_data['id']}, '{$tag_translation_data['relevant_words']}');
+	});
 </script>
 s;
 
@@ -368,5 +326,67 @@ function getVerseLessonsTagsData($verse_id) {
 
 	# Return verse tag data
 	return $verse_lessons_tags_data;
+
+}
+
+function getVerseNumbers($verses_string) {
+
+	# Handle verses string
+	$verses_numbers_array = [];
+	foreach (explode(',', $verses_string) as $verses_string_part) {
+
+		# Check if verses string part contains range
+		if (strpos($verses_string_part, '-')) {
+
+			# Get verses string string part limits
+			$verses_string_part_limits = explode('-', $verses_string_part);
+
+			# Get verses string part range
+			$verses_string_part_range = range($verses_string_part_limits[0], $verses_string_part_limits[1]);
+
+			# Append multiple verse numbers to verses numbers array
+			$verses_numbers_array = array_merge($verses_numbers_array, $verses_string_part_range);
+
+		} else {
+
+			# Append single verse to verses numbers array
+			$verses_numbers_array[] = $verses_string_part * 1;
+		}
+
+	}
+
+	# Return verses numbers array
+	return $verses_numbers_array;
+
+}
+
+function getWordsToHighlight($words_to_highlight_string) {
+
+	# Handle words to highlight string
+	$words_to_highlight_array = [];
+	foreach (explode(',', $words_to_highlight_string) as $words_to_highlight_string_part) {
+
+		# Check if words to highlight string part contains range
+		if (strpos($words_to_highlight_string_part, '-')) {
+
+			# Get words to highlight string part limits
+			$words_to_highlight_string_part_limits = explode('-', $words_to_highlight_string_part);
+
+			# Get words to highlight string part range
+			$words_to_highlight_string_part_range = range($words_to_highlight_string_part_limits[0], $words_to_highlight_string_part_limits[1]);
+
+			# Append multiple words to highlight to words to highlight array
+			$words_to_highlight_array = array_merge($words_to_highlight_array, $words_to_highlight_string_part_range);
+
+		} else {
+
+			# Append single word to highlight to words to highlight array
+			$words_to_highlight_array[] = $words_to_highlight_string_part * 1;
+		}
+
+	}
+
+	# Return words to highlight array
+	return $words_to_highlight_array;
 
 }

@@ -61,6 +61,7 @@
 		}
 		&.settings {
 			float: right;
+			font-size: 24px;
 
 			&.active, &:hover {
 				background-color: $pink;

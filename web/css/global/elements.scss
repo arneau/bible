@@ -19,6 +19,7 @@
 		}
 		span {
 			display: inline-block;
+			transition: all 0.5s ease 0s;
 
 			&.highlighted {
 				background-color: #fd4;
@@ -34,13 +35,10 @@
 		color: #d8d8d8;
 		float: left;
 		font-style: normal;
-		margin-top: 5px;
-		width: 100%;
+		margin: 5px 20px 0 0;
 
 		span {
 
-			&.reference {
-			}
 			&.bible {
 
 				&:hover {
@@ -50,22 +48,40 @@
 					}
 				}
 			}
-			&.vote_up, &.vote_down {
-				cursor: pointer;
-				display: inline-block;
-				padding: 11px 3px 9px;
+		}
+	}
+	.votes {
+		color: #d8d8d8;
+		float: left;
+		margin: 5px 20px 0 0;
 
-				&:hover {
+		.vote_up, .vote_down {
+			cursor: pointer;
+			display: inline-block;
+			padding: 7px 3px 0;
 
-					img {
-						background-color: $blue;
-					}
-				}
+			&:hover {
+				color: $blue;
+			}
+		}
+	}
+	.relevant_words {
+		color: #d8d8d8;
+		float: left;
+		margin-top: 5px;
 
-				img {
-					background: #d8d8d8;
-					width: 12px;
-				}
+		.edit, .confirm {
+			cursor: pointer;
+			display: inline-block;
+			padding: 7px 3px 0;
+
+			&.confirm {
+				display: none;
+				font-size: 1.1em;
+			}
+
+			&:hover {
+				color: $blue;
 			}
 		}
 	}

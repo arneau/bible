@@ -9,21 +9,53 @@
 			color: #e8e8e8;
 		}
 	}
-	h3 {
-		@extend %h3_responsive;
+	section {
+		position: relative;
 
-		margin-bottom: 20px;
-	}
-	.passages {
-		border-left: 8px solid $blue;
-	}
-	.topics {
-		border-left: 8px solid $green;
-	}
-	.lessons {
-		border-left: 8px solid $yellow;
-	}
-	.notes {
-		border-left: 8px solid $orange;
+		&.passages {
+			border-left: 8px solid $blue;
+
+			.icon {
+				background-color: $blue;
+			}
+		}
+		&.topics {
+			border-left: 8px solid $green;
+
+			.icon {
+				background-color: $green;
+			}
+		}
+		&.lessons {
+			border-left: 8px solid $yellow;
+
+			.icon {
+				background-color: $yellow;
+			}
+		}
+		&.notes {
+			border-left: 8px solid $orange;
+
+			.icon {
+				background-color: $orange;
+			}
+		}
+
+		.icon {
+			color: #fff;
+			font-size: 32px;
+			height: 40px;
+			line-height: 40px;
+			position: absolute;
+			right: 0;
+			text-align: center;
+			top: 0;
+			width: 40px;
+		}
+		h3 {
+			@extend %h3_responsive;
+
+			margin-bottom: 20px;
+		}
 	}
 }

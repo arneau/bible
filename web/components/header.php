@@ -1,6 +1,7 @@
 <html>
 <head>
 	<link href="css/styles.css" rel="stylesheet" />
+	<link href="assets/icons.css" rel="stylesheet" />
 	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,700|Source+Sans+Pro:400,700" media="all" rel="stylesheet" type="text/css" />
 	<link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bitter:400,400italic,700">
 	<link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bree+Serif">
@@ -15,5 +16,5 @@
 	<a class="lessons" href="lessons.php">Lessons</a>
 	<a class="notes" href="#">Notes</a>
 	<a class="articles" href="#">Articles</a>
-	<a class="settings" href="#">Settings</a>
+	<a class="settings icon-settings" href="#"></a>
 </div>

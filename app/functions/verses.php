@@ -84,7 +84,7 @@ function getVerseTranslationData($verse_translation_id) {
 	$verse_translation_words_array = explode(' ', $verse_translation_object->getText());
 	foreach ($verse_translation_words_array as $word_number => &$word_value) {
 		$word_number ++;
-		$word_value = '<span data-verse-translation="' . $verse_translation_object->getId() . '" data-word="' . $word_number . '">' . $word_value . '</span>';
+		$word_value = '<span class="word" data-verse-translation="' . $verse_translation_object->getId() . '" data-word="' . $word_number . '">' . $word_value . '</span>';
 	}
 	$verse_translation_text_formatted = implode(' ', $verse_translation_words_array);
 

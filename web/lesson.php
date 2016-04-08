@@ -24,7 +24,8 @@ echo <<<s
 		<div class="columns">
 			<div class="column">
 				<section class="passages">
-					<h3>Tagged passages</h3>
+					<div class="icon icon-verses"></div>
+					<h3>Tagged verses</h3>
 s;
 
 # Display lesson tags
@@ -41,12 +42,15 @@ echo <<<s
 			</div>
 			<div class="column">
 				<section class="topics">
+					<div class="icon icon-topics"></div>
 					<h3>Relevant topics</h3>
 				</section>
 				<section class="lessons">
+					<div class="icon icon-lessons"></div>
 					<h3>Lesson family</h3>
 				</section>
 				<section class="notes">
+					<div class="icon icon-edit"></div>
 					<h3>Saved notes</h3>
 				</section>
 			</div>
