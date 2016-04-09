@@ -11,6 +11,28 @@ function getVerse($verse_id) {
 
 }
 
+function getVerseByReference($reference_string) {
+
+	# Get reference data
+	$reference_data = getReferenceData($reference_string);
+
+	# Get book object
+	$book_object = BookQuery::create()
+		->filterByName($reference_data['book'])
+		->findOne();
+
+	# Get verse object
+	$verse_object = VerseQuery::create()
+		->filterByBook($book_object)
+		->filterByChapterNumber($reference_data['chapter'])
+		->filterByVerseNumber($reference_data['verses'])
+		->findOne();
+
+	# Return verse object
+	return $verse_object;
+
+}
+
 function getVerseData($verse_id) {
 
 	# Get verse object
@@ -29,6 +51,19 @@ function getVerseData($verse_id) {
 		'number' => $verse_object->getVerseNumber(),
 	];
 	$verse_data['reference'] = $verse_data['book']['name'] . ' ' . $verse_data['chapter'] . ':' . $verse_data['number'];
+
+	# Return verse data
+	return $verse_data;
+
+}
+
+function getVerseDataByReference($reference_string) {
+
+	# Get verse object
+	$verse_object = getVerseByReference($reference_string);
+
+	# Get verse data
+	$verse_data = getVerseData($verse_object->getId());
 
 	# Return verse data
 	return $verse_data;

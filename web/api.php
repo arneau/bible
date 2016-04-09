@@ -5,11 +5,15 @@ require_once '../vendor/autoload.php';
 require_once '../generated-conf/config.php';
 require_once '../app/functions/functions.php';
 
-# Get words to highlight (if applicable)
-if (isset($_GET['get_words_to_highlight'])) {
-	$words_to_highlight = getWordsToHighlight($_GET['words_to_highlight_string']);
-	$words_to_highlight = json_encode($words_to_highlight);
-	echo $words_to_highlight;
+# Add lesson tag (if applicable)
+if (isset($_GET['add_lesson_tag'])) {
+
+	# Get verse object
+	$verse_object = getVerseByReference($_GET['reference_string']);
+
+	# Add lesson tag
+	addLessonTag($_GET['lesson_id'], $verse_object->getId());
+
 }
 
 # Update tag translation relevant words (if applicable)

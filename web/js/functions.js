@@ -57,8 +57,8 @@ function highlightTagTranslationWords(tag_translation_id, words_to_highlight_str
 
 function editTagTranslationRelevantWords(tag_translation_id) {
 
-	// Hide edit icon and show confirm icon
-	$('blockquote[data-tag-translation=' + tag_translation_id + '] .relevant_words .edit').hide().next().css('display', 'inline-block');
+	// Make display changes
+	$('blockquote[data-tag-translation=' + tag_translation_id + ']').css('border-left-color', '#fd4').find('.relevant_words .edit').hide().next().css('display', 'inline-block');
 
 	// Unhighlight all tag translation words
 	$('blockquote[data-tag-translation=' + tag_translation_id + '] .word').removeClass('highlighted');
@@ -105,8 +105,8 @@ function editTagTranslationRelevantWords(tag_translation_id) {
 
 function confirmTagTranslationRelevantWords(tag_translation_id) {
 
-	// Hide confirm icon and show edit icon
-	$('blockquote[data-tag-translation=' + tag_translation_id + '] .relevant_words .confirm').hide().prev().css('display', 'inline-block');
+	// Make display changes
+	$('blockquote[data-tag-translation=' + tag_translation_id + ']').css('border-left-color', '#eee').find('.relevant_words .confirm').hide().prev().css('display', 'inline-block');
 
 	// Submit relevant words to API
 	$.get('api.php?update_tag_translation_relevant_words&tag_translation=' + tag_translation_id + '&relevant_words=' + relevant_words[tag_translation_id].join(','));
@@ -126,3 +126,32 @@ function clearSelection() {
 	}
 
 }
+
+$('form[data-type=api]').submit(function() {
+	return submitForm(this);
+});
+
+function submitForm(form) {
+
+	// Submit form data to API and reload
+	$.get('api.php?' + $(form).attr('action') + '&' + $(form).serialize(), function() {
+		location.reload();
+	});
+
+	// Stop default form submission
+	return false;
+}
+
+function showPopup(popup_id) {
+
+	// Show popup by ID
+	$('#' + popup_id + '.popup').css('display', 'flex').find('input[type=text]').first().focus();
+
+}
+
+// Add listeners to popups
+$('.popup').click(function() {
+	$(this).hide();
+}).children().first().click(function(event) {
+	event.stopPropagation();
+});

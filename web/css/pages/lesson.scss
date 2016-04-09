@@ -10,52 +10,117 @@
 		}
 	}
 	section {
-		position: relative;
 
-		&.passages {
-			border-left: 8px solid $blue;
+		&#passages {
+			border-bottom: 8px solid $blue;
 
-			.icon {
+			.heading {
 				background-color: $blue;
+
+				.icon {
+					margin-top: 6px;
+				}
 			}
 		}
-		&.topics {
-			border-left: 8px solid $green;
+		&#topics {
+			border-bottom: 8px solid $green;
 
-			.icon {
+			.heading {
 				background-color: $green;
+
+				.icon {
+					margin-top: 4px;
+				}
 			}
 		}
-		&.lessons {
-			border-left: 8px solid $yellow;
+		&#lessons {
+			border-bottom: 8px solid $yellow;
 
-			.icon {
+			.heading {
 				background-color: $yellow;
+
+				.icon {
+					margin-top: 5px;
+				}
+			}
+			.content {
+
+				ul {
+					@extend %ul;
+
+					margin-bottom: 20px;
+
+					li {
+						@extend %li;
+
+						a {
+
+							&.current, &:hover {
+								color: $yellow;
+							}
+						}
+					}
+				}
 			}
 		}
-		&.notes {
-			border-left: 8px solid $orange;
+		&#notes {
+			border-bottom: 8px solid $red;
 
-			.icon {
-				background-color: $orange;
+			.heading {
+				background-color: $red;
+
+				.icon {
+					margin-top: 4px;
+				}
 			}
 		}
+	}
+}
 
-		.icon {
-			color: #fff;
-			font-size: 32px;
-			height: 40px;
-			line-height: 40px;
-			position: absolute;
-			right: 0;
-			text-align: center;
-			top: 0;
-			width: 40px;
+#add_lesson_popup {
+
+	.box {
+
+		.heading {
+			background-color: $blue;
+
+			h3 {
+
+				span {
+					display: inline-block;
+					font-size: 24px;
+					margin: 4px 12px 0 0;
+
+					@include width(medium) {
+						font-size: 32px;
+						margin-top: 5px;
+					}
+
+					@include width(large) {
+						margin-top: 6px;
+					}
+				}
+			}
 		}
-		h3 {
-			@extend %h3_responsive;
+		.content {
 
-			margin-bottom: 20px;
+			p {
+				@extend %p;
+
+				label {
+					@extend %label;
+
+					margin-bottom: 5px;
+				}
+				input[type=text] {
+					@extend %input;
+				}
+				button {
+					@extend %button;
+
+					background-color: $blue;
+				}
+			}
 		}
 	}
 }

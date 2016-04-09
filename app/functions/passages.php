@@ -200,10 +200,10 @@ function getVerseHTML($verse_html_data = []) {
 	# Start verse HTML
 	$verse_html = <<<s
 <blockquote class="verse" data-tag-translation="{$tag_translation_data['id']}">
-	<p>
+	<div class="text">
 		<sup>{$verse_data['number']}</sup>
 		{$verse_translation_data['text']['formatted']}
-	</p>
+	</div>
 	<cite>
 		<span class="reference">{$verse_data['reference']}</span> &middot;
 		<span class="bible" data-info="{$bible_data['name']}">{$bible_data['code']['formatted']}</span>
@@ -219,8 +219,8 @@ s;
 		<span class="vote_down icon-arrow-down"></span>
 	</div>
 	<div class="relevant_words">
-		<span class="edit icon-edit" onclick="editTagTranslationRelevantWords({$tag_translation_data['id']});"></span>
-		<span class="confirm icon-confirm" onclick="confirmTagTranslationRelevantWords({$tag_translation_data['id']});"></span>
+		<span class="edit icon-pencil" onclick="editTagTranslationRelevantWords({$tag_translation_data['id']});"></span>
+		<span class="confirm icon-tick" onclick="confirmTagTranslationRelevantWords({$tag_translation_data['id']});"></span>
 	</div>
 s;
 	}

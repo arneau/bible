@@ -25,7 +25,7 @@ function addTopicTag($topic_id, $verse_id, $bible_code, $relevant_words) {
 
 }
 
-function addLessonTag($lesson_id, $verse_id, $bible_code, $relevant_words) {
+function addLessonTag($lesson_id, $verse_id, $bible_code = 'kjv', $relevant_words = '') {
 
 	# Add tag object
 	$tag_object = new Tag();

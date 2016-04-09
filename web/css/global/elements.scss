@@ -9,7 +9,7 @@
 		padding: 20px 0 20px 20px;
 	}
 
-	p {
+	.text {
 		sup {
 			@extend %sup;
 
@@ -82,6 +82,66 @@
 
 			&:hover {
 				color: $blue;
+			}
+		}
+	}
+}
+
+.popup {
+	align-items: center;
+	background-color: rgba(0, 0, 0, 0.9);
+	bottom: 0;
+	display: none;
+	justify-content: center;
+	left: 0;
+	padding: 20px;
+	position: fixed;
+	right: 0;
+	top: 0;
+
+	@include width(medium) {
+		padding: 40px;
+	}
+
+	.box {
+		background-color: #fff;
+		box-shadow: 5px 5px #000;
+		max-width: 500px;
+		width: 100%;
+
+		.heading {
+			box-shadow: 0 5px rgba(0, 0, 0, 0.05);
+			float: left;
+			padding: 20px;
+			width: 100%;
+
+			@include width(medium) {
+				padding: 30px;
+			}
+
+			h3 {
+				@extend %h3_responsive;
+
+				color: #fff;
+			}
+		}
+		.content {
+			float: left;
+			padding: 20px 20px 0;
+			width: 100%;
+
+			@include width(medium) {
+				padding: 30px 30px 10px;
+			}
+
+			p {
+				@extend %p;
+
+				margin-bottom: 20px;
+
+				@include width(medium) {
+					margin-bottom: 30px;
+				}
 			}
 		}
 	}
