@@ -1,77 +1,86 @@
 #lesson_page {
 
-	h1 {
-		@extend %h1_responsive;
+	.page_heading {
+		@extend %default_section;
 
-		margin-bottom: 20px;
+		h1 {
+			@extend %h1_responsive;
 
-		span {
-			color: #e8e8e8;
+			margin-bottom: 20px;
+
+			span {
+				color: #e8e8e8;
+			}
 		}
 	}
-	section {
+	#passages {
+		@extend %toggle_section;
 
-		&#passages {
-			border-bottom: 8px solid $blue;
+		border-bottom: 8px solid $dark_blue;
 
-			.heading {
-				background-color: $blue;
+		.heading {
+			background-color: $dark_blue;
 
-				.icon {
-					margin-top: 6px;
-				}
+			.icon {
+				margin-top: 6px;
 			}
 		}
-		&#topics {
-			border-bottom: 8px solid $green;
+	}
+	#topics {
+		@extend %toggle_section;
 
-			.heading {
-				background-color: $green;
+		border-bottom: 8px solid $dark_green;
 
-				.icon {
-					margin-top: 4px;
-				}
+		.heading {
+			background-color: $dark_green;
+
+			.icon {
+				margin-top: 4px;
 			}
 		}
-		&#lessons {
-			border-bottom: 8px solid $yellow;
+	}
+	#lessons {
+		@extend %toggle_section;
 
-			.heading {
-				background-color: $yellow;
+		border-bottom: 8px solid $yellow;
 
-				.icon {
-					margin-top: 5px;
-				}
+		.heading {
+			background-color: $yellow;
+
+			.icon {
+				margin-top: 5px;
 			}
-			.content {
+		}
+		.content {
 
-				ul {
-					@extend %ul;
+			ul {
+				@extend %ul;
 
-					margin-bottom: 20px;
+				margin-bottom: 20px;
 
-					li {
-						@extend %li;
+				li {
+					@extend %li;
 
-						a {
+					a {
 
-							&.current, &:hover {
-								color: $yellow;
-							}
+						&.current, &:hover {
+							color: $yellow;
 						}
 					}
 				}
 			}
 		}
-		&#notes {
-			border-bottom: 8px solid $red;
+	}
+	#notes {
+		@extend %toggle_section;
 
-			.heading {
-				background-color: $red;
+		border-bottom: 8px solid $red;
 
-				.icon {
-					margin-top: 4px;
-				}
+		.heading {
+			background-color: $red;
+
+			.icon {
+				margin-top: 4px;
 			}
 		}
 	}
@@ -82,7 +91,7 @@
 	.box {
 
 		.heading {
-			background-color: $blue;
+			background-color: $dark_blue;
 
 			h3 {
 
@@ -118,7 +127,7 @@
 				button {
 					@extend %button;
 
-					background-color: $blue;
+					background-color: $dark_blue;
 				}
 			}
 		}

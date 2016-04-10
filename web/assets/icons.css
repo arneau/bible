@@ -1,10 +1,10 @@
 @font-face {
     font-family: 'icons';
-    src:    url('fonts/icons.eot?mdo615');
-    src:    url('fonts/icons.eot?mdo615#iefix') format('embedded-opentype'),
-        url('fonts/icons.ttf?mdo615') format('truetype'),
-        url('fonts/icons.woff?mdo615') format('woff'),
-        url('fonts/icons.svg?mdo615#icons') format('svg');
+    src:    url('fonts/icons.eot?aowdig');
+    src:    url('fonts/icons.eot?aowdig#iefix') format('embedded-opentype'),
+        url('fonts/icons.ttf?aowdig') format('truetype'),
+        url('fonts/icons.woff?aowdig') format('woff'),
+        url('fonts/icons.svg?aowdig#icons') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -56,5 +56,8 @@
 }
 .icon-bible-add:before {
     content: "\f005";
+}
+.icon-close:before {
+    content: "\f081";
 }
 

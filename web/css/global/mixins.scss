@@ -1,5 +1,12 @@
 @import 'config';
 
+@mixin unselectable() {
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
 @mixin width($width) {
 	@if($width == 'medium') {
 		@media (min-width: $medium) {

@@ -1,10 +1,10 @@
-<?php
+cd<?php
 
 return [
 	'propel' => [
 		'paths' => [
-			'schemaDir' => '/Users/arneau/Documents/defender-app/app/database/',
-			'phpDir' => '/Users/arneau/Documents/defender-app/app/models/',
+			'schemaDir' => '/Applications/XAMPP/xamppfiles/htdocs/defender-app/app/database/',
+			'phpDir' => '/Applications/XAMPP/xamppfiles/htdocs/defender-app/app/models/',
 		],
 	],
 ];

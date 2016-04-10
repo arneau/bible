@@ -38,7 +38,7 @@ function getUniqueNumbers(reference_string) {
 
 }
 
-function highlightTagTranslationWords(tag_translation_id, words_to_highlight_string, unhighlight_first = false) {
+function highlightTagTranslationWords(tag_translation_id, words_to_highlight_string, unhighlight_first) {
 
 	// Unhighlight all tag translation words (if applicable)
 	if (unhighlight_first) {
@@ -113,6 +113,15 @@ function confirmTagTranslationRelevantWords(tag_translation_id) {
 
 }
 
+function deleteTag(tag_id) {
+
+	// Send request to API and reload
+	$.get('api.php?delete_tag&tag=' + tag_id, function() {
+		location.reload();
+	});
+
+}
+
 function clearSelection() {
 
 	// Clear selection in Firefox
@@ -145,7 +154,7 @@ function submitForm(form) {
 function showPopup(popup_id) {
 
 	// Show popup by ID
-	$('#' + popup_id + '.popup').css('display', 'flex').find('input[type=text]').first().focus();
+	$('#' + popup_id + '.popup').css('display', 'flex').find('input[type=text]').first().select();
 
 }
 

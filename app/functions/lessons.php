@@ -46,19 +46,25 @@ function getLessonTags($lesson_id) {
 	# Get lesson object
 	$lesson_object = getLesson($lesson_id);
 
-	# Get lesson tags objects
-	$lesson_tags_objects = $lesson_object->getLessonTags();
+	# Get lesson tags IDs
+	$lesson_tags_ids = $lesson_object->getLessonTags()->getPrimaryKeys();
+
+	# Get applicable tag objects
+	$tags_objects = TagQuery::create()
+		->useLessonTagQuery()
+		->filterByPrimaryKeys($lesson_tags_ids)
+		->endUse()
+		->orderByVoteCount()
+		->orderByVerseId()
+		->find();
 
 	# Handle lesson tags objects
 	$lesson_tags_to_return = [];
-	foreach ($lesson_tags_objects as $lesson_tag_object) {
-
-		# Get tag object
-		$tag_object = $lesson_tag_object->getTag();
+	foreach ($tags_objects as $tag_object) {
 
 		# Append lesson tag to lesson tags to return
 		$lesson_tags_to_return[] = [
-			'id' => $tag_object->getId(),
+			'id' => $tag_object->getId()
 		];
 
 	}

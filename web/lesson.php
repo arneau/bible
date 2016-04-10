@@ -23,19 +23,17 @@ $lesson_title_html .= $lesson_data['Summary'];
 # Start page
 echo <<<s
 	<div class="page" id="lesson_page">
-		<section>
-			<h1>
-				{$lesson_title_html}
-				<span>(Lesson)</span>
-			</h1>
+		<section class="page_heading">
+			<h1>{$lesson_title_html}</h1>
 		</section>
 		<div class="columns">
 			<div class="column">
-				<section class="page_section" id="passages">
-					<div class="heading">
+				<section id="passages">
+					<input checked id="passages_toggle" type="checkbox" />
+					<label class="heading" for="passages_toggle">
 						<div class="icon icon-bible"></div>
 						<h2>Tagged verses</h2>
-					</div>
+					</label>
 					<div class="content">
 						<div class="buttons">
 							<button class="icon-bible-add" onclick="showPopup('add_lesson_popup');"></button>
@@ -57,22 +55,23 @@ echo <<<s
 				</section>
 			</div>
 			<div class="column">
-				<section class="page_section" id="topics">
-					<div class="heading">
+				<section id="topics">
+					<input id="topics_toggle" type="checkbox" />
+					<label class="heading" for="topics_toggle">
 						<div class="icon icon-topics"></div>
 						<h2>Relevant topics</h2>
-					</div>
+					</label>
 					<div class="content">
 						<p>Placeholder</p>
 					</div>
 				</section>
-				<section class="page_section" id="lessons">
-					<div class="heading">
+				<section id="lessons">
+					<input id="lessons_toggle" type="checkbox" />
+					<label class="heading" for="lessons_toggle">
 						<div class="icon icon-lessons"></div>
 						<h2>Lesson family</h2>
-					</div>
+					</label>
 					<div class="content">
-						<ul>
 s;
 
 # Display lesson family
@@ -81,31 +80,39 @@ if ($lesson_ancestors) {
 } else {
 	$lesson_family_root = $lesson_object;
 }
-$lesson_family_members_array[] = $lesson_family_root->toArray();
-$lesson_family_members_array = array_merge($lesson_family_members_array, $lesson_family_root->getDescendants()->toArray());
+if ($lesson_family_root->getDescendants()) {
+	$lesson_family_members_array = array_merge([
+		$lesson_family_root->toArray()
+	], $lesson_family_root->getDescendants()->toArray());
+} else {
+	$lesson_family_members_array[] = $lesson_family_root->toArray();
+}
 foreach ($lesson_family_members_array as $lesson_family_member_data) {
-	$lesson_family_member_padding = ($lesson_family_member_data['TreeLevel'] - 1) * 20;
+	$lesson_family_member_margin = ($lesson_family_member_data['TreeLevel'] - 1) * 20;
 	if ($lesson_family_member_data['Id'] == $lesson_data['Id']) {
 		$lesson_family_member_class = ' class="current"';
 	} else {
 		$lesson_family_member_class = '';
 	}
 	echo <<<s
-						<li style="margin-left: {$lesson_family_member_padding}px;">
-							<a{$lesson_family_member_class} href="?id={$lesson_family_member_data['Id']}">{$lesson_family_member_prefix} {$lesson_family_member_data['Summary']}</a>
-						</li>
+						<a class="lesson" href="?id={$lesson_family_member_data['Id']}" style="margin-left: {$lesson_family_member_margin}px; width: calc(100% - {$lesson_family_member_margin}px);">
+							<div class="content">
+								<h3{$lesson_family_member_class}>{$lesson_family_member_data['Summary']}</h3>
+								<p><span class="icon icon-bible"></span>Tagged verses: {$lesson_family_member_data['TagCount']}</p>
+							</div>
+						</a>
 s;
 }
 
 echo <<<s
-						</ul>
 					</div>
 				</section>
-				<section class="page_section" id="notes">
-					<div class="heading">
+				<section id="notes">
+					<input id="notes_toggle" type="checkbox" />
+					<label class="heading" for="notes_toggle">
 						<div class="icon icon-ul"></div>
 						<h2>Saved notes</h2>
-					</div>
+					</label>
 					<div class="content">
 						<p>Placeholder</p>
 					</div>

@@ -222,6 +222,9 @@ s;
 		<span class="edit icon-pencil" onclick="editTagTranslationRelevantWords({$tag_translation_data['id']});"></span>
 		<span class="confirm icon-tick" onclick="confirmTagTranslationRelevantWords({$tag_translation_data['id']});"></span>
 	</div>
+	<div class="tag">
+		<span class="delete icon-close" onclick="deleteTag({$verse_html_data['tag_id']});"></span>
+	</div>
 s;
 	}
 

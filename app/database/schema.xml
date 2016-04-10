@@ -52,13 +52,13 @@
 		<foreign-key foreignTable="bible">
 			<reference foreign="id" local="bible_id" />
 		</foreign-key>
-		<foreign-key foreignTable="tag">
+		<foreign-key foreignTable="tag" onDelete="cascade">
 			<reference foreign="id" local="tag_id" />
 		</foreign-key>
 	</table>
 	<table name="tag_vote">
 		<column name="tag_id" required="true" type="integer" />
-		<foreign-key foreignTable="tag">
+		<foreign-key foreignTable="tag" onDelete="cascade">
 			<reference foreign="id" local="tag_id" />
 		</foreign-key>
 	</table>
@@ -111,7 +111,7 @@
 	<table name="topic_tag">
 		<column name="tag_id" required="true" type="integer" />
 		<column name="topic_id" required="true" type="integer" />
-		<foreign-key foreignTable="tag">
+		<foreign-key foreignTable="tag" onDelete="cascade">
 			<reference foreign="id" local="tag_id" />
 		</foreign-key>
 		<foreign-key foreignTable="topic">
@@ -146,7 +146,7 @@
 		<foreign-key foreignTable="lesson">
 			<reference foreign="id" local="lesson_id" />
 		</foreign-key>
-		<foreign-key foreignTable="tag">
+		<foreign-key foreignTable="tag" onDelete="cascade">
 			<reference foreign="id" local="tag_id" />
 		</foreign-key>
 	</table>

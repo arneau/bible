@@ -26,49 +26,4 @@ body {
 			}
 		}
 	}
-
-	section {
-		background-color: #fff;
-		box-shadow: 0 5px rgba(0, 0, 0, 0.05);
-		float: left;
-		margin-bottom: 10px;
-		padding: 20px 20px 0;
-		width: 100%;
-
-		@include width(medium) {
-			box-shadow: 5px 5px rgba(0, 0, 0, 0.05);
-			margin-bottom: 20px;
-		}
-
-		&.page_section {
-			padding: 0;
-
-			.heading {
-				box-shadow: 0 5px rgba(0, 0, 0, 0.05);
-				display: flex;
-				flex-flow: row nowrap;
-				float: left;
-				padding: 20px;
-				width: 100%;
-
-				.icon {
-					color: #fff;
-					flex: 0 0 auto;
-					font-size: 32px;
-					margin-right: 20px;
-				}
-				h2 {
-					@extend %h1;
-
-					color: #fff;
-					flex: 1 1 auto;
-				}
-			}
-			.content {
-				float: left;
-				padding: 20px 20px 0;
-				width: 100%;
-			}
-		}
-	}
 }

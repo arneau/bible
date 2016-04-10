@@ -26,19 +26,19 @@
 		&.apologetics {
 
 			&.active, &:hover {
-				background-color: $purple;
+				background-color: $light_purple;
 			}
 		}
 		&.gods_word {
 
 			&.active, &:hover {
-				background-color: $blue;
+				background-color: $dark_blue;
 			}
 		}
 		&.topics {
 
 			&.active, &:hover {
-				background-color: $green;
+				background-color: $dark_green;
 			}
 		}
 		&.lessons {
@@ -50,7 +50,7 @@
 		&.notes {
 
 			&.active, &:hover {
-				background-color: $orange;
+				background-color: $light_orange;
 			}
 		}
 		&.articles {

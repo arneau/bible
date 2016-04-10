@@ -23,4 +23,15 @@ if (isset($_GET['update_tag_translation_relevant_words'])) {
 		->save();
 }
 
+# Delete tag (if applicable)
+if (isset($_GET['delete_tag'])) {
+
+	# Get tag object
+	$tag_object = getTag($_GET['tag']);
+
+	# Delete tag object
+	$tag_object->delete();
+
+}
+
 ?>
