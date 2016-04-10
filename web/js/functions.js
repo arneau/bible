@@ -113,10 +113,19 @@ function confirmTagTranslationRelevantWords(tag_translation_id) {
 
 }
 
+function deleteLesson(lesson_id) {
+
+	// Send request to API and reload
+	$.get('api.php?delete_lesson&lesson_id=' + lesson_id, function() {
+		//location = 'lessons.php';
+	});
+
+}
+
 function deleteTag(tag_id) {
 
 	// Send request to API and reload
-	$.get('api.php?delete_tag&tag=' + tag_id, function() {
+	$.get('api.php?delete_tag&tag_id=' + tag_id, function() {
 		location.reload();
 	});
 

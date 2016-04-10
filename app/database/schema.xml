@@ -133,7 +133,7 @@
 	<table name="lesson_note">
 		<column name="lesson_id" required="true" type="integer" />
 		<column name="note_id" required="true" type="integer" />
-		<foreign-key foreignTable="lesson">
+		<foreign-key foreignTable="lesson" onDelete="cascade">
 			<reference foreign="id" local="lesson_id" />
 		</foreign-key>
 		<foreign-key foreignTable="note">
@@ -143,7 +143,7 @@
 	<table name="lesson_tag">
 		<column name="lesson_id" required="true" type="integer" />
 		<column name="tag_id" required="true" type="integer" />
-		<foreign-key foreignTable="lesson">
+		<foreign-key foreignTable="lesson" onDelete="cascade">
 			<reference foreign="id" local="lesson_id" />
 		</foreign-key>
 		<foreign-key foreignTable="tag" onDelete="cascade">

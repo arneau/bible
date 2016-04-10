@@ -25,6 +25,8 @@ echo <<<s
 	<div class="page" id="lesson_page">
 		<section class="page_heading">
 			<h1>{$lesson_title_html}</h1>
+			<button class="icon-pencil" onclick="showPopup('edit_lesson_summary_popup');"></button>
+			<button class="icon-close" onclick="deleteLesson('{$lesson_data['Id']}');"></button>
 		</section>
 		<div class="columns">
 			<div class="column">
@@ -36,7 +38,7 @@ echo <<<s
 					</label>
 					<div class="content">
 						<div class="buttons">
-							<button class="icon-bible-add" onclick="showPopup('add_lesson_popup');"></button>
+							<button class="icon-bible-add" onclick="showPopup('add_lesson_tag_popup');"></button>
 						</div>
 s;
 
@@ -120,7 +122,27 @@ echo <<<s
 			</div>
 		</div>
 	</div>
-	<div class="popup" id="add_lesson_popup">
+	<div class="popup" id="edit_lesson_summary_popup">
+		<div class="box">
+			<div class="heading">
+				<h3>
+					<span class="icon icon-lesson"></span>
+					Edit summary
+				</h3>
+			</div>
+			<form action="edit_lesson_summary" class="content" data-type="api">
+				<p>
+					<label>Summary</label>
+					<input name="lesson_summary" type="text" value="{$lesson_data['Summary']}" />
+				</p>
+				<p>
+					<input name="lesson_id" type="hidden" value="{$lesson_data['Id']}" />
+					<button>Submit</button>
+				</p>
+			</form>
+		</div>
+	</div>
+	<div class="popup" id="add_lesson_tag_popup">
 		<div class="box">
 			<div class="heading">
 				<h3>

@@ -231,7 +231,7 @@ body {
   font: 1em/1.6 "Bitter", "serif";
   width: 100%; }
 
-#add_lesson_popup .box .content p button {
+#edit_lesson_summary_popup .box .content p button, #add_lesson_tag_popup .box .content p button {
   border: 0;
   color: #fff;
   cursor: pointer;
@@ -239,7 +239,7 @@ body {
   font: 1em/1.6 "Bitter", "serif";
   padding: 10px 20px;
   transition: all 0.5s ease 0s; }
-  #add_lesson_popup .box .content p button:hover {
+  #edit_lesson_summary_popup .box .content p button:hover, #add_lesson_tag_popup .box .content p button:hover {
     box-shadow: 5px 5px rgba(0, 0, 0, 0.05); }
 
 #lesson_page #passages > .heading h2, #lesson_page #topics > .heading h2, #lesson_page #lessons > .heading h2, #lesson_page #notes > .heading h2, #topics_page h1, #lessons_page h1, #lesson_page .page_heading h1 {
@@ -278,17 +278,17 @@ body {
   #header a {
     font-size: 1.1em; } }
 
-#add_lesson_popup .box .content p input[type=text] {
+#edit_lesson_summary_popup .box .content p input[type=text], #add_lesson_tag_popup .box .content p input[type=text] {
   border: 2px solid #eee;
   float: left;
   font: 1em/1.6 "Roboto", "sans-serif";
   padding: 5px 10px;
   transition: all 0.5s ease 0s;
   width: 100%; }
-  #add_lesson_popup .box .content p input[type=text]:focus {
+  #edit_lesson_summary_popup .box .content p input[type=text]:focus, #add_lesson_tag_popup .box .content p input[type=text]:focus {
     border-color: #17b; }
 
-#add_lesson_popup .box .content p label {
+#edit_lesson_summary_popup .box .content p label, #add_lesson_tag_popup .box .content p label {
   float: left;
   font: 1em/1.6 "Roboto", "sans-serif";
   width: 100%; }
@@ -303,7 +303,7 @@ body {
     content: "●";
     margin-right: 5px; }
 
-.lesson .content p, .popup .box .content p, #add_lesson_popup .box .content p {
+.lesson .content p, .popup .box .content p, #edit_lesson_summary_popup .box .content p, #add_lesson_tag_popup .box .content p {
   float: left;
   font: 1em/1.6 "Roboto", "sans-serif";
   width: 100%; }
@@ -464,22 +464,40 @@ body {
     #lesson_page #notes .heading .icon {
       margin-top: 4px; }
 
-#add_lesson_popup .box .heading {
+#edit_lesson_summary_popup .box .heading {
   background-color: #17b; }
-  #add_lesson_popup .box .heading h3 span {
+  #edit_lesson_summary_popup .box .heading h3 span {
     display: inline-block;
     font-size: 24px;
     margin: 4px 12px 0 0; }
     @media (min-width: 576px) {
-      #add_lesson_popup .box .heading h3 span {
+      #edit_lesson_summary_popup .box .heading h3 span {
         font-size: 32px;
         margin-top: 5px; } }
     @media (min-width: 768px) {
-      #add_lesson_popup .box .heading h3 span {
+      #edit_lesson_summary_popup .box .heading h3 span {
         margin-top: 6px; } }
-#add_lesson_popup .box .content p label {
+#edit_lesson_summary_popup .box .content p label {
   margin-bottom: 5px; }
-#add_lesson_popup .box .content p button {
+#edit_lesson_summary_popup .box .content p button {
+  background-color: #17b; }
+
+#add_lesson_tag_popup .box .heading {
+  background-color: #17b; }
+  #add_lesson_tag_popup .box .heading h3 span {
+    display: inline-block;
+    font-size: 24px;
+    margin: 4px 12px 0 0; }
+    @media (min-width: 576px) {
+      #add_lesson_tag_popup .box .heading h3 span {
+        font-size: 32px;
+        margin-top: 5px; } }
+    @media (min-width: 768px) {
+      #add_lesson_tag_popup .box .heading h3 span {
+        margin-top: 6px; } }
+#add_lesson_tag_popup .box .content p label {
+  margin-bottom: 5px; }
+#add_lesson_tag_popup .box .content p button {
   background-color: #17b; }
 
 /*# sourceMappingURL=styles.css.map */
