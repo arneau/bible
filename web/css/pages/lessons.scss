@@ -1,35 +1,20 @@
 #lessons_page {
 
-	h1 {
-		@extend %h1_responsive;
+	.page_heading {
 
-		margin-bottom: 20px;
-		width: auto;
+		h1 {
+			@extend %h1;
+
+			margin-bottom: 20px;
+
+			span {
+				color: #e8e8e8;
+			}
+		}
 	}
-	.lesson {
-		background-color: #fff;
-		border-left: 10px solid #17b;
-		clear: both;
-		float: left;
-		margin-bottom: 10px;
-		padding: 10px;
+	section {
+		@extend %default_section;
 
-		@include width(medium) {
-			padding: 20px;
-		}
-
-		&.adoptee {
-			border-left-color: #ccc;
-		}
-
-		&:not(.adoptee):hover {
-			background-color: #17b;
-			color: #fff;
-			cursor: pointer;
-		}
-
-		h3 {
-			@extend %h3;
-		}
+		background: #fff;
 	}
 }

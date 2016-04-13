@@ -25,7 +25,7 @@ function getUniqueNumbers(reference_string) {
 			var reference_string_part_limits = reference_string_part.split('-');
 
 			// Append individual words to words to highlight array (if applicable)
-			for (current_word = reference_string_part_limits[0] * 1; current_word <= reference_string_part_limits[1] * 1; current_word ++) {
+			for (current_word = reference_string_part_limits[0] * 1; current_word <= reference_string_part_limits[1] * 1; current_word++) {
 				unique_numbers_array.push(current_word);
 			}
 
@@ -105,6 +105,9 @@ function editTagTranslationRelevantWords(tag_translation_id) {
 
 function confirmTagTranslationRelevantWords(tag_translation_id) {
 
+	// Remove listeners from words
+	$('blockquote[data-tag-translation=' + tag_translation_id + '] .word').off('mousedown').off('mouseup');
+
 	// Make display changes
 	$('blockquote[data-tag-translation=' + tag_translation_id + ']').css('border-left-color', '#eee').find('.relevant_words .confirm').hide().prev().css('display', 'inline-block');
 
@@ -117,7 +120,16 @@ function deleteLesson(lesson_id) {
 
 	// Send request to API and reload
 	$.get('api.php?delete_lesson&lesson_id=' + lesson_id, function() {
-		//location = 'lessons.php';
+		location = 'lessons.php';
+	});
+
+}
+
+function moveLesson(lesson_id, parent_lesson_id) {
+
+	// Send request to API and reload
+	$.get('api.php?move_lesson&lesson_id=' + lesson_id + '&parent_lesson_id=' + parent_lesson_id, function() {
+		location.reload();
 	});
 
 }
@@ -168,8 +180,19 @@ function showPopup(popup_id) {
 }
 
 // Add listeners to popups
-$('.popup').click(function() {
-	$(this).hide();
-}).children().first().click(function(event) {
-	event.stopPropagation();
+$('.popup').each(function() {
+	$(this).click(function() {
+		$(this).hide();
+	}).children().first().click(function(event) {
+		event.stopPropagation();
+	});
+});
+
+// Make lessons draggable and droppable
+$('.lesson').draggable({
+	revert: true
+}).droppable({
+	drop: function(event, ui) {
+		moveLesson(ui.draggable.attr('data-lesson-id'), $(this).attr('data-lesson-id'));
+	}
 });

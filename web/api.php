@@ -28,6 +28,14 @@ if (isset($_GET['edit_lesson_summary'])) {
 
 }
 
+# Move lesson (if applicable)
+if (isset($_GET['move_lesson'])) {
+
+	# Move lesson to new parent
+	moveLesson($_GET['lesson_id'], $_GET['parent_lesson_id']);
+
+}
+
 # Update tag translation relevant words (if applicable)
 if (isset($_GET['update_tag_translation_relevant_words'])) {
 	$tag_translation = getTagTranslation($_GET['tag_translation']);

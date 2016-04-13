@@ -14,29 +14,33 @@ require_once 'components/header.php';
 # Start page
 echo <<<s
 	<div class="page" id="lessons_page">
-		<section>
+		<section class="page_heading">
 			<h1>Lessons</h1>
 		</section>
+		<section>
 s;
 
 # Display lessons
-$is_adoptee = false;
 foreach ($lessons_list as $lesson_data) {
 
-	# Define offset
-	$offset = 40 * $lesson_data['Level'] . 'px';
+	$lesson_family_member_margin = ($lesson_data['TreeLevel'] - 1) * 20;
 
-	# Echo lesson
 	echo <<<s
-		<a class="lesson" href="lesson.php?id=$lesson_data[Id]" style="margin-left: $offset;">
-			<h3>$lesson_data[Summary]</h3>
-		</a>
+			<a class="lesson" data-lesson-id="{$lesson_data['Id']}" href="lesson.php?id={$lesson_data['Id']}" style="margin-left: {$lesson_family_member_margin}px; width: calc(100% - {$lesson_family_member_margin}px);">
+				<div class="content">
+					<h3>{$lesson_data['Summary']}</h3>
+					<p>
+						<span class="icon icon-bible"></span>
+						Tagged verses: {$lesson_data['TagCount']}
+					</p>
+				</div>
+			</a>
 s;
-
 }
 
 # End page
 echo <<<s
+		</section>
 	</div>
 s;
 

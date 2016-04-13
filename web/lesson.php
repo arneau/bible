@@ -11,20 +11,13 @@ require_once 'components/header.php';
 # Get lesson, data, etc
 $lesson_object = getLesson($_GET['id']);
 $lesson_data = getLessonData($_GET['id']);
-
-# Build lesson title
-$lesson_ancestors = $lesson_object->getAncestors()->toArray();
-unset($lesson_ancestors[0]);
-foreach ($lesson_ancestors as $lesson_ancestor) {
-	$lesson_title_html .= '<span>' . $lesson_ancestor['Summary'] . ' / </span>';
-}
-$lesson_title_html .= $lesson_data['Summary'];
+$lesson_tags = getLessonTags($_GET['id']);
 
 # Start page
 echo <<<s
 	<div class="page" id="lesson_page">
 		<section class="page_heading">
-			<h1>{$lesson_title_html}</h1>
+			<h1>{$lesson_data['summary']['formatted']}</h1>
 			<button class="icon-pencil" onclick="showPopup('edit_lesson_summary_popup');"></button>
 			<button class="icon-close" onclick="deleteLesson('{$lesson_data['Id']}');"></button>
 		</section>
@@ -43,7 +36,6 @@ echo <<<s
 s;
 
 # Display lesson tags
-$lesson_tags = getLessonTags($lesson_data['Id']);
 if ($lesson_tags) {
 
 	foreach ($lesson_tags as $lesson_tag_data) {
@@ -68,7 +60,7 @@ echo <<<s
 					</div>
 				</section>
 				<section id="lessons">
-					<input id="lessons_toggle" type="checkbox" />
+					<input checked id="lessons_toggle" type="checkbox" />
 					<label class="heading" for="lessons_toggle">
 						<div class="icon icon-lessons"></div>
 						<h2>Lesson family</h2>
@@ -77,6 +69,8 @@ echo <<<s
 s;
 
 # Display lesson family
+$lesson_ancestors = $lesson_object->getAncestors()->toArray();
+unset($lesson_ancestors[0]);
 if ($lesson_ancestors) {
 	$lesson_family_root = getLesson($lesson_ancestors[1]['Id']);
 } else {
@@ -97,7 +91,7 @@ foreach ($lesson_family_members_array as $lesson_family_member_data) {
 		$lesson_family_member_class = '';
 	}
 	echo <<<s
-						<a class="lesson" href="?id={$lesson_family_member_data['Id']}" style="margin-left: {$lesson_family_member_margin}px; width: calc(100% - {$lesson_family_member_margin}px);">
+						<a class="lesson" data-lesson-id="{$lesson_family_member_data['Id']}" href="?id={$lesson_family_member_data['Id']}" style="margin-left: {$lesson_family_member_margin}px; width: calc(100% - {$lesson_family_member_margin}px);">
 							<div class="content">
 								<h3{$lesson_family_member_class}>{$lesson_family_member_data['Summary']}</h3>
 								<p><span class="icon icon-bible"></span>Tagged verses: {$lesson_family_member_data['TagCount']}</p>

@@ -43,7 +43,7 @@ table {
 :focus {
   outline: 0; }
 
-#lesson_page .page_heading {
+#lessons_page section, #lesson_page .page_heading {
   background-color: #fff;
   box-shadow: 0 5px rgba(0, 0, 0, 0.05);
   float: left;
@@ -51,7 +51,7 @@ table {
   padding: 20px 20px 0;
   width: 100%; }
   @media (min-width: 576px) {
-    #lesson_page .page_heading {
+    #lessons_page section, #lesson_page .page_heading {
       box-shadow: 5px 5px rgba(0, 0, 0, 0.05);
       margin-bottom: 20px; } }
 
@@ -158,6 +158,7 @@ table {
         color: #17b; }
 
 .lesson {
+  background: #fff;
   border: 1px solid #fff;
   border-left: 0;
   cursor: pointer;
@@ -167,6 +168,8 @@ table {
   .lesson:hover {
     box-shadow: 5px 5px rgba(0, 0, 0, 0.05);
     border-color: #eee; }
+  .lesson.ui-draggable-dragging {
+    z-index: 1; }
   .lesson .content {
     border-left: 8px solid #fc4;
     float: left;
@@ -242,32 +245,34 @@ body {
   #edit_lesson_summary_popup .box .content p button:hover, #add_lesson_tag_popup .box .content p button:hover {
     box-shadow: 5px 5px rgba(0, 0, 0, 0.05); }
 
-#lesson_page #passages > .heading h2, #lesson_page #topics > .heading h2, #lesson_page #lessons > .heading h2, #lesson_page #notes > .heading h2, #topics_page h1, #lessons_page h1, #lesson_page .page_heading h1 {
+#topics_page h1, #lessons_page .page_heading h1, #lesson_page .page_heading h1 {
+  float: left;
+  font: 2em/1.3 "Bree Serif", "serif";
+  width: 100%; }
+
+@media (min-width: 576px) {
+  #topics_page h1 {
+    font-size: 2.5em; } }
+@media (min-width: 768px) {
+  #topics_page h1 {
+    font-size: 3em; } }
+
+#lesson_page #passages > .heading h2, #lesson_page #topics > .heading h2, #lesson_page #lessons > .heading h2, #lesson_page #notes > .heading h2 {
   float: left;
   font: 1.6em/1.3 "Bree Serif", "serif";
   width: 100%; }
 
-@media (min-width: 576px) {
-  #topics_page h1, #lessons_page h1, #lesson_page .page_heading h1 {
-    font-size: 1.9em; } }
-@media (min-width: 768px) {
-  #topics_page h1, #lessons_page h1, #lesson_page .page_heading h1 {
-    font-size: 2.2em; } }
-@media (min-width: 1024px) {
-  #topics_page h1, #lessons_page h1, #lesson_page .page_heading h1 {
-    font-size: 2.5em; } }
-
-.lesson .content h3, .popup .box .heading h3, #topics_page .topic h3, #lessons_page .lesson h3 {
+.lesson .content h3, .popup .box .heading h3, #topics_page .topic h3 {
   float: left;
-  font: 1.2em/1.3 "Bree Serif", "serif";
+  font: 1.3em/1.3 "Bree Serif", "serif";
   width: 100%; }
 
 @media (min-width: 576px) {
   .popup .box .heading h3 {
-    font-size: 1.4em; } }
+    font-size: 1.6em; } }
 @media (min-width: 768px) {
   .popup .box .heading h3 {
-    font-size: 1.6em; } }
+    font-size: 2em; } }
 
 #header a, #topics_page .toggle_adoptees {
   float: left;
@@ -411,25 +416,12 @@ body {
     color: #fff;
     cursor: pointer; }
 
-#lessons_page h1 {
-  margin-bottom: 20px;
-  width: auto; }
-#lessons_page .lesson {
-  background-color: #fff;
-  border-left: 10px solid #17b;
-  clear: both;
-  float: left;
-  margin-bottom: 10px;
-  padding: 10px; }
-  @media (min-width: 576px) {
-    #lessons_page .lesson {
-      padding: 20px; } }
-  #lessons_page .lesson.adoptee {
-    border-left-color: #ccc; }
-  #lessons_page .lesson:not(.adoptee):hover {
-    background-color: #17b;
-    color: #fff;
-    cursor: pointer; }
+#lessons_page .page_heading h1 {
+  margin-bottom: 20px; }
+  #lessons_page .page_heading h1 span {
+    color: #e8e8e8; }
+#lessons_page section {
+  background: #fff; }
 
 #lesson_page .page_heading h1 {
   margin-bottom: 20px; }

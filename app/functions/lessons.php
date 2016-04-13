@@ -36,6 +36,20 @@ function getLessonData($lesson_id) {
 	# Get lesson data
 	$lesson_data = $lesson_object->toArray();
 
+	# Get all but root ancestors
+	$lesson_ancestors = $lesson_object->getAncestors()->toArray();
+	unset($lesson_ancestors[0]);
+
+	# Define lesson summary
+	$lesson_data['summary'] = [
+		'default' => $lesson_data['Summary'],
+		'formatted' => ''
+	];
+	foreach ($lesson_ancestors as $lesson_ancestor) {
+		$lesson_data['summary']['formatted'] .= '<span>' . $lesson_ancestor['Summary'] . ' / </span>';
+	}
+	$lesson_data['summary']['formatted'] .= $lesson_data['Summary'];
+
 	# Return lesson data
 	return $lesson_data;
 
