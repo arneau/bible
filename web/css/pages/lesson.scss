@@ -25,6 +25,20 @@
 				margin-top: 6px;
 			}
 		}
+		.content {
+
+			p {
+				@extend %p;
+
+				margin-bottom: 20px;
+
+				a {
+					color: $dark_blue;
+					cursor: pointer;
+					margin-right: 10px;
+				}
+			}
+		}
 	}
 	#topics {
 		@extend %toggle_section;

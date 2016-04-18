@@ -165,7 +165,13 @@ function submitForm(form) {
 
 	// Submit form data to API and reload
 	$.get('api.php?' + $(form).attr('action') + '&' + $(form).serialize(), function() {
-		location.reload();
+
+		// Order passages (if applicable)
+		location = location + '&order_passages_by=date_tagged';
+
+		// Else reload
+		//location.reload();
+
 	});
 
 	// Stop default form submission

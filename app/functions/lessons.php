@@ -1,5 +1,7 @@
 <?php
 
+use Propel\Runtime\ActiveQuery\Criteria;
+
 function addLesson($lesson_parent_id, $lesson_name) {
 
 	# Get parent
@@ -37,13 +39,14 @@ function getLessonData($lesson_id) {
 	$lesson_data = $lesson_object->toArray();
 
 	# Get all but root ancestors
-	$lesson_ancestors = $lesson_object->getAncestors()->toArray();
+	$lesson_ancestors = $lesson_object->getAncestors()
+		->toArray();
 	unset($lesson_ancestors[0]);
 
 	# Define lesson summary
 	$lesson_data['summary'] = [
 		'default' => $lesson_data['Summary'],
-		'formatted' => ''
+		'formatted' => '',
 	];
 	foreach ($lesson_ancestors as $lesson_ancestor) {
 		$lesson_data['summary']['formatted'] .= '<span>' . $lesson_ancestor['Summary'] . ' / </span>';
@@ -55,20 +58,25 @@ function getLessonData($lesson_id) {
 
 }
 
-function getLessonTags($lesson_id) {
+function getLessonTags($lesson_id, $order_by = 'vote_count') {
 
 	# Get lesson object
 	$lesson_object = getLesson($lesson_id);
 
 	# Get lesson tags IDs
-	$lesson_tags_ids = $lesson_object->getLessonTags()->getPrimaryKeys();
+	$lesson_tags_ids = $lesson_object->getLessonTags()
+		->getPrimaryKeys();
 
 	# Get applicable tag objects
 	$tags_objects = TagQuery::create()
 		->useLessonTagQuery()
 		->filterByPrimaryKeys($lesson_tags_ids)
 		->endUse()
+		->_if($order_by == 'vote_count')
 		->orderByVoteCount()
+		->_elseif($order_by == 'date_tagged')
+		->orderById(Criteria::DESC)
+		->_endif()
 		->orderByVerseId()
 		->find();
 
@@ -78,7 +86,7 @@ function getLessonTags($lesson_id) {
 
 		# Append lesson tag to lesson tags to return
 		$lesson_tags_to_return[] = [
-			'id' => $tag_object->getId()
+			'id' => $tag_object->getId(),
 		];
 
 	}

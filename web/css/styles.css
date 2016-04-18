@@ -308,7 +308,7 @@ body {
     content: "●";
     margin-right: 5px; }
 
-.lesson .content p, .popup .box .content p, #edit_lesson_summary_popup .box .content p, #add_lesson_tag_popup .box .content p {
+.lesson .content p, .popup .box .content p, #lesson_page #passages .content p, #edit_lesson_summary_popup .box .content p, #add_lesson_tag_popup .box .content p {
   float: left;
   font: 1em/1.6 "Roboto", "sans-serif";
   width: 100%; }
@@ -378,6 +378,10 @@ body {
       @media (min-width: 768px) {
         .page .columns .column {
           width: 50%; } }
+      .page .columns .column:first-child {
+        padding-left: 0; }
+      .page .columns .column:first-child {
+        padding-right: 0; }
 
 #topics_page.hide_adoptees .adoptee {
   display: none; }
@@ -433,6 +437,12 @@ body {
     background-color: #17b; }
     #lesson_page #passages .heading .icon {
       margin-top: 6px; }
+  #lesson_page #passages .content p {
+    margin-bottom: 20px; }
+    #lesson_page #passages .content p a {
+      color: #17b;
+      cursor: pointer;
+      margin-right: 10px; }
 #lesson_page #topics {
   border-bottom: 8px solid #1a7; }
   #lesson_page #topics .heading {
