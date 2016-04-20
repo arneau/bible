@@ -39,11 +39,7 @@
 			<parameter name="foreign_table" value="tag_vote" />
 			<parameter name="expression" value="COUNT(tag_id)" />
 		</behavior>
-		<column name="verse_id" required="true" type="integer" />
 		<column defaultValue="0" name="vote_count" type="integer" />
-		<foreign-key foreignTable="verse">
-			<reference foreign="id" local="verse_id" />
-		</foreign-key>
 	</table>
 	<table name="tag_translation">
 		<column name="bible_id" required="true" type="integer" />
@@ -54,6 +50,16 @@
 		</foreign-key>
 		<foreign-key foreignTable="tag" onDelete="cascade">
 			<reference foreign="id" local="tag_id" />
+		</foreign-key>
+	</table>
+	<table name="tag_verse">
+		<column name="tag_id" required="true" type="integer" />
+		<column name="verse_id" required="true" type="integer" />
+		<foreign-key foreignTable="tag" onDelete="cascade">
+			<reference foreign="id" local="tag_id" />
+		</foreign-key>
+		<foreign-key foreignTable="verse">
+			<reference foreign="id" local="verse_id" />
 		</foreign-key>
 	</table>
 	<table name="tag_vote">

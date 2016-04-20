@@ -150,13 +150,13 @@ function getReferenceData($reference_string) {
 
 }
 
-function getVerseHTML($verse_html_data = []) {
+function getPassageHTML($passage_html_data = []) {
 
 	# Get bible object
-	if ($verse_html_data['bible_id']) {
-		$bible_object = getBible($verse_html_data['bible_id']);
-	} elseif ($verse_html_data['bible_code']) {
-		$bible_object = getBibleByCode($verse_html_data['bible_code']);
+	if ($passage_html_data['bible_id']) {
+		$bible_object = getBible($passage_html_data['bible_id']);
+	} elseif ($passage_html_data['bible_code']) {
+		$bible_object = getBibleByCode($passage_html_data['bible_code']);
 	} else {
 		$bible_object = getBibleByCode('kjv');
 	}
@@ -164,15 +164,15 @@ function getVerseHTML($verse_html_data = []) {
 	# Get bible data
 	$bible_data = getBibleData($bible_object->getId());
 
-	if ($verse_html_data['verse_id']) {
+	if ($passage_html_data['verse_id']) {
 
 		# Get verse object
-		$verse_object = getVerse($verse_html_data['verse_id']);
+		$tag_verses_objects = getVerse($passage_html_data['verse_id']);
 
-	} elseif ($verse_html_data['tag_id']) {
+	} elseif ($passage_html_data['tag_id']) {
 
 		# Get tag object
-		$tag_object = getTag($verse_html_data['tag_id']);
+		$tag_object = getTag($passage_html_data['tag_id']);
 
 		# Get tag data
 		$tag_data = getTagData($tag_object->getId());
@@ -183,26 +183,47 @@ function getVerseHTML($verse_html_data = []) {
 		# Get tag translation data
 		$tag_translation_data = getTagTranslationData($tag_translation_object->getId());
 
-		# Get verse object
-		$verse_object = $tag_object->getVerse();
+		# Get tag verses data
+		$tag_verses_data = $tag_object->getTagVerses()
+			->toArray();
+
+		# Get verses IDs
+		$verses_ids = array_column($tag_verses_data, 'VerseId');
+
+		# Get verses objects
+		$verses_objects = VerseQuery::create()
+			->filterByPrimaryKeys($verses_ids)
+			->find();
 
 	}
 
-	# Get verse data
-	$verse_data = getVerseData($verse_object->getId());
-
-	# Get verse translation object
-	$verse_translation_object = getVerseTranslationByVerseId($verse_object->getId(), $bible_object->getId());
-
-	# Get verse translation data
-	$verse_translation_data = getVerseTranslationData($verse_translation_object->getId());
-
-	# Start verse HTML
-	$verse_html = <<<s
+	# Start passage HTML
+	$passage_html = <<<s
 <blockquote class="verse" data-tag-translation="{$tag_translation_data['id']}">
 	<div class="text">
+s;
+
+	# Add each verse to passage HTML
+	foreach ($verses_objects as $verse_object) {
+
+		# Get verses data
+		$verse_data = getVerseData($verse_object->getId());
+
+		# Get verse translation object
+		$verse_translation_object = getVerseTranslationByVerseId($verse_object->getId(), $bible_object->getId());
+
+		# Get verse translation data
+		$verse_translation_data = getVerseTranslationData($verse_translation_object->getId());
+
+		# Add verse to passage HTML
+		$passage_html .= <<<s
 		<sup>{$verse_data['number']}</sup>
 		{$verse_translation_data['text']['formatted']}
+s;
+	}
+
+	# End passage HTML
+	$passage_html .= <<<s
 	</div>
 	<cite>
 		<span class="reference">{$verse_data['reference']}</span> &middot;
@@ -211,8 +232,8 @@ function getVerseHTML($verse_html_data = []) {
 s;
 
 	# Add tag elements (if applicable)
-	if ($verse_html_data['tag_id']) {
-		$verse_html .= <<<s
+	if ($passage_html_data['tag_id']) {
+		$passage_html .= <<<s
 	<div class="votes">
 		<span class="vote_count">{$tag_data['vote_count']}</span> votes
 		<span class="vote_up icon-arrow-up"></span>
@@ -223,21 +244,21 @@ s;
 		<span class="confirm icon-tick" onclick="confirmTagTranslationRelevantWords({$tag_translation_data['id']});"></span>
 	</div>
 	<div class="tag">
-		<span class="delete icon-close" onclick="deleteTag({$verse_html_data['tag_id']});"></span>
+		<span class="delete icon-close" onclick="deleteTag({$passage_html_data['tag_id']});"></span>
 	</div>
 s;
 	}
 
-	# Continue verse HTML
-	$verse_html .= <<<s
+	# Continue passage HTML
+	$passage_html .= <<<s
 </blockquote>
 s;
 
 	# Add highlighting (if applicable)
-	if ($verse_html_data['tag_id']) {
+	if ($passage_html_data['tag_id']) {
 
 		# Add words to highlight javascript
-		$verse_html .= <<<s
+		$passage_html .= <<<s
 <script>
 	$(document).ready(function() {
 		highlightTagTranslationWords({$tag_translation_data['id']}, '{$tag_translation_data['relevant_words']}');
@@ -247,8 +268,8 @@ s;
 
 	}
 
-	# Return verse HTML
-	return $verse_html;
+	# Return passage HTML
+	return $passage_html;
 
 }
 

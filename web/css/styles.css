@@ -378,10 +378,6 @@ body {
       @media (min-width: 768px) {
         .page .columns .column {
           width: 50%; } }
-      .page .columns .column:first-child {
-        padding-left: 0; }
-      .page .columns .column:first-child {
-        padding-right: 0; }
 
 #topics_page.hide_adoptees .adoptee {
   display: none; }

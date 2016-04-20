@@ -91,15 +91,15 @@ function getTagHTML($tag_id, $bible_code = 'kjv') {
 		->filterByTag($tag_object)
 		->findOne();
 
-	# Define verse HTML data
-	$verse_html_data = [
+	# Define passage HTML data
+	$passage_html_data = [
 		'bible_id' => $bible_object->getId(),
 		'tag_id' => $tag_object->getId(),
 		'tag_translation_id' => $tag_translation_object->getId(),
 	];
 
-	# Get tag HTML
-	$tag_html = getVerseHTML($verse_html_data);
+	# Get passage HTML
+	$tag_html = getPassageHTML($passage_html_data);
 
 	# Return tag HTML
 	return $tag_html;
