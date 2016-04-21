@@ -8,11 +8,8 @@ require_once '../app/functions/functions.php';
 # Add lesson tag (if applicable)
 if (isset($_GET['add_lesson_tag'])) {
 
-	# Get verse object
-	$verse_object = getVerseByReference($_GET['reference_string']);
-
 	# Add lesson tag
-	addLessonTag($_GET['lesson_id'], $verse_object->getId());
+	addLessonTag($_GET['lesson_id'], $_GET['reference_string']);
 
 }
 

@@ -133,7 +133,7 @@ function getReferenceData($reference_string) {
 		$reference_data['book'] = $reference_parts[1];
 		$reference_data['chapter'] = $reference_parts[2];
 		if (isset($reference_parts[3])) {
-			$reference_data['verses'] = getVerseNumbers($reference_parts[3]);
+			$reference_data['verses'] = getNumbersArrayFromString($reference_parts[3]);
 		} else {
 			$reference_data['verses'] = [];
 		}
@@ -183,16 +183,15 @@ function getPassageHTML($passage_html_data = []) {
 		# Get tag translation data
 		$tag_translation_data = getTagTranslationData($tag_translation_object->getId());
 
-		# Get tag verses data
-		$tag_verses_data = $tag_object->getTagVerses()
-			->toArray();
-
-		# Get verses IDs
-		$verses_ids = array_column($tag_verses_data, 'VerseId');
+		# Get tag verses ids
+		$tag_verses_ids = $tag_object->getTagVerses()
+			->getPrimaryKeys();
 
 		# Get verses objects
 		$verses_objects = VerseQuery::create()
-			->filterByPrimaryKeys($verses_ids)
+			->useTagVerseQuery()
+			->filterByPrimaryKeys($tag_verses_ids)
+			->endUse()
 			->find();
 
 	}
@@ -204,6 +203,7 @@ function getPassageHTML($passage_html_data = []) {
 s;
 
 	# Add each verse to passage HTML
+	$word_number = 1;
 	foreach ($verses_objects as $verse_object) {
 
 		# Get verses data
@@ -215,24 +215,37 @@ s;
 		# Get verse translation data
 		$verse_translation_data = getVerseTranslationData($verse_translation_object->getId());
 
-		# Add verse to passage HTML
+		# Add verse number to passage HTML
 		$passage_html .= <<<s
 		<sup>{$verse_data['number']}</sup>
-		{$verse_translation_data['text']['formatted']}
 s;
+
+		# Handle verse words
+		foreach ($verse_translation_data['words'] as $word_value) {
+
+			# Add verse words to passage HTML
+			$passage_html .= <<<s
+		<span class="word" data-word="{$word_number}">{$word_value}</span>
+s;
+
+			# Increment word number
+			$word_number ++;
+
+		}
 	}
 
 	# End passage HTML
 	$passage_html .= <<<s
 	</div>
 	<cite>
-		<span class="reference">{$verse_data['reference']}</span> &middot;
+		<span class="reference">{$passage_html_data['reference_string']}</span> &middot;
 		<span class="bible" data-info="{$bible_data['name']}">{$bible_data['code']['formatted']}</span>
 	</cite>
 s;
 
 	# Add tag elements (if applicable)
 	if ($passage_html_data['tag_id']) {
+
 		$passage_html .= <<<s
 	<div class="votes">
 		<span class="vote_count">{$tag_data['vote_count']}</span> votes
@@ -247,6 +260,7 @@ s;
 		<span class="delete icon-close" onclick="deleteTag({$passage_html_data['tag_id']});"></span>
 	</div>
 s;
+
 	}
 
 	# Continue passage HTML
@@ -353,64 +367,83 @@ function getVerseLessonsTagsData($verse_id) {
 
 }
 
-function getVerseNumbers($verses_string) {
+function getNumbersArrayFromString($numbers_string) {
 
-	# Handle verses string
-	$verses_numbers_array = [];
-	foreach (explode(',', $verses_string) as $verses_string_part) {
+	# Handle string
+	$numbers_array = [];
+	foreach (explode(',', $numbers_string) as $string_part) {
 
-		# Check if verses string part contains range
-		if (strpos($verses_string_part, '-')) {
+		# Check if string part contains range
+		if (strpos($string_part, '-')) {
 
-			# Get verses string string part limits
-			$verses_string_part_limits = explode('-', $verses_string_part);
+			# Get string string part limits
+			$string_part_limits = explode('-', $string_part);
 
-			# Get verses string part range
-			$verses_string_part_range = range($verses_string_part_limits[0], $verses_string_part_limits[1]);
+			# Get string part range
+			$string_part_range = range($string_part_limits[0], $string_part_limits[1]);
 
-			# Append multiple verse numbers to verses numbers array
-			$verses_numbers_array = array_merge($verses_numbers_array, $verses_string_part_range);
+			# Append multiple verse numbers to numbers array
+			$numbers_array = array_merge($numbers_array, $string_part_range);
 
 		} else {
 
-			# Append single verse to verses numbers array
-			$verses_numbers_array[] = $verses_string_part * 1;
+			# Append single verse to numbers array
+			$numbers_array[] = $string_part * 1;
 		}
 
 	}
 
-	# Return verses numbers array
-	return $verses_numbers_array;
+	# Return numbers array
+	return $numbers_array;
 
 }
 
-function getWordsToHighlight($words_to_highlight_string) {
+function getNumbersStringFromArray($numbers_array) {
 
-	# Handle words to highlight string
-	$words_to_highlight_array = [];
-	foreach (explode(',', $words_to_highlight_string) as $words_to_highlight_string_part) {
+	# Get unique numbers within numbers array
+	$numbers_array = array_unique($numbers_array);
 
-		# Check if words to highlight string part contains range
-		if (strpos($words_to_highlight_string_part, '-')) {
+	# Sort numbers array
+	sort($numbers_array);
 
-			# Get words to highlight string part limits
-			$words_to_highlight_string_part_limits = explode('-', $words_to_highlight_string_part);
+	# Define numbers array start and end points
+	$numbers_array_start_points = [];
+	$numbers_array_end_points = [];
+	for ($index = 0; $index < count($numbers_array); $index ++) {
 
-			# Get words to highlight string part range
-			$words_to_highlight_string_part_range = range($words_to_highlight_string_part_limits[0], $words_to_highlight_string_part_limits[1]);
+		# Check if start point
+		if ($index == 0 || $numbers_array[$index - 1] + 1 < $numbers_array[$index]) {
+			$numbers_array_start_points[] = $index;
+		}
 
-			# Append multiple words to highlight to words to highlight array
-			$words_to_highlight_array = array_merge($words_to_highlight_array, $words_to_highlight_string_part_range);
-
-		} else {
-
-			# Append single word to highlight to words to highlight array
-			$words_to_highlight_array[] = $words_to_highlight_string_part * 1;
+		# Check if end point
+		if ($numbers_array[$index] < $numbers_array[$index + 1] - 1 || $index == count($numbers_array) - 1) {
+			$numbers_array_end_points[] = $index;
 		}
 
 	}
 
-	# Return words to highlight array
-	return $words_to_highlight_array;
+	# Define numbers string parts
+	$numbers_string_parts = [];
+	for ($index = 0; $index < count($numbers_array_start_points); $index ++) {
+
+		# Get start and end numbers
+		$start_number = $numbers_array[$numbers_array_start_points[$index]];
+		$end_number = $numbers_array[$numbers_array_end_points[$index]];
+
+		# Check if start point
+		if ($start_number != $end_number) {
+			$numbers_string_parts[] = $start_number . '-' . $end_number;
+		} else {
+			$numbers_string_parts[] = $start_number;
+		}
+
+	}
+
+	# Define numbers string
+	$numbers_string = implode(',', $numbers_string_parts);
+
+	# Return numbers string
+	return $numbers_string;
 
 }

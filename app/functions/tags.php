@@ -25,12 +25,28 @@ function addTopicTag($topic_id, $verse_id, $bible_code, $relevant_words) {
 
 }
 
-function addLessonTag($lesson_id, $verse_id, $bible_code = 'kjv', $relevant_words = '') {
+function addLessonTag($lesson_id, $reference_string, $bible_code = 'kjv', $relevant_words = '') {
+
+	# Get reference data
+	$reference_data = getReferenceData($reference_string);
 
 	# Add tag object
 	$tag_object = new Tag();
-	$tag_object->setVerseId($verse_id)
-		->save();
+	$tag_object->save();
+
+	# Add tag verse object for each verse number
+	foreach ($reference_data['verses'] as $verse_number) {
+
+		# Get verse object
+		$verse_object = getVerseByReference($reference_data['book'] . ' ' . $reference_data['chapter'] . ':' . $verse_number);
+
+		# Add tag verse object
+		$tag_verse_object = new TagVerse();
+		$tag_verse_object->setTag($tag_object)
+			->setVerse($verse_object)
+			->save();
+
+	}
 
 	# Get bible object
 	$bible_object = getBibleByCode($bible_code);
@@ -82,6 +98,9 @@ function getTagHTML($tag_id, $bible_code = 'kjv') {
 	# Get tag object
 	$tag_object = getTag($tag_id);
 
+	# Get tag reference
+	$tag_reference = getTagReference($tag_object->getId());
+
 	# Get bible object
 	$bible_object = getBibleByCode($bible_code);
 
@@ -94,6 +113,7 @@ function getTagHTML($tag_id, $bible_code = 'kjv') {
 	# Define passage HTML data
 	$passage_html_data = [
 		'bible_id' => $bible_object->getId(),
+		'reference_string' => $tag_reference,
 		'tag_id' => $tag_object->getId(),
 		'tag_translation_id' => $tag_translation_object->getId(),
 	];
@@ -103,6 +123,43 @@ function getTagHTML($tag_id, $bible_code = 'kjv') {
 
 	# Return tag HTML
 	return $tag_html;
+
+}
+
+function getTagReference($tag_id) {
+
+	# Get tag object
+	$tag_object = getTag($tag_id);
+
+	# Get tag verses ids
+	$tag_verses_ids = $tag_object->getTagVerses()
+		->getPrimaryKeys();
+
+	# Get verses objects
+	$verses_objects = VerseQuery::create()
+		->useTagVerseQuery()
+		->filterByPrimaryKeys($tag_verses_ids)
+		->endUse()
+		->find();
+
+	# Define tag reference data
+	foreach ($verses_objects as $verse_object) {
+
+		# Get verse data
+		$verse_data = getVerseData($verse_object->getId());
+
+		# Append verse data to tag reference data
+		$tag_reference_data['book'] = $verse_data['book']['name'];
+		$tag_reference_data['chapter'] = $verse_data['chapter'];
+		$tag_reference_data['verses_numbers'][] = $verse_data['number'];
+
+	}
+
+	# Define tag reference
+	$tag_reference = $tag_reference_data['book'] . ' ' . $tag_reference_data['chapter'] . ':' . getNumbersStringFromArray($tag_reference_data['verses_numbers']);
+
+	# Return tag reference
+	return $tag_reference;
 
 }
 

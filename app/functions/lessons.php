@@ -77,9 +77,6 @@ function getLessonTags($lesson_id, $order_by = 'vote_count') {
 		->_elseif($order_by == 'date_tagged')
 		->orderById(Criteria::DESC)
 		->_endif()
-		->useTagVerseQuery()
-		->orderByVerseId()
-		->endUse()
 		->find();
 
 	# Handle lesson tags objects

@@ -115,22 +115,15 @@ function getVerseTranslationData($verse_translation_id) {
 	# Get verse translation object
 	$verse_translation_object = getVerseTranslation($verse_translation_id);
 
-	# Handle verse translation words
+	# Define verse translation words array
 	$verse_translation_words_array = explode(' ', $verse_translation_object->getText());
-	foreach ($verse_translation_words_array as $word_number => &$word_value) {
-		$word_number ++;
-		$word_value = '<span class="word" data-verse-translation="' . $verse_translation_object->getId() . '" data-word="' . $word_number . '">' . $word_value . '</span>';
-	}
-	$verse_translation_text_formatted = implode(' ', $verse_translation_words_array);
 
 	# Define verse translation data
 	$verse_translation_data = [
 		'id' => $verse_translation_object->getId(),
-		'text' => [
-			'default' => $verse_translation_object->getText(),
-			'formatted' => $verse_translation_text_formatted,
-		],
+		'text' => $verse_translation_object->getText(),
 		'word_count' => $verse_translation_object->getWordCount(),
+		'words' => $verse_translation_words_array,
 	];
 
 	# Return verse translation data
