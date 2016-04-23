@@ -21,6 +21,7 @@
 	</table>
 	<table name="verse_translation">
 		<column name="bible_id" required="true" type="integer" />
+		<column name="previous_verses_word_count" required="true" type="integer" />
 		<column name="text" required="true" size="1000" type="varchar" />
 		<column name="verse_id" required="true" type="integer" />
 		<column name="word_count" required="true" type="integer" />

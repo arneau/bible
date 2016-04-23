@@ -59,6 +59,7 @@ DROP TABLE IF EXISTS `defender_verse_translation`;
 CREATE TABLE `defender_verse_translation`
 (
     `bible_id` INTEGER NOT NULL,
+    `previous_verses_word_count` INTEGER NOT NULL,
     `text` VARCHAR(1000) NOT NULL,
     `verse_id` INTEGER NOT NULL,
     `word_count` INTEGER NOT NULL,
