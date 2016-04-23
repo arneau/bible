@@ -104,8 +104,8 @@ function getTagHTML($tag_id, $bible_code = 'kjv') {
 	# Get bible object
 	$bible_object = getBibleByCode($bible_code);
 
-	# Get tag translation object
-	$tag_translation_object = TagTranslationQuery::create()
+	# Get tag highlighter object
+	$tag_highlighter_object = TagHighlighterQuery::create()
 		->filterByBible($bible_object)
 		->filterByTag($tag_object)
 		->findOne();
@@ -115,7 +115,7 @@ function getTagHTML($tag_id, $bible_code = 'kjv') {
 		'bible_id' => $bible_object->getId(),
 		'reference_string' => $tag_reference,
 		'tag_id' => $tag_object->getId(),
-		'tag_translation_id' => $tag_translation_object->getId(),
+		'tag_highlighter_id' => $tag_highlighter_object->getId(),
 	];
 
 	# Get passage HTML
@@ -163,49 +163,49 @@ function getTagReference($tag_id) {
 
 }
 
-function getTagTranslation($tag_translation_id) {
+function getTagHighlighter($tag_highlighter_id) {
 
-	# Get tag translation object
-	$tag_translation_object = TagTranslationQuery::create()
-		->findOneById($tag_translation_id);
+	# Get tag highlighter object
+	$tag_highlighter_object = TagHighlighterQuery::create()
+		->findOneById($tag_highlighter_id);
 
-	# Return tag translation object
-	return $tag_translation_object;
+	# Return tag highlighter object
+	return $tag_highlighter_object;
 
 }
 
-function getTagTranslationByTagId($tag_id, $bible_id) {
+function getTagHighlighterByTagId($tag_id, $bible_id) {
 
-	# Get tag translation object
-	$tag_translation_object = TagTranslationQuery::create()
+	# Get tag highlighter object
+	$tag_highlighter_object = TagHighlighterQuery::create()
 		->filterByTagId($tag_id)
 		->filterByBibleId($bible_id)
 		->findOne();
 
-	# Return tag translation object
-	return $tag_translation_object;
+	# Return tag highlighter object
+	return $tag_highlighter_object;
 
 }
 
-function getTagTranslationData($tag_id) {
+function getTagHighlighterData($tag_id) {
 
-	# Get tag translation object
-	$tag_translation_object = getTagTranslation($tag_id);
+	# Get tag highlighter object
+	$tag_highlighter_object = getTagHighlighter($tag_id);
 
 	# Get bible object
-	$bible_object = $tag_translation_object->getBible();
+	$bible_object = $tag_highlighter_object->getBible();
 
 	# Get bible data
 	$bible_data = getBibleData($bible_object->getId());
 
-	# Define tag translation data
-	$tag_translation_data = [
-		'id' => $tag_translation_object->getId(),
+	# Define tag highlighter data
+	$tag_highlighter_data = [
+		'id' => $tag_highlighter_object->getId(),
 		'bible' => $bible_data,
-		'relevant_words' => $tag_translation_object->getRelevantWords(),
+		'relevant_words' => $tag_highlighter_object->getRelevantWords(),
 	];
 
-	# Return tag translation data
-	return $tag_translation_data;
+	# Return tag highlighter data
+	return $tag_highlighter_data;
 
 }

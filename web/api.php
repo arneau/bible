@@ -33,11 +33,14 @@ if (isset($_GET['move_lesson'])) {
 
 }
 
-# Update tag translation relevant words (if applicable)
-if (isset($_GET['update_tag_translation_relevant_words'])) {
-	$tag_translation = getTagTranslation($_GET['tag_translation']);
-	$tag_translation->setRelevantWords($_GET['relevant_words'])
+# Update tag highlighter relevant words (if applicable)
+if (isset($_GET['update_tag_highlighter'])) {
+
+	# Set tag highlighter relevant words
+	$tag_highlighter = getTagHighlighter($_GET['tag_highlighter_id']);
+	$tag_highlighter->setRelevantWords($_GET['tag_highlighter_relevant_words'])
 		->save();
+
 }
 
 # Delete lesson (if applicable)

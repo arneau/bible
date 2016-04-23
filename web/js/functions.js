@@ -38,41 +38,41 @@ function getUniqueNumbers(reference_string) {
 
 }
 
-function highlightTagTranslationWords(tag_translation_id, words_to_highlight_string, unhighlight_first) {
+function applyTagHighlighter(tag_highlighter_id, relevant_words, unhighlight_first) {
 
-	// Unhighlight all tag translation words (if applicable)
+	// Unhighlight all tag highlighter words (if applicable)
 	if (unhighlight_first) {
-		$('blockquote[data-tag-translation=' + tag_translation_id + '] .word').removeClass('highlighted');
+		$('blockquote[data-tag-highlighter=' + tag_highlighter_id + '] .word').removeClass('highlighted');
 	}
 
 	// Get words to highlight array
-	words_to_highlight_array = getUniqueNumbers(words_to_highlight_string);
+	words_to_highlight_array = getUniqueNumbers(relevant_words);
 
-	// Highlight applicable tag translation words to highlight
+	// Highlight applicable tag highlighter words to highlight
 	words_to_highlight_array.map(function(word_number) {
-		$('blockquote[data-tag-translation=' + tag_translation_id + '] .word[data-word=' + word_number + ']').addClass('highlighted');
+		$('blockquote[data-tag-highlighter=' + tag_highlighter_id + '] .word[data-word=' + word_number + ']').addClass('highlighted');
 	});
 
 }
 
-function editTagTranslationRelevantWords(tag_translation_id) {
+function editTagHighlighter(tag_highlighter_id) {
 
 	// Make display changes
-	$('blockquote[data-tag-translation=' + tag_translation_id + ']').css('border-left-color', '#fd4').find('.relevant_words .edit').hide().next().css('display', 'inline-block');
+	$('blockquote[data-tag-highlighter=' + tag_highlighter_id + ']').css('border-left-color', '#fd4').find('.relevant_words .edit').hide().next().css('display', 'inline-block');
 
-	// Unhighlight all tag translation words
-	$('blockquote[data-tag-translation=' + tag_translation_id + '] .word').removeClass('highlighted');
+	// Unhighlight all tag highlighter words
+	$('blockquote[data-tag-highlighter=' + tag_highlighter_id + '] .word').removeClass('highlighted');
 
 	// Define relevant words
 	if (typeof relevant_words === 'undefined') {
 		relevant_words = [];
 	}
 
-	// Define relevant words for the applicable tag translation
-	relevant_words[tag_translation_id] = [];
+	// Define relevant words for the applicable tag highlighter
+	relevant_words[tag_highlighter_id] = [];
 
 	// Add listeners to words
-	$('blockquote[data-tag-translation=' + tag_translation_id + '] .word').mousedown(function() {
+	$('blockquote[data-tag-highlighter=' + tag_highlighter_id + '] .word').mousedown(function() {
 
 		// Capture first word of selection
 		first_word = $(this).attr('data-word');
@@ -94,25 +94,25 @@ function editTagTranslationRelevantWords(tag_translation_id) {
 		}
 
 		// Highlight relevant words
-		highlightTagTranslationWords(tag_translation_id, latest_word_range);
+		applyTagHighlighter(tag_highlighter_id, latest_word_range);
 
 		// Append selection to relevant words
-		relevant_words[tag_translation_id].push(latest_word_range);
+		relevant_words[tag_highlighter_id].push(latest_word_range);
 
 	});
 
 }
 
-function confirmTagTranslationRelevantWords(tag_translation_id) {
+function updateTagHighlighter(tag_highlighter_id) {
 
 	// Remove listeners from words
-	$('blockquote[data-tag-translation=' + tag_translation_id + '] .word').off('mousedown').off('mouseup');
+	$('blockquote[data-tag-highlighter=' + tag_highlighter_id + '] .word').off('mousedown').off('mouseup');
 
 	// Make display changes
-	$('blockquote[data-tag-translation=' + tag_translation_id + ']').css('border-left-color', '#eee').find('.relevant_words .confirm').hide().prev().css('display', 'inline-block');
+	$('blockquote[data-tag-highlighter=' + tag_highlighter_id + ']').css('border-left-color', '#eee').find('.relevant_words .confirm').hide().prev().css('display', 'inline-block');
 
 	// Submit relevant words to API
-	$.get('api.php?update_tag_translation_relevant_words&tag_translation=' + tag_translation_id + '&relevant_words=' + relevant_words[tag_translation_id].join(','));
+	$.get('api.php?update_tag_highlighter&tag_highlighter_id=' + tag_highlighter_id + '&tag_highlighter_relevant_words=' + relevant_words[tag_highlighter_id].join(','));
 
 }
 
@@ -202,3 +202,29 @@ $('.lesson').draggable({
 		moveLesson(ui.draggable.attr('data-lesson-id'), $(this).attr('data-lesson-id'));
 	}
 });
+
+function filterLessonFamilies(input) {
+
+	var search_string = $(input).val().toLowerCase();
+
+	$('.lesson_family').show().removeMark();
+
+	if (search_string.length > 2) {
+
+		$('.lesson_family').each(function() {
+
+			var lesson_family_text = $(this).text().toLowerCase();
+
+			if (lesson_family_text.indexOf(search_string) !== -1) {
+				$(this).mark(search_string, {
+					className: 'match'
+				});
+			} else {
+				$(this).hide();
+			}
+
+		});
+
+	}
+
+}

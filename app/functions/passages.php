@@ -177,11 +177,11 @@ function getPassageHTML($passage_html_data = []) {
 		# Get tag data
 		$tag_data = getTagData($tag_object->getId());
 
-		# Get tag translation object
-		$tag_translation_object = getTagTranslationByTagId($tag_object->getId(), $bible_object->getId());
+		# Get tag highlighter object
+		$tag_highlighter_object = getTagHighlighter($passage_html_data['tag_highlighter_id']);
 
-		# Get tag translation data
-		$tag_translation_data = getTagTranslationData($tag_translation_object->getId());
+		# Get tag highlighter data
+		$tag_highlighter_data = getTagHighlighterData($tag_highlighter_object->getId());
 
 		# Get tag verses ids
 		$tag_verses_ids = $tag_object->getTagVerses()
@@ -198,12 +198,11 @@ function getPassageHTML($passage_html_data = []) {
 
 	# Start passage HTML
 	$passage_html = <<<s
-<blockquote class="verse" data-tag-translation="{$tag_translation_data['id']}">
+<blockquote class="verse" data-tag-highlighter="{$tag_highlighter_data['id']}">
 	<div class="text">
 s;
 
 	# Add each verse to passage HTML
-	$word_number = 1;
 	foreach ($verses_objects as $verse_object) {
 
 		# Get verses data
@@ -214,6 +213,9 @@ s;
 
 		# Get verse translation data
 		$verse_translation_data = getVerseTranslationData($verse_translation_object->getId());
+
+		# Define starting word number
+		$word_number = $verse_translation_data['previous_verses_word_count'] + 1;
 
 		# Add verse number to passage HTML
 		$passage_html .= <<<s
@@ -253,8 +255,8 @@ s;
 		<span class="vote_down icon-arrow-down"></span>
 	</div>
 	<div class="relevant_words">
-		<span class="edit icon-pencil" onclick="editTagTranslationRelevantWords({$tag_translation_data['id']});"></span>
-		<span class="confirm icon-tick" onclick="confirmTagTranslationRelevantWords({$tag_translation_data['id']});"></span>
+		<span class="edit icon-pencil" onclick="editTagHighlighter({$tag_highlighter_data['id']});"></span>
+		<span class="confirm icon-tick" onclick="updateTagHighlighter({$tag_highlighter_data['id']});"></span>
 	</div>
 	<div class="tag">
 		<span class="delete icon-close" onclick="deleteTag({$passage_html_data['tag_id']});"></span>
@@ -269,13 +271,13 @@ s;
 s;
 
 	# Add highlighting (if applicable)
-	if ($passage_html_data['tag_id']) {
+	if ($passage_html_data['tag_highlighter_id']) {
 
 		# Add words to highlight javascript
 		$passage_html .= <<<s
 <script>
 	$(document).ready(function() {
-		highlightTagTranslationWords({$tag_translation_data['id']}, '{$tag_translation_data['relevant_words']}');
+		applyTagHighlighter({$tag_highlighter_data['id']}, '{$tag_highlighter_data['relevant_words']}');
 	});
 </script>
 s;

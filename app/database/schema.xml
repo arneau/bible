@@ -41,7 +41,7 @@
 		</behavior>
 		<column defaultValue="0" name="vote_count" type="integer" />
 	</table>
-	<table name="tag_translation">
+	<table name="tag_highlighter">
 		<column name="bible_id" required="true" type="integer" />
 		<column name="relevant_words" required="true" size="255" type="varchar" />
 		<column name="tag_id" required="true" type="integer" />

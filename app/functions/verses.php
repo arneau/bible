@@ -115,6 +115,29 @@ function getVerseTranslationData($verse_translation_id) {
 	# Get verse translation object
 	$verse_translation_object = getVerseTranslation($verse_translation_id);
 
+	# Get verse object
+	$verse_object = $verse_translation_object->getVerse();
+
+	# Determine previous verses' word count
+	$previous_verses_word_count = 0;
+	if ($verse_object->getVerseNumber() > 1) {
+
+		# Get previous verses' data
+		$previous_verses_data = VerseQuery::create()
+			->filterByBook($verse_object->getBook())
+			->filterByChapterNumber($verse_object->getChapterNumber())
+			->filterByVerseNumber(range(1, $verse_object->getVerseNumber() - 1))
+			->joinWithVerseTranslation()
+			->find()
+			->toArray();
+
+		# Get previous verses' word count
+		foreach ($previous_verses_data as $previous_verse_data) {
+			$previous_verses_word_count += $previous_verse_data['VerseTranslations'][0]['WordCount'];
+		}
+
+	}
+
 	# Define verse translation words array
 	$verse_translation_words_array = explode(' ', $verse_translation_object->getText());
 
@@ -122,6 +145,7 @@ function getVerseTranslationData($verse_translation_id) {
 	$verse_translation_data = [
 		'id' => $verse_translation_object->getId(),
 		'text' => $verse_translation_object->getText(),
+		'previous_verses_word_count' => $previous_verses_word_count,
 		'word_count' => $verse_translation_object->getWordCount(),
 		'words' => $verse_translation_words_array,
 	];

@@ -88,24 +88,24 @@ CREATE TABLE `defender_tag`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- defender_tag_translation
+-- defender_tag_highlighter
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `defender_tag_translation`;
+DROP TABLE IF EXISTS `defender_tag_highlighter`;
 
-CREATE TABLE `defender_tag_translation`
+CREATE TABLE `defender_tag_highlighter`
 (
     `bible_id` INTEGER NOT NULL,
     `relevant_words` VARCHAR(255) NOT NULL,
     `tag_id` INTEGER NOT NULL,
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     PRIMARY KEY (`id`),
-    INDEX `defender_tag_translation_fi_34bfc9` (`bible_id`),
-    INDEX `defender_tag_translation_fi_f5ffad` (`tag_id`),
-    CONSTRAINT `defender_tag_translation_fk_34bfc9`
+    INDEX `defender_tag_highlighter_fi_34bfc9` (`bible_id`),
+    INDEX `defender_tag_highlighter_fi_f5ffad` (`tag_id`),
+    CONSTRAINT `defender_tag_highlighter_fk_34bfc9`
         FOREIGN KEY (`bible_id`)
         REFERENCES `defender_bible` (`id`),
-    CONSTRAINT `defender_tag_translation_fk_f5ffad`
+    CONSTRAINT `defender_tag_highlighter_fk_f5ffad`
         FOREIGN KEY (`tag_id`)
         REFERENCES `defender_tag` (`id`)
         ON DELETE CASCADE

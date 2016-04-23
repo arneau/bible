@@ -1,6 +1,6 @@
 <?php
 
-use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Propel;
 
 function addLesson($lesson_parent_id, $lesson_name) {
 
@@ -67,6 +67,12 @@ function getLessonTags($lesson_id, $order_by = 'vote_count') {
 	$lesson_tags_ids = $lesson_object->getLessonTags()
 		->getPrimaryKeys();
 
+	# Get tag verse column to sort by
+	$tag_verse_column_to_order_by = Propel::getDatabaseMap()
+		->getTableByPhpName('TagVerse')
+		->getColumnByPhpName('VerseId')
+		->getFullyQualifiedName();
+
 	# Get applicable tag objects
 	$tags_objects = TagQuery::create()
 		->useLessonTagQuery()
@@ -75,8 +81,10 @@ function getLessonTags($lesson_id, $order_by = 'vote_count') {
 		->_if($order_by == 'vote_count')
 		->orderByVoteCount()
 		->_elseif($order_by == 'date_tagged')
-		->orderById(Criteria::DESC)
+		->orderById('DESC')
 		->_endif()
+		->joinWithTagVerse()
+		->addAscendingOrderByColumn($tag_verse_column_to_order_by)
 		->find();
 
 	# Handle lesson tags objects

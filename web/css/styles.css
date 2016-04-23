@@ -424,6 +424,11 @@ body {
     color: #e8e8e8; }
 #lessons_page section {
   background: #fff; }
+  #lessons_page section .lesson_family {
+    float: left;
+    width: 100%; }
+    #lessons_page section .lesson_family .match {
+      background: #38d878; }
 
 #lesson_page .page_heading h1 {
   margin-bottom: 20px; }
