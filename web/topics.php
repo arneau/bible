@@ -25,14 +25,14 @@ $is_adoptee = false;
 foreach ($topics_list as $topic_data) {
 
 	# Check if no longer adoptee
-	if (isset($adoptees_stop_at_level) && $topic_data['Level'] <= $adoptees_stop_at_level) {
+	if (isset($adoptees_stop_at_level) && $topic_data['ListLevel'] <= $adoptees_stop_at_level) {
 		$is_adoptee = false;
 	}
 
 	# Check if adoptee
 	if (!$is_adoptee && isset($topic_data['IsAdoptee']) && $topic_data['IsAdoptee']) {
 		$is_adoptee = true;
-		$adoptees_stop_at_level = $topic_data['Level'];
+		$adoptees_stop_at_level = $topic_data['ListLevel'];
 	}
 
 	# Define adoptee class
@@ -43,7 +43,7 @@ foreach ($topics_list as $topic_data) {
 	}
 
 	# Define offset
-	$offset = 40 * $topic_data['Level'] . 'px';
+	$offset = 40 * $topic_data['ListLevel'] . 'px';
 
 	# Echo topic
 	echo <<<s

@@ -51,9 +51,9 @@ function addLessonTag($lesson_id, $reference_string, $bible_code = 'kjv', $relev
 	# Get bible object
 	$bible_object = getBibleByCode($bible_code);
 
-	# Add tag translation object
-	$tag_translation_object = new TagTranslation();
-	$tag_translation_object->setBible($bible_object)
+	# Add tag highlighter object
+	$tag_highlighter_object = new TagHighlighter();
+	$tag_highlighter_object->setBible($bible_object)
 		->setRelevantWords($relevant_words)
 		->setTag($tag_object)
 		->save();

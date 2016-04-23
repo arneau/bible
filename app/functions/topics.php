@@ -76,7 +76,8 @@ function getTopicAdoptees($topic_id) {
 		->toArray();
 
 	# Add IsAdoptee to each adoptee
-	array_walk($topic_adoptees_array, function(&$topic_adoptee_data) {
+	array_walk($topic_adoptees_array, function (&$topic_adoptee_data) {
+
 		$topic_adoptee_data['IsAdoptee'] = true;
 	});
 
@@ -99,26 +100,27 @@ function getTopicsList($include_adoptees = true) {
 	$topics_list = [];
 
 	# Build topics list
-	getTopicsListRecursor($root_topic_children_array, $topics_list);
+	getTopicsListRecursor($topics_list, $root_topic_children_array);
 
 	# Return topics list
 	return $topics_list;
 
 }
 
-function getTopicsListRecursor($topics_array, &$topics_list, $level = 0) {
+function getTopicsListRecursor(&$topics_list, $topics_array, $list_level = 0) {
 
 	# Sort topics alphabetically
 	uasort($topics_array, function ($a, $b) {
 
 		return strcmp($a['Name'], $b['Name']);
+
 	});
 
 	# Handle topics
 	foreach ($topics_array as $topic_data) {
 
 		# Add level to topic data
-		$topic_data['Level'] = $level;
+		$topic_data['ListLevel'] = $list_level;
 
 		# Append topic data to topics list
 		$topics_list[] = $topic_data;
@@ -138,7 +140,7 @@ function getTopicsListRecursor($topics_array, &$topics_list, $level = 0) {
 
 		# Recurse through topic children (if applicable)
 		if ($topic_dependants_array) {
-			getTopicsListRecursor($topic_dependants_array, $topics_list, $level + 1);
+			getTopicsListRecursor($topics_list, $topic_dependants_array, $list_level + 1);
 		}
 
 	}

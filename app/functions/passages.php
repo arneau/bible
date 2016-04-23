@@ -167,7 +167,9 @@ function getPassageHTML($passage_html_data = []) {
 	if ($passage_html_data['verse_id']) {
 
 		# Get verse object
-		$tag_verses_objects = getVerse($passage_html_data['verse_id']);
+		$tag_verses_objects = [
+			getVerse($passage_html_data['verse_id'])
+		];
 
 	} elseif ($passage_html_data['tag_id']) {
 
@@ -198,75 +200,73 @@ function getPassageHTML($passage_html_data = []) {
 
 	# Start passage HTML
 	$passage_html = <<<s
-<blockquote class="verse" data-tag-highlighter="{$tag_highlighter_data['id']}">
+<blockquote class="passage" data-tag-highlighter="{$tag_highlighter_data['id']}">
 	<div class="text">
 s;
 
 	# Add each verse to passage HTML
 	foreach ($verses_objects as $verse_object) {
 
-		# Get verses data
 		$verse_data = getVerseData($verse_object->getId());
 
-		# Get verse translation object
 		$verse_translation_object = getVerseTranslationByVerseId($verse_object->getId(), $bible_object->getId());
-
-		# Get verse translation data
 		$verse_translation_data = getVerseTranslationData($verse_translation_object->getId());
 
-		# Define starting word number
 		$word_number = $verse_translation_data['previous_verses_word_count'] + 1;
 
-		# Add verse number to passage HTML
 		$passage_html .= <<<s
-		<sup>{$verse_data['number']}</sup>
+		<p>
+			<sup>{$verse_data['number']}</sup>
 s;
 
-		# Handle verse words
 		foreach ($verse_translation_data['words'] as $word_value) {
 
-			# Add verse words to passage HTML
 			$passage_html .= <<<s
 		<span class="word" data-word="{$word_number}">{$word_value}</span>
 s;
 
-			# Increment word number
 			$word_number ++;
 
 		}
+
+		$passage_html .= <<<s
+		</p>
+s;
+
 	}
 
-	# End passage HTML
 	$passage_html .= <<<s
 	</div>
-	<cite>
-		<span class="reference">{$passage_html_data['reference_string']}</span> &middot;
-		<span class="bible" data-info="{$bible_data['name']}">{$bible_data['code']['formatted']}</span>
-	</cite>
+	<div class="footer">
+		<cite>
+			<span class="reference">{$passage_html_data['reference_string']}</span> &middot;
+			<span class="bible" data-info="{$bible_data['name']}">{$bible_data['code']['formatted']}</span>
+		</cite>
 s;
 
 	# Add tag elements (if applicable)
 	if ($passage_html_data['tag_id']) {
 
 		$passage_html .= <<<s
-	<div class="votes">
-		<span class="vote_count">{$tag_data['vote_count']}</span> votes
-		<span class="vote_up icon-arrow-up"></span>
-		<span class="vote_down icon-arrow-down"></span>
-	</div>
-	<div class="relevant_words">
-		<span class="edit icon-pencil" onclick="editTagHighlighter({$tag_highlighter_data['id']});"></span>
-		<span class="confirm icon-tick" onclick="updateTagHighlighter({$tag_highlighter_data['id']});"></span>
-	</div>
-	<div class="tag">
-		<span class="delete icon-close" onclick="deleteTag({$passage_html_data['tag_id']});"></span>
-	</div>
+		<div class="votes">
+			<span class="vote_count">{$tag_data['vote_count']}</span> votes
+			<span class="vote_up icon-arrow-up"></span>
+			<span class="vote_down icon-arrow-down"></span>
+		</div>
+		<div class="relevant_words">
+			<span class="edit icon-pencil" onclick="editTagHighlighter({$tag_highlighter_data['id']});"></span>
+			<span class="confirm icon-tick" onclick="updateTagHighlighter({$tag_highlighter_data['id']});"></span>
+		</div>
+		<div class="tag">
+			<span class="delete icon-close" onclick="deleteTag({$passage_html_data['tag_id']});"></span>
+		</div>
 s;
 
 	}
 
 	# Continue passage HTML
 	$passage_html .= <<<s
+	</div>
 </blockquote>
 s;
 

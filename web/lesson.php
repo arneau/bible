@@ -30,19 +30,21 @@ echo <<<s
 						<h2>Tagged verses</h2>
 					</label>
 					<div class="content">
-						<div>
-							<div class="column">
-								<p>
-									<a onclick="showPopup('add_lesson_tag_popup');">Add tag</a>
-								</p>
-							</div>
-							<div class="column">
-								<p>
-									Order by ...
-									<a href="?id={$_GET['id']}&order_passages_by=reference">Reference</a>
-									<a href="?id={$_GET['id']}&order_passages_by=vote_count">Vote count</a>
-									<a href="?id={$_GET['id']}&order_passages_by=date_tagged">Date tagged</a>
-								</p>
+						<div class="actions">
+							<div class="columns">
+								<div class="column">
+									<p>
+										<a onclick="showPopup('add_lesson_tag_popup');">Add tag</a>
+									</p>
+								</div>
+								<div class="column">
+									<p>
+										Order by ...
+										<a href="?id={$_GET['id']}&order_passages_by=reference">Reference</a>
+										<a href="?id={$_GET['id']}&order_passages_by=vote_count">Vote count</a>
+										<a href="?id={$_GET['id']}&order_passages_by=date_tagged">Date tagged</a>
+									</p>
+								</div>
 							</div>
 						</div>
 s;
