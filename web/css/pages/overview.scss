@@ -1,0 +1,12 @@
+#overview_page {
+
+	section {
+		@extend %default_section;
+
+		h2 {
+			@extend %h2;
+
+			margin-bottom: 20px;
+		}
+	}
+}
