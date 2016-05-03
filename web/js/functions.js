@@ -134,6 +134,21 @@ function moveLesson(lesson_id, parent_lesson_id) {
 
 }
 
+function moveTagToLesson(tag_id, lesson_id) {
+	$.get('api.php?move_tag_to_lesson&tag_id=' + tag_id + '&lesson_id=' + lesson_id, function() {
+		location.reload();
+	});
+}
+
+function addTopicLesson(topic_id, lesson_id) {
+
+	// Send request to API and reload
+	$.get('api.php?add_topic_lesson&topic_id=' + topic_id + '&lesson_id=' + lesson_id, function() {
+		location.reload();
+	});
+
+}
+
 function deleteTag(tag_id) {
 
 	// Send request to API and reload
@@ -166,11 +181,12 @@ function submitForm(form) {
 	// Submit form data to API and reload
 	$.get('api.php?' + $(form).attr('action') + '&' + $(form).serialize(), function() {
 
-		// Order passages (if applicable)
-		location = location + '&order_passages_by=date_tagged';
-
-		// Else reload
-		//location.reload();
+		// Reload page as per action
+		if ($(form).attr('action') == 'edit_topic') {
+			location.reload();
+		} else {
+			location = location + '&order_passages_by=date_tagged';
+		}
 
 	});
 
@@ -194,12 +210,32 @@ $('.popup').each(function() {
 	});
 });
 
-// Make lessons draggable and droppable
-$('.lesson').draggable({
-	revert: true
+$('.passage').draggable({
+	handle: '.handle',
+	helper: 'clone',
+	revert: true,
+});
+$('.lesson_list_item').draggable({
+	helper: 'clone',
+	revert: true,
 }).droppable({
+	accept: '.passage, .lesson_list_item',
+	hoverClass: 'below',
+	tolerance: 'pointer',
 	drop: function(event, ui) {
-		moveLesson(ui.draggable.attr('data-lesson-id'), $(this).attr('data-lesson-id'));
+		if (ui.draggable.is('.passage')) {
+			moveTagToLesson(ui.draggable.attr('data-tag-id'), $(this).attr('data-lesson-id'))
+		} else if (ui.draggable.is('.lesson_list_item')) {
+			moveLesson(ui.draggable.attr('data-lesson-id'), $(this).attr('data-lesson-id'));
+		}
+	}
+});
+$('.topic_list_item').droppable({
+	accept: '.lesson_list_item, .topic_list_item',
+	hoverClass: 'below',
+	tolerance: 'pointer',
+	drop: function(event, ui) {
+		addTopicLesson($(this).attr('data-topic-id'), ui.draggable.attr('data-lesson-id'));
 	}
 });
 

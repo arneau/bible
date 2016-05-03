@@ -73,6 +73,7 @@
 .passage {
 	@extend %blockquote;
 
+	background-color: #fff;
 	border-left: 8px solid rgba(0, 0, 0, 0.05);
 	margin-bottom: 20px;
 	padding: 10px 0 10px 10px;
@@ -112,11 +113,14 @@
 		}
 	}
 	.footer {
+		@extend %p;
+
+		color: rgba(0, 0, 0, 0.38);
 		float: left;
+		font-size: 0.9em !important;
 		width: 100%;
 
 		cite {
-			color: #d8d8d8;
 			float: left;
 			font-style: normal;
 			margin-right: 20px;
@@ -135,7 +139,6 @@
 			}
 		}
 		.votes {
-			color: #d8d8d8;
 			float: left;
 			margin-right: 20px;
 
@@ -150,7 +153,6 @@
 			}
 		}
 		.relevant_words {
-			color: #d8d8d8;
 			float: left;
 			margin-right: 20px;
 
@@ -170,7 +172,6 @@
 			}
 		}
 		.tag {
-			color: #d8d8d8;
 			float: left;
 
 			.delete {
@@ -183,6 +184,55 @@
 				}
 			}
 		}
+	}
+}
+
+.topic_list_item, .lesson_list_item {
+	border-left: 8px solid transparent;
+	clear: both;
+	float: left;
+	margin-bottom: 10px;
+	padding: 10px 28px 10px 20px;
+
+	&:hover, &.below {
+		color: #fff;
+
+		p {
+			color: rgba(255, 255, 255, 0.5);
+		}
+	}
+
+	$level: 0;
+	@while ($level <= 10) {
+		&[data-list-item-level=level_#{$level}] {
+			margin-left: 20px * $level;
+		}
+		$level: $level + 1;
+	}
+
+	h4 {
+		@extend %h4;
+	}
+	p {
+		@extend %p;
+
+		clear: both;
+		color: rgba(0, 0, 0, 0.38);
+		font-size: 0.9em !important;
+	}
+}
+.topic_list_item {
+	border-left-color: $dark_blue;
+
+	&:hover, &.below {
+		background-color: $dark_blue;
+	}
+}
+.lesson_list_item {
+	border-left-color: $dark_green;
+
+	&:hover, &.below {
+		background-color: $dark_green;
 	}
 }
 

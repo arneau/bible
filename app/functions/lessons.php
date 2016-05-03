@@ -2,19 +2,16 @@
 
 use Propel\Runtime\Propel;
 
-function addLesson($lesson_parent_id, $lesson_name) {
+function addLesson($lesson_parent_id, $lesson_summary) {
 
-	# Get parent
 	$parent_object = LessonQuery::create()
 		->findOneById($lesson_parent_id);
 
-	# Add lesson
 	$lesson_object = new Lesson();
-	$lesson_object->setSummary($lesson_name)
-		->insertAsLastChildOf($parent_object)
+	$lesson_object->insertAsLastChildOf($parent_object)
+		->setSummary($lesson_summary)
 		->save();
 
-	# Return ID
 	return $lesson_object->getId();
 
 }
@@ -39,17 +36,21 @@ function getLessonData($lesson_id) {
 	$lesson_data = $lesson_object->toArray();
 
 	# Get all but root ancestors
-	$lesson_ancestors = $lesson_object->getAncestors()
-		->toArray();
-	unset($lesson_ancestors[0]);
+	$lesson_ancestors_objects = $lesson_object->getAncestors();
+	if ($lesson_ancestors_objects) {
+		$lesson_ancestors_datas = $lesson_ancestors_objects->toArray();
+		unset($lesson_ancestors_datas[0]);
+	}
 
 	# Define lesson summary
 	$lesson_data['summary'] = [
 		'default' => $lesson_data['Summary'],
 		'formatted' => '',
 	];
-	foreach ($lesson_ancestors as $lesson_ancestor) {
-		$lesson_data['summary']['formatted'] .= '<span>' . $lesson_ancestor['Summary'] . ' / </span>';
+	if ($lesson_ancestors_datas) {
+		foreach ($lesson_ancestors_datas as $lesson_ancestor_data) {
+			$lesson_data['summary']['formatted'] .= '<span>' . $lesson_ancestor_data['Summary'] . ' / </span>';
+		}
 	}
 	$lesson_data['summary']['formatted'] .= $lesson_data['Summary'];
 

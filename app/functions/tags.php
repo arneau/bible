@@ -1,31 +1,6 @@
 <?php
 
-function addTopicTag($topic_id, $verse_id, $bible_code, $relevant_words) {
-
-	# Add tag object
-	$tag_object = new Tag();
-	$tag_object->setVerseId($verse_id)
-		->save();
-
-	# Get bible object
-	$bible_object = getBibleByCode($bible_code);
-
-	# Add tag translation object
-	$tag_translation_object = new TagTranslation();
-	$tag_translation_object->setBible($bible_object)
-		->setRelevantWords($relevant_words)
-		->setTag($tag_object)
-		->save();
-
-	# Add topic tag object
-	$topic_tag_object = new TopicTag();
-	$topic_tag_object->setTopicId($topic_id)
-		->setTag($tag_object)
-		->save();
-
-}
-
-function addLessonTag($lesson_id, $reference_string, $bible_code = 'kjv', $relevant_words = '') {
+function addTag($reference_string, $bible_code = 'kjv', $relevant_words = '') {
 
 	# Get reference data
 	$reference_data = getReferenceData($reference_string);
@@ -57,6 +32,28 @@ function addLessonTag($lesson_id, $reference_string, $bible_code = 'kjv', $relev
 		->setRelevantWords($relevant_words)
 		->setTag($tag_object)
 		->save();
+
+	return $tag_object;
+
+}
+
+function addTopicTag($topic_id, $verse_id, $bible_code = 'kjv', $relevant_words = '') {
+
+	# Add tag object
+	$tag_object = addTag($verse_id, $bible_code, $relevant_words);
+
+	# Add topic tag object
+	$topic_tag_object = new TopicTag();
+	$topic_tag_object->setTopicId($topic_id)
+		->setTag($tag_object)
+		->save();
+
+}
+
+function addLessonTag($lesson_id, $verse_id, $bible_code = 'kjv', $relevant_words = '') {
+
+	# Add tag object
+	$tag_object = addTag($verse_id, $bible_code, $relevant_words);
 
 	# Add lesson tag object
 	$lesson_tag_object = new LessonTag();

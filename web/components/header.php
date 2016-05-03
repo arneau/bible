@@ -10,6 +10,7 @@
 <div id="header">
 	<a class="apologetics" href="#">Apologetics</a>
 	<a class="gods_word" href="#">God's Word</a>
+	<a class="overview" href="overview.php">Overview</a>
 	<a class="topics" href="topics.php">Topics</a>
 	<a class="lessons" href="lessons.php">Lessons</a>
 	<a class="notes" href="#">Notes</a>

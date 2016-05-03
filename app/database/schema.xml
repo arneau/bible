@@ -91,10 +91,10 @@
 	<table name="topic_lesson">
 		<column name="lesson_id" required="true" type="integer" />
 		<column name="topic_id" required="true" type="integer" />
-		<foreign-key foreignTable="lesson">
+		<foreign-key foreignTable="lesson" onDelete="cascade">
 			<reference foreign="id" local="lesson_id" />
 		</foreign-key>
-		<foreign-key foreignTable="topic">
+		<foreign-key foreignTable="topic" onDelete="cascade">
 			<reference foreign="id" local="topic_id" />
 		</foreign-key>
 	</table>

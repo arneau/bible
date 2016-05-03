@@ -32,4 +32,7 @@ body {
 			}
 		}
 	}
+	.page_section {
+		@extend %default_section;
+	}
 }

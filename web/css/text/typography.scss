@@ -6,10 +6,10 @@ body {
 	font-size: $default_font_size;
 
 	@include width(medium) {
-		font-size: $default_font_size + 1;
+		font-size: $default_font_size + 1.5;
 	}
 	@include width(large) {
-		font-size: $default_font_size + 2;
+		font-size: $default_font_size + 3;
 	}
 }
 
@@ -23,7 +23,7 @@ body {
 	color: #fff;
 	cursor: pointer;
 	float: left;
-	font: 1em / 1.6 $small_heading_fonts;
+	font: 1em / 1.6 #{$small_heading_fonts};
 	padding: 10px 20px;
 	transition: all 0.5s ease 0s;
 

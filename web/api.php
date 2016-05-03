@@ -5,15 +5,29 @@ require_once '../vendor/autoload.php';
 require_once '../generated-conf/config.php';
 require_once '../app/functions/functions.php';
 
-# Add lesson tag (if applicable)
-if (isset($_GET['add_lesson_tag'])) {
+if (isset($_GET['add_lesson'])) {
+	addLesson($_GET['lesson_id'], $_GET['lesson_summary']);
+}
 
-	# Add lesson tag
+if (isset($_GET['add_topic_tag'])) {
+	addTopicTag($_GET['topic']['id'], $_GET['reference_string']);
+}
+
+if (isset($_GET['add_lesson_tag'])) {
 	addLessonTag($_GET['lesson_id'], $_GET['reference_string']);
+}
+
+if (isset($_GET['edit_topic'])) {
+
+	# Get topic object
+	$topic_object = getTopic($_GET['topic']['id']);
+
+	# Set data and save
+	$topic_object->setName($_GET['topic']['name'])
+		->save();
 
 }
 
-# Edit lesson summary (if applicable)
 if (isset($_GET['edit_lesson_summary'])) {
 
 	# Get lesson object
@@ -25,12 +39,36 @@ if (isset($_GET['edit_lesson_summary'])) {
 
 }
 
-# Move lesson (if applicable)
+if (isset($_GET['link_lesson_to_topic'])) {
+
+	$topic_lesson_object = new TopicLesson();
+	$topic_lesson_object->setLessonId($_GET['lesson_id'])
+		->setTopicId($_GET['topic_id'])
+		->save();
+
+}
+
+if (isset($_GET['move_tag_to_lesson'])) {
+
+	$lesson_tag_object = LessonTagQuery::create()
+		->useTagQuery()
+		->filterById($_GET['tag_id'])
+		->endUse()
+		->findOne()
+		->setLessonId($_GET['lesson_id'])
+		->save();
+
+}
+
 if (isset($_GET['move_lesson'])) {
 
 	# Move lesson to new parent
 	moveLesson($_GET['lesson_id'], $_GET['parent_lesson_id']);
 
+}
+
+if (isset($_GET['add_topic_lesson'])) {
+	addTopicLesson($_GET['topic_id'], $_GET['lesson_id']);
 }
 
 # Update tag highlighter relevant words (if applicable)

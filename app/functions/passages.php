@@ -200,7 +200,7 @@ function getPassageHTML($passage_html_data = []) {
 
 	# Start passage HTML
 	$passage_html = <<<s
-<blockquote class="passage" data-tag-highlighter="{$tag_highlighter_data['id']}">
+<blockquote class="passage" data-tag-highlighter="{$tag_highlighter_data['id']}" data-tag-id="{$tag_data['id']}">
 	<div class="text">
 s;
 
@@ -240,7 +240,7 @@ s;
 	<div class="footer">
 		<cite>
 			<span class="reference">{$passage_html_data['reference_string']}</span> &middot;
-			<span class="bible" data-info="{$bible_data['name']}">{$bible_data['code']['formatted']}</span>
+			<span class="bible">{$bible_data['code']['formatted']}</span>
 		</cite>
 s;
 
@@ -260,6 +260,7 @@ s;
 		<div class="tag">
 			<span class="delete icon-close" onclick="deleteTag({$passage_html_data['tag_id']});"></span>
 		</div>
+		<div class="handle">Move</div>
 s;
 
 	}

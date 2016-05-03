@@ -13,12 +13,16 @@ $lesson_object = getLesson($_GET['id']);
 $lesson_data = getLessonData($_GET['id']);
 $lesson_tags = getLessonTags($_GET['id'], $_GET['order_passages_by']);
 
+# Get topics select options
+$topics_select_options = getTopicsSelectOptions();
+
 # Start page
 echo <<<s
 	<div class="page" id="lesson_page">
 		<section class="page_heading">
 			<h1>{$lesson_data['summary']['formatted']}</h1>
-			<button class="icon-pencil" onclick="showPopup('edit_lesson_summary_popup');"></button>
+			<button class="icon-pencil" onclick="showPopup('edit_lesson_summary');"></button>
+			<button class="icon-topics" onclick="showPopup('link_lesson_to_topic');"></button>
 			<button class="icon-close" onclick="deleteLesson('{$lesson_data['Id']}');"></button>
 		</section>
 		<div class="columns">
@@ -80,38 +84,27 @@ echo <<<s
 						<h2>Lesson family</h2>
 					</label>
 					<div class="content">
+						<p>
+							<a onclick="showPopup('add_lesson');">Add lesson</a>
+						</p>
 s;
 
-# Display lesson family
-$lesson_ancestors = $lesson_object->getAncestors()->toArray();
-unset($lesson_ancestors[0]);
-if ($lesson_ancestors) {
-	$lesson_family_root = getLesson($lesson_ancestors[1]['Id']);
+$lesson_ancestors = $lesson_object->getAncestors();
+if ($lesson_ancestors[1]) {
+	$lesson_family_root_member_id = $lesson_ancestors[1]->getId();
 } else {
-	$lesson_family_root = $lesson_object;
+	$lesson_family_root_member_id = $lesson_object->getId();
 }
-if ($lesson_family_root->getDescendants()) {
-	$lesson_family_members_array = array_merge([
-		$lesson_family_root->toArray()
-	], $lesson_family_root->getDescendants()->toArray());
-} else {
-	$lesson_family_members_array[] = $lesson_family_root->toArray();
-}
-foreach ($lesson_family_members_array as $lesson_family_member_data) {
-	$lesson_family_member_margin = ($lesson_family_member_data['TreeLevel'] - 1) * 20;
-	if ($lesson_family_member_data['Id'] == $lesson_data['Id']) {
-		$lesson_family_member_class = ' class="current"';
-	} else {
-		$lesson_family_member_class = '';
-	}
-	echo <<<s
-						<a class="lesson" data-lesson-id="{$lesson_family_member_data['Id']}" href="?id={$lesson_family_member_data['Id']}" style="margin-left: {$lesson_family_member_margin}px; width: calc(100% - {$lesson_family_member_margin}px);">
-							<div class="content">
-								<h3{$lesson_family_member_class}>{$lesson_family_member_data['Summary']}</h3>
-								<p><span class="icon icon-bible"></span>Tagged verses: {$lesson_family_member_data['TagCount']}</p>
-							</div>
-						</a>
-s;
+$root_lesson_children_objects = LessonQuery::create()
+	->filterByPrimaryKeys([
+		$lesson_family_root_member_id,
+	])
+	->find();
+
+$lesson_family_members_list_items = getCategoryListItems($root_lesson_children_objects);
+
+foreach ($lesson_family_members_list_items as $lesson_family_member_list_item_data) {
+	echo getCategoryListItemHTML($lesson_family_member_list_item_data);
 }
 
 echo <<<s
@@ -130,7 +123,7 @@ echo <<<s
 			</div>
 		</div>
 	</div>
-	<div class="popup" id="edit_lesson_summary_popup">
+	<div class="popup" id="edit_lesson_summary">
 		<div class="box">
 			<div class="heading">
 				<h3>
@@ -150,6 +143,48 @@ echo <<<s
 			</form>
 		</div>
 	</div>
+	<div class="popup" id="add_lesson">
+		<div class="box">
+			<div class="heading">
+				<h3>
+					<span class="icon icon-lesson"></span>
+					Add lesson
+				</h3>
+			</div>
+			<form action="add_lesson" class="content" data-type="api">
+				<p>
+					<label>Summary</label>
+					<input name="lesson_summary" type="text" />
+				</p>
+				<p>
+					<input name="lesson_id" type="hidden" value="{$lesson_data['Id']}" />
+					<button>Submit</button>
+				</p>
+			</form>
+		</div>
+	</div>
+	<div class="popup" id="link_lesson_to_topic">
+		<div class="box">
+			<div class="heading">
+				<h3>
+					<span class="icon icon-lesson"></span>
+					Link lesson to topic
+				</h3>
+			</div>
+			<form action="link_lesson_to_topic" class="content" data-type="api">
+				<p>
+					<label>Topic</label>
+					<select name="topic_id">
+						{$topics_select_options}
+					</select>
+				</p>
+				<p>
+					<input name="lesson_id" type="hidden" value="{$lesson_data['Id']}" />
+					<button>Submit</button>
+				</p>
+			</form>
+		</div>
+	</div>
 	<div class="popup" id="add_lesson_tag_popup">
 		<div class="box">
 			<div class="heading">
@@ -160,7 +195,7 @@ echo <<<s
 			</div>
 			<form action="add_lesson_tag" class="content" data-type="api">
 				<p>
-					<label>Verse</label>
+					<label>Reference</label>
 					<input name="reference_string" type="text" />
 				</p>
 				<p>
