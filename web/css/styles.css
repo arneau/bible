@@ -109,7 +109,7 @@ table {
     float: left;
     width: 100%; }
     .passage .text p {
-      margin-bottom: 20px; }
+      margin-bottom: 10px; }
       .passage .text p sup {
         color: #17b;
         font-weight: bold; }
@@ -125,6 +125,7 @@ table {
     color: rgba(0, 0, 0, 0.38);
     float: left;
     font-size: 0.9em !important;
+    margin-top: 10px;
     width: 100%; }
     .passage .footer cite {
       float: left;
@@ -343,7 +344,7 @@ body {
   font: 1em/1.6 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
 
-.passage .text p, .passage .footer, .topic_list_item p, .lesson_list_item p, .lesson .content p, .popup .box .content p, #lesson_page #passages .content p, #lesson_page #lessons .content p {
+.passage .text p, .passage .footer, .topic_list_item p, .lesson_list_item p, .lesson .content p, .popup .box .content p, #lesson_page #passages .content .actions p, #lesson_page #lessons .content p {
   float: left;
   font: 1em/1.6 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
@@ -474,12 +475,15 @@ body {
     background-color: #17b; }
     #lesson_page #passages .heading .icon {
       margin-top: 6px; }
-  #lesson_page #passages .content p {
-    margin-bottom: 20px; }
-    #lesson_page #passages .content p a {
-      color: #17b;
-      cursor: pointer;
-      margin-right: 10px; }
+  #lesson_page #passages .content .actions {
+    float: left;
+    width: 100%; }
+    #lesson_page #passages .content .actions p {
+      margin-bottom: 20px; }
+      #lesson_page #passages .content .actions p a {
+        color: #17b;
+        cursor: pointer;
+        margin-right: 10px; }
 #lesson_page #topics {
   border-bottom: 8px solid #1a7; }
   #lesson_page #topics .heading {

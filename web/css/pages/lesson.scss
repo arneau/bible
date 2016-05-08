@@ -27,15 +27,20 @@
 		}
 		.content {
 
-			p {
-				@extend %p;
+			.actions {
+				float: left;
+				width: 100%;
 
-				margin-bottom: 20px;
+				p {
+					@extend %p;
 
-				a {
-					color: $dark_blue;
-					cursor: pointer;
-					margin-right: 10px;
+					margin-bottom: 20px;
+
+					a {
+						color: $dark_blue;
+						cursor: pointer;
+						margin-right: 10px;
+					}
 				}
 			}
 		}

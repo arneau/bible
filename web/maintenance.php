@@ -101,4 +101,22 @@ if (0) {
 
 }
 
+# Delete tags without tag verses
+if (0) {
+
+	$tags_objects = TagQuery::create()
+		->find();
+
+	foreach ($tags_objects as $tag_object) {
+
+		$tag_verses_objects = $tag_object->getTagVerses();
+
+		if (!$tag_verses_objects->toArray()) {
+			$tag_object->delete();
+		}
+
+	}
+
+}
+
 ?>

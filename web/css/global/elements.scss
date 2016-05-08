@@ -89,7 +89,7 @@
 		p {
 			@extend %p;
 
-			margin-bottom: 20px;
+			margin-bottom: 10px;
 
 			sup {
 				@extend %sup;
@@ -118,6 +118,7 @@
 		color: rgba(0, 0, 0, 0.38);
 		float: left;
 		font-size: 0.9em !important;
+		margin-top: 10px;
 		width: 100%;
 
 		cite {

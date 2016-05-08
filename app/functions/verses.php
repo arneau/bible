@@ -20,6 +20,9 @@ function getVerseByReference($reference_string) {
 	$book_object = BookQuery::create()
 		->filterByName($reference_data['book'])
 		->findOne();
+	if (!$book_object) {
+		return false;
+	}
 
 	# Get verse object
 	$verse_object = VerseQuery::create()
@@ -27,6 +30,9 @@ function getVerseByReference($reference_string) {
 		->filterByChapterNumber($reference_data['chapter'])
 		->filterByVerseNumber($reference_data['verses'])
 		->findOne();
+	if (!$verse_object) {
+		return false;
+	}
 
 	# Return verse object
 	return $verse_object;

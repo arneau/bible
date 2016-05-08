@@ -5,15 +5,22 @@ function addTag($reference_string, $bible_code = 'kjv', $relevant_words = '') {
 	# Get reference data
 	$reference_data = getReferenceData($reference_string);
 
+	if (!$reference_data) {
+		return false;
+	}
+
 	# Add tag object
 	$tag_object = new Tag();
-	$tag_object->save();
 
 	# Add tag verse object for each verse number
 	foreach ($reference_data['verses'] as $verse_number) {
 
 		# Get verse object
 		$verse_object = getVerseByReference($reference_data['book'] . ' ' . $reference_data['chapter'] . ':' . $verse_number);
+
+		if (!$verse_object) {
+			return false;
+		}
 
 		# Add tag verse object
 		$tag_verse_object = new TagVerse();
@@ -22,6 +29,8 @@ function addTag($reference_string, $bible_code = 'kjv', $relevant_words = '') {
 			->save();
 
 	}
+
+	$tag_object->save();
 
 	# Get bible object
 	$bible_object = getBibleByCode($bible_code);
@@ -37,29 +46,33 @@ function addTag($reference_string, $bible_code = 'kjv', $relevant_words = '') {
 
 }
 
-function addTopicTag($topic_id, $verse_id, $bible_code = 'kjv', $relevant_words = '') {
+function addTopicTag($topic_id, $reference_string, $bible_code = 'kjv', $relevant_words = '') {
 
 	# Add tag object
-	$tag_object = addTag($verse_id, $bible_code, $relevant_words);
+	$tag_object = addTag($reference_string, $bible_code, $relevant_words);
 
-	# Add topic tag object
-	$topic_tag_object = new TopicTag();
-	$topic_tag_object->setTopicId($topic_id)
-		->setTag($tag_object)
-		->save();
+	# Add topic tag object (if applicable)
+	if ($tag_object) {
+		$topic_tag_object = new TopicTag();
+		$topic_tag_object->setTopicId($topic_id)
+			->setTag($tag_object)
+			->save();
+	}
 
 }
 
-function addLessonTag($lesson_id, $verse_id, $bible_code = 'kjv', $relevant_words = '') {
+function addLessonTag($lesson_id, $reference_string, $bible_code = 'kjv', $relevant_words = '') {
 
 	# Add tag object
-	$tag_object = addTag($verse_id, $bible_code, $relevant_words);
+	$tag_object = addTag($reference_string, $bible_code, $relevant_words);
 
-	# Add lesson tag object
-	$lesson_tag_object = new LessonTag();
-	$lesson_tag_object->setLessonId($lesson_id)
-		->setTag($tag_object)
-		->save();
+	# Add lesson tag object (if applicable)
+	if ($tag_object) {
+		$lesson_tag_object = new LessonTag();
+		$lesson_tag_object->setLessonId($lesson_id)
+			->setTag($tag_object)
+			->save();
+	}
 
 }
 
