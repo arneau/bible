@@ -243,7 +243,7 @@ function filterLessonFamilies(input) {
 
 	var search_string = $(input).val().toLowerCase();
 
-	$('.lesson_family').show().removeMark();
+	//$('.lesson_family').show().removeMark();
 
 	if (search_string.length > 2) {
 
@@ -252,9 +252,9 @@ function filterLessonFamilies(input) {
 			var lesson_family_text = $(this).text().toLowerCase();
 
 			if (lesson_family_text.indexOf(search_string) !== -1) {
-				$(this).mark(search_string, {
-					className: 'match'
-				});
+				//$(this).mark(search_string, {
+				//	className: 'match'
+				//});
 			} else {
 				$(this).hide();
 			}
