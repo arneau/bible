@@ -38,6 +38,23 @@ function getUniqueNumbers(reference_string) {
 
 }
 
+function applyHighlighter(relevant_words, unhighlight_first) {
+
+	// Unhighlight all tag highlighter words (if applicable)
+	if (unhighlight_first) {
+		$('.passage .word').removeClass('highlighted');
+	}
+
+	// Get words to highlight array
+	words_to_highlight_array = getUniqueNumbers(relevant_words);
+
+	// Highlight applicable tag highlighter words to highlight
+	words_to_highlight_array.map(function(word_number) {
+		$('.passage .word[data-word=' + word_number + ']').addClass('highlighted');
+	});
+
+}
+
 function applyTagHighlighter(tag_highlighter_id, relevant_words, unhighlight_first) {
 
 	// Unhighlight all tag highlighter words (if applicable)
@@ -237,6 +254,10 @@ $('.topic_list_item').droppable({
 	drop: function(event, ui) {
 		addTopicLesson($(this).attr('data-topic-id'), ui.draggable.attr('data-lesson-id'));
 	}
+});
+
+$('.passage .tags .tag').mouseenter(function() {
+	applyHighlighter($(this).attr('data-relevant-words'), true);
 });
 
 function filterLessonFamilies(input) {

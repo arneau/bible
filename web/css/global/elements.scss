@@ -97,7 +97,7 @@
 				color: $dark_blue;
 				font-weight: bold;
 			}
-			span {
+			.word {
 				display: inline-block;
 				transition: all 0.5s ease 0s;
 
@@ -107,6 +107,40 @@
 
 					& + .highlighted {
 						margin-left: -9px;
+					}
+				}
+			}
+			.tags {
+				float: left;
+				margin-top: 5px;
+				width: 100%;
+
+				.tag {
+					float: left;
+					height: 10px;
+					margin-right: 5px;
+					width: 10px;
+
+					&:nth-child(7n + 1) {
+						background-color: $dark_blue;
+					}
+					&:nth-child(7n + 2) {
+						background-color: $dark_green;
+					}
+					&:nth-child(7n + 3) {
+						background-color: $yellow;
+					}
+					&:nth-child(7n + 4) {
+						background-color: $light_orange;
+					}
+					&:nth-child(7n + 5) {
+						background-color: $red;
+					}
+					&:nth-child(7n + 6) {
+						background-color: $pink;
+					}
+					&:nth-child(7n + 7) {
+						background-color: $light_purple;
 					}
 				}
 			}
@@ -125,19 +159,6 @@
 			float: left;
 			font-style: normal;
 			margin-right: 20px;
-
-			span {
-
-				&.bible {
-
-					&:hover {
-
-						&:after {
-							content: " · " attr(data-info);
-						}
-					}
-				}
-			}
 		}
 		.votes {
 			float: left;

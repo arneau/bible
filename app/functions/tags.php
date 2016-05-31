@@ -184,12 +184,19 @@ function getTagHighlighter($tag_highlighter_id) {
 
 }
 
-function getTagHighlighterByTagId($tag_id, $bible_id) {
+function getTagHighlighterByTagId($tag_id, $bible_id = false, $bible_code = false) {
+
+	# Get bible object
+	if ($bible_id) {
+		$bible_object = getBible($bible_id);
+	} elseif($bible_code) {
+		$bible_object = getBibleByCode($bible_code);
+	}
 
 	# Get tag highlighter object
 	$tag_highlighter_object = TagHighlighterQuery::create()
 		->filterByTagId($tag_id)
-		->filterByBibleId($bible_id)
+		->filterByBible($bible_object)
 		->findOne();
 
 	# Return tag highlighter object

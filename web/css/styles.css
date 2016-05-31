@@ -1,4 +1,3 @@
-@charset "UTF-8";
 * {
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
@@ -43,7 +42,7 @@ table {
 :focus {
   outline: 0; }
 
-.page .page_section, #overview_page section, #lessons_page section, #lesson_page .page_heading {
+.page .page_section, #read_page section, #overview_page section, #lessons_page section, #lesson_page .page_heading {
   background-color: #fff;
   box-shadow: 0 5px rgba(0, 0, 0, 0.05);
   float: left;
@@ -51,7 +50,7 @@ table {
   padding: 20px 20px 0;
   width: 100%; }
   @media (min-width: 576px) {
-    .page .page_section, #overview_page section, #lessons_page section, #lesson_page .page_heading {
+    .page .page_section, #read_page section, #overview_page section, #lessons_page section, #lesson_page .page_heading {
       box-shadow: 5px 5px rgba(0, 0, 0, 0.05);
       margin-bottom: 20px; } }
 
@@ -113,14 +112,37 @@ table {
       .passage .text p sup {
         color: #17b;
         font-weight: bold; }
-      .passage .text p span {
+      .passage .text p .word {
         display: inline-block;
         transition: all 0.5s ease 0s; }
-        .passage .text p span.highlighted {
+        .passage .text p .word.highlighted {
           background-color: #fd4;
           padding: 0 5px; }
-          .passage .text p span.highlighted + .highlighted {
+          .passage .text p .word.highlighted + .highlighted {
             margin-left: -9px; }
+      .passage .text p .tags {
+        float: left;
+        margin-top: 5px;
+        width: 100%; }
+        .passage .text p .tags .tag {
+          float: left;
+          height: 10px;
+          margin-right: 5px;
+          width: 10px; }
+          .passage .text p .tags .tag:nth-child(7n + 1) {
+            background-color: #17b; }
+          .passage .text p .tags .tag:nth-child(7n + 2) {
+            background-color: #1a7; }
+          .passage .text p .tags .tag:nth-child(7n + 3) {
+            background-color: #fc4; }
+          .passage .text p .tags .tag:nth-child(7n + 4) {
+            background-color: #f84; }
+          .passage .text p .tags .tag:nth-child(7n + 5) {
+            background-color: #e44; }
+          .passage .text p .tags .tag:nth-child(7n + 6) {
+            background-color: #e69; }
+          .passage .text p .tags .tag:nth-child(7n + 7) {
+            background-color: #96c; }
   .passage .footer {
     color: rgba(0, 0, 0, 0.38);
     float: left;
@@ -131,8 +153,6 @@ table {
       float: left;
       font-style: normal;
       margin-right: 20px; }
-      .passage .footer cite span.bible:hover:after {
-        content: " · " attr(data-info); }
     .passage .footer .votes {
       float: left;
       margin-right: 20px; }
@@ -309,7 +329,7 @@ body {
   font: bold 2.25em/1.1 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
 
-#lesson_page #passages > .heading h2, #lesson_page #topics > .heading h2, #lesson_page #lessons > .heading h2, #lesson_page #notes > .heading h2, #overview_page section h2 {
+#lesson_page #passages > .heading h2, #lesson_page #topics > .heading h2, #lesson_page #lessons > .heading h2, #lesson_page #notes > .heading h2, #read_page section h2, #overview_page section h2 {
   float: left;
   font: bold 1.75em/1.2 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
@@ -344,7 +364,7 @@ body {
   font: 1em/1.6 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
 
-.passage .text p, .passage .footer, .topic_list_item p, .lesson_list_item p, .lesson .content p, .popup .box .content p, #lesson_page #passages .content .actions p, #lesson_page #lessons .content p {
+.passage .text p, .passage .footer, .topic_list_item p, .lesson_list_item p, .lesson .content p, .popup .box .content p, #read_page section p, #lesson_page #passages .content .actions p, #lesson_page #lessons .content p {
   float: left;
   font: 1em/1.6 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
@@ -412,6 +432,11 @@ body {
             padding-left: 0; }
           .page .columns .column:last-child {
             padding-right: 0; } }
+
+#read_page section h2 {
+  margin-bottom: 20px; }
+#read_page section p {
+  margin-bottom: 20px; }
 
 #overview_page section h2 {
   margin-bottom: 20px; }

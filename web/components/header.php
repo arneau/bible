@@ -1,15 +1,15 @@
 <html>
 <head>
 	<link href="css/styles.css" rel="stylesheet" />
-	<link href="assets/icons.css" rel="stylesheet" />
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-	<script src="https://rawgit.com/julmot/jquery.mark/master/dist/jquery.mark.min.js"></script>
+	<link href="assets/icons/icons.css" rel="stylesheet" />
+	<script src="assets/libraries/jquery.min.js"></script>
+	<script src="assets/libraries/jquery-ui.min.js"></script>
+	<script src="assets/libraries/jquery.mark.min.js"></script>
 </head>
 <body>
 <div id="header">
 	<a class="apologetics" href="#">Apologetics</a>
-	<a class="gods_word" href="#">God's Word</a>
+	<a class="gods_word" href="read.php">God's Word</a>
 	<a class="overview" href="overview.php">Overview</a>
 	<a class="topics" href="topics.php">Topics</a>
 	<a class="lessons" href="lessons.php">Lessons</a>

@@ -134,8 +134,6 @@ function getReferenceData($reference_string) {
 		$reference_data['chapter'] = $reference_parts[2];
 		if (isset($reference_parts[3])) {
 			$reference_data['verses'] = getNumbersArrayFromString($reference_parts[3]);
-		} else {
-			$reference_data['verses'] = [];
 		}
 
 		# Return reference data
@@ -168,7 +166,7 @@ function getPassageHTML($passage_html_data = []) {
 
 		# Get verse object
 		$tag_verses_objects = [
-			getVerse($passage_html_data['verse_id'])
+			getVerse($passage_html_data['verse_id']),
 		];
 
 	} elseif ($passage_html_data['tag_id']) {
@@ -196,6 +194,11 @@ function getPassageHTML($passage_html_data = []) {
 			->endUse()
 			->find();
 
+	} else {
+
+		# Get verses by reference
+		$verses_objects = getVersesByReference($passage_html_data['reference_string']);
+
 	}
 
 	# Start passage HTML
@@ -222,10 +225,49 @@ s;
 		foreach ($verse_translation_data['words'] as $word_value) {
 
 			$passage_html .= <<<s
-		<span class="word" data-word="{$word_number}">{$word_value}</span>
+			<span class="word" data-word="{$word_number}">{$word_value}</span>
 s;
 
 			$word_number ++;
+
+		}
+
+		if ($passage_html_data['show_tags']) {
+
+			$verse_tags_objects = LessonTagQuery::create()
+				->useTagQuery()
+				->useTagVerseQuery()
+				->filterByVerse($verse_object)
+				->endUse()
+				->endUse()
+				->useLessonQuery()
+				->orderById()
+				->endUse()
+				->find();
+
+			if ($verse_tags_objects) {
+
+				$passage_html .= <<<s
+			<span class="tags">
+s;
+
+				foreach ($verse_tags_objects as $verse_tag_object) {
+
+					$lesson_data = getLessonData($verse_tag_object->getLessonId());
+
+					$tag_highlighter_object = getTagHighlighterByTagId($verse_tag_object->getTagId(), false, 'kjv');
+					$tag_highlighter_data = getTagHighlighterData($tag_highlighter_object->getId());
+
+					$passage_html .= <<<s
+				<a class="tag" href="lesson.php?id={$lesson_data['Id']}" data-relevant-words="{$tag_highlighter_data['relevant_words']}" target="_blank" title="Lesson: {$lesson_data['Summary']}"></a>
+s;
+				}
+
+				$passage_html .= <<<s
+			</span>
+s;
+
+			}
 
 		}
 
