@@ -11,6 +11,13 @@
 		<column name="chapter_count" required="true" type="integer" />
 		<column name="name" required="true" size="255" type="varchar" />
 	</table>
+	<table name="book_abbreviation">
+		<column name="book_id" required="true" type="integer" />
+		<column name="name" required="true" size="255" type="varchar" />
+		<foreign-key foreignTable="book">
+			<reference foreign="id" local="book_id" />
+		</foreign-key>
+	</table>
 	<table name="verse">
 		<column name="book_id" required="true" type="integer" />
 		<column name="chapter_number" required="true" type="integer" />

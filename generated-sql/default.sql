@@ -32,6 +32,24 @@ CREATE TABLE `defender_book`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- defender_book_abbreviation
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `defender_book_abbreviation`;
+
+CREATE TABLE `defender_book_abbreviation`
+(
+    `book_id` INTEGER NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`),
+    INDEX `defender_book_abbreviation_fi_570e00` (`book_id`),
+    CONSTRAINT `defender_book_abbreviation_fk_570e00`
+        FOREIGN KEY (`book_id`)
+        REFERENCES `defender_book` (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- defender_verse
 -- ---------------------------------------------------------------------
 
@@ -205,10 +223,12 @@ CREATE TABLE `defender_topic_lesson`
     INDEX `defender_topic_lesson_fi_e13667` (`topic_id`),
     CONSTRAINT `defender_topic_lesson_fk_df0bc4`
         FOREIGN KEY (`lesson_id`)
-        REFERENCES `defender_lesson` (`id`),
+        REFERENCES `defender_lesson` (`id`)
+        ON DELETE CASCADE,
     CONSTRAINT `defender_topic_lesson_fk_e13667`
         FOREIGN KEY (`topic_id`)
         REFERENCES `defender_topic` (`id`)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

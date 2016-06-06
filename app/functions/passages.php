@@ -129,9 +129,14 @@ function getReferenceData($reference_string) {
 	# Check parts
 	if ($reference_parts && $reference_parts[1] && $reference_parts[2]) {
 
-		# Handle parts
-		$reference_data['book'] = $reference_parts[1];
+		# Handle book
+		$book_object = getBookByName($reference_parts[1]);
+		$reference_data['book'] = $book_object->getName();
+
+		# Handle chapter
 		$reference_data['chapter'] = $reference_parts[2];
+
+		# Handle verses
 		if (isset($reference_parts[3])) {
 			$reference_data['verses'] = getNumbersArrayFromString($reference_parts[3]);
 		}
