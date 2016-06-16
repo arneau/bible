@@ -8,17 +8,16 @@ require_once '../app/functions/functions.php';
 # Display header
 require_once 'components/header.php';
 
-# Get lesson, data, etc
+# Get lesson and data
 $topic_object = getTopic($_GET['id']);
 $topic_data = getTopicData($_GET['id']);
-$topic_tags = getTopicTags($_GET['id'], $_GET['order_passages_by']);
 
 # Get topics select options
 $topics_select_options = getTopicsSelectOptions();
 
 # Start page
 echo <<<s
-	<div class="page" id="lesson_page">
+	<div class="page" id="topic_page">
 		<section class="page_heading">
 			<h1>{$topic_data['name']['formatted']}</h1>
 			<button class="icon-pencil" onclick="showPopup('edit_topic');"></button>
@@ -54,12 +53,11 @@ echo <<<s
 s;
 
 # Display lesson tags
+$topic_tags = getTopicTags($_GET['id'], $_GET['order_passages_by']);
 if ($topic_tags) {
-
 	foreach ($topic_tags as $lesson_tag_data) {
 		echo getTagHTML($lesson_tag_data['id']);
 	}
-
 }
 
 echo <<<s
@@ -67,24 +65,47 @@ echo <<<s
 				</section>
 			</div>
 			<div class="column">
-				<section id="topics">
-					<input id="topics_toggle" type="checkbox" />
-					<label class="heading" for="topics_toggle">
+				<section id="topics_and_lessons">
+					<input checked id="topics_and_lessons_toggle" type="checkbox" />
+					<label class="heading" for="topics_and_lessons_toggle">
 						<div class="icon icon-topics"></div>
-						<h2>Relevant topics</h2>
+						<h2>Topics & Lessons</h2>
 					</label>
 					<div class="content">
-						<p>Placeholder</p>
-					</div>
-				</section>
-				<section id="lessons">
-					<input id="lessons_toggle" type="checkbox" />
-					<label class="heading" for="lessons_toggle">
-						<div class="icon icon-lessons"></div>
-						<h2>Lesson family</h2>
-					</label>
-					<div class="content">
-						<p>Placeholder</p>
+						<p class="actions">
+							<a onclick="showPopup('add_topic');">Add topic</a>
+							&middot;
+							<a onclick="showPopup('add_lesson');">Add lesson</a>
+						</p>
+						<div class="list">
+s;
+
+# Get root ID
+$topic_ancestors_objects = $topic_object->getAncestors();
+if ($topic_ancestors_objects[1]) {
+	$topic_root_id = $topic_ancestors_objects[1]->getId();
+} else {
+	$topic_root_id = $topic_object->getId();
+}
+
+# Display topic and lesson family
+$topics_objects = TopicQuery::create()
+	->filterByPrimaryKeys([
+		$topic_root_id
+	])
+	->find();
+if ($topics_objects->count()) {
+	$topic_children_list_items = getCategoryListItems($topics_objects);
+	foreach ($topic_children_list_items as $topic_children_list_item_data) {
+		echo getCategoryListItemHTML($topic_children_list_item_data);
+	}
+}
+
+echo <<<s
+						</div>
+						<script>
+							$('[data-topic-id={$topic_data['Id']}]').addClass('active');
+						</script>
 					</div>
 				</section>
 				<section id="notes">
@@ -130,8 +151,8 @@ echo <<<s
 			</div>
 			<form action="add_topic" class="content" data-type="api">
 				<p>
-					<label>Summary</label>
-					<input name="topic_summary" type="text" />
+					<label>Name</label>
+					<input name="topic_name" type="text" />
 				</p>
 				<p>
 					<input name="topic_id" type="hidden" value="{$topic_data['Id']}" />
@@ -155,6 +176,26 @@ echo <<<s
 				</p>
 				<p>
 					<input name="topic[id]" type="hidden" value="{$topic_data['Id']}" />
+					<button>Submit</button>
+				</p>
+			</form>
+		</div>
+	</div>
+	<div class="popup" id="add_lesson">
+		<div class="box">
+			<div class="heading">
+				<h3>
+					<span class="icon icon-lesson"></span>
+					Add lesson
+				</h3>
+			</div>
+			<form action="add_lesson" class="content" data-type="api">
+				<p>
+					<label>Summary</label>
+					<input name="lesson_summary" type="text" />
+				</p>
+				<p>
+					<input name="topic_id" type="hidden" value="{$topic_data['Id']}" />
 					<button>Submit</button>
 				</p>
 			</form>

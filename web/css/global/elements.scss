@@ -34,7 +34,8 @@
 
 				& + .content {
 					height: auto;
-					padding: 25px 20px 0;
+					margin: 20px 0;
+					padding: 0 20px;
 				}
 			}
 		}
@@ -209,6 +210,12 @@
 	}
 }
 
+.list {
+	float: left;
+	margin-bottom: 10px;
+	width: 100%;
+}
+
 .topic_list_item, .lesson_list_item {
 	border-left: 8px solid transparent;
 	clear: both;
@@ -216,7 +223,7 @@
 	margin-bottom: 10px;
 	padding: 10px 28px 10px 20px;
 
-	&:hover, &.below {
+	&:hover, &.active, &.below {
 		color: #fff;
 
 		p {
@@ -246,14 +253,14 @@
 .topic_list_item {
 	border-left-color: $dark_blue;
 
-	&:hover, &.below {
+	&:hover, &.active, &.below {
 		background-color: $dark_blue;
 	}
 }
 .lesson_list_item {
 	border-left-color: $dark_green;
 
-	&:hover, &.below {
+	&:hover, &.active, &.below {
 		background-color: $dark_green;
 	}
 }

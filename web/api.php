@@ -5,8 +5,21 @@ require_once '../vendor/autoload.php';
 require_once '../generated-conf/config.php';
 require_once '../app/functions/functions.php';
 
+if (isset($_GET['add_topic'])) {
+	addTopic($_GET['topic_id'], $_GET['topic_name']);
+}
+
 if (isset($_GET['add_lesson'])) {
-	addLesson($_GET['lesson_id'], $_GET['lesson_summary']);
+
+	if ($_GET['lesson_id']) {
+		$lesson_id = addLesson($_GET['lesson_id'], $_GET['lesson_summary']);
+	}
+
+	if ($_GET['topic_id']) {
+		$lesson_id = addLesson(1, $_GET['lesson_summary']);
+		addTopicLesson($_GET['topic_id'], $lesson_id);
+	}
+
 }
 
 if (isset($_GET['add_topic_tag'])) {

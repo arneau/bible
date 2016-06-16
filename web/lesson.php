@@ -109,6 +109,9 @@ foreach ($lesson_family_members_list_items as $lesson_family_member_list_item_da
 
 echo <<<s
 					</div>
+					<script>
+						$('[data-lesson-id={$lesson_data['Id']}]').addClass('active');
+					</script>
 				</section>
 				<section id="notes">
 					<input id="notes_toggle" type="checkbox" />

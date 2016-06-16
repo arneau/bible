@@ -236,16 +236,16 @@ function getTopicsListRecursor(&$topics_list, $topics_array, $include_adoptees =
 
 }
 
-function getCategoryListItems($root_objects, $include_adoptees = false) {
+function getCategoryListItems($root_objects, $include_topics = true, $include_adoptees = false) {
 
 	$category_list_items = [];
-	getCategoryListItemRecursor($category_list_items, $root_objects, $include_adoptees);
+	getCategoryListItemRecursor($category_list_items, $root_objects, $include_topics, $include_adoptees);
 
 	return $category_list_items;
 
 }
 
-function getCategoryListItemRecursor(&$category_list_items, $level_objects, $include_adoptees = false, $list_level = 0) {
+function getCategoryListItemRecursor(&$category_list_items, $level_objects, $include_topics = false, $include_adoptees = false, $list_level = 0) {
 
 	if (get_class($level_objects[0]) == 'Topic') {
 
@@ -270,27 +270,27 @@ function getCategoryListItemRecursor(&$category_list_items, $level_objects, $inc
 
 		if (get_class($level_object) == 'Topic') {
 
-			$level_object_lessons_objects = LessonQuery::create()
-				->useTopicLessonQuery()
-				->filterByPrimaryKeys($level_object->getTopicLessons()
-					->getPrimaryKeys())
-				->endUse()
-				->find();
-			if ($level_object_lessons_objects->count()) {
-				getCategoryListItemRecursor($category_list_items, $level_object_lessons_objects, $include_adoptees, $list_level + 1);
+			if ($include_topics) {
+
+				$level_object_lessons_objects = $level_object->getLessons();
+				if ($level_object_lessons_objects->count()) {
+					getCategoryListItemRecursor($category_list_items, $level_object_lessons_objects, $include_topics, $include_adoptees, $list_level + 1);
+				}
+
 			}
 
 			$level_object_topics_objects = $level_object->getChildren();
 			if ($level_object_topics_objects->count()) {
-				getCategoryListItemRecursor($category_list_items, $level_object_topics_objects, $include_adoptees, $list_level + 1);
+				getCategoryListItemRecursor($category_list_items, $level_object_topics_objects, $include_topics, $include_adoptees, $list_level + 1);
 			}
 
 		}
+
 		if (get_class($level_object) == 'Lesson') {
 
 			$level_object_lessons_objects = $level_object->getChildren();
 			if ($level_object_lessons_objects->count()) {
-				getCategoryListItemRecursor($category_list_items, $level_object_lessons_objects, $include_adoptees, $list_level + 1);
+				getCategoryListItemRecursor($category_list_items, $level_object_lessons_objects, $include_topics, $include_adoptees, $list_level + 1);
 			}
 
 		}

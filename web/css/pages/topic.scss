@@ -1,0 +1,144 @@
+#topic_page {
+
+	.page_heading {
+		@extend %default_section;
+
+		h1 {
+			@extend %h1;
+
+			margin-bottom: 20px;
+
+			span {
+				color: #e8e8e8;
+			}
+		}
+	}
+	#passages {
+		@extend %toggle_section;
+
+		border-bottom: 8px solid $dark_blue;
+
+		.heading {
+			background-color: $dark_blue;
+
+			.icon {
+				margin-top: 6px;
+			}
+		}
+		.content {
+
+			.actions {
+				float: left;
+				width: 100%;
+
+				p {
+					@extend %p;
+
+					margin-bottom: 20px;
+
+					a {
+						color: $dark_blue;
+						cursor: pointer;
+						margin-right: 10px;
+					}
+				}
+			}
+		}
+	}
+	#topics_and_lessons {
+		@extend %toggle_section;
+
+		border-bottom: 8px solid $dark_blue;
+
+		.heading {
+			background-color: $dark_blue;
+
+			.icon {
+				margin-top: 4px;
+			}
+		}
+		.content {
+			max-height: 600px;
+			overflow-y: scroll;
+
+			.actions {
+				@extend %p;
+
+				margin-bottom: 20px;
+
+				a {
+					color: $dark_blue;
+					cursor: pointer;
+				}
+			}
+			.list {
+				margin-bottom: 0;
+
+				& :last-child {
+					margin-bottom: 0;
+				}
+			}
+		}
+	}
+	#notes {
+		@extend %toggle_section;
+
+		border-bottom: 8px solid $yellow;
+
+		.heading {
+			background-color: $yellow;
+
+			.icon {
+				margin-top: 4px;
+			}
+		}
+	}
+}
+
+.popup {
+
+	.box {
+
+		.heading {
+			background-color: $dark_blue;
+
+			h3 {
+
+				span {
+					display: inline-block;
+					font-size: 24px;
+					margin: 4px 12px 0 0;
+
+					@include width(medium) {
+						font-size: 32px;
+						margin-top: 5px;
+					}
+
+					@include width(large) {
+						margin-top: 6px;
+					}
+				}
+			}
+		}
+		.content {
+
+			p {
+				@extend %p;
+
+				label {
+					@extend %label;
+
+					margin-bottom: 5px;
+				}
+				input[type=text] {
+					@extend %input;
+				}
+				button {
+					@extend %button;
+
+					background-color: $dark_blue;
+				}
+			}
+		}
+	}
+}

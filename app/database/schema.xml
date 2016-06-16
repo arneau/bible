@@ -79,28 +79,26 @@
 
 	<!-- Topic tables -->
 	<table name="topic">
-		<behavior name="aggregate_column">
-			<parameter name="name" value="tag_count" />
-			<parameter name="foreign_table" value="topic_tag" />
-			<parameter name="expression" value="COUNT(topic_id)" />
-		</behavior>
 		<behavior name="nested_set" />
 		<column name="name" required="true" size="255" type="varchar" />
-		<column defaultValue="0" name="tag_count" required="true" type="integer" />
 	</table>
-	<table name="topic_adoptee">
-		<column name="adoptee_id" required="true" type="integer" />
-		<column name="topic_id" required="true" type="integer" />
+	<table name="lesson">
+		<behavior name="nested_set" />
+		<column name="summary" required="true" size="1000" type="varchar" />
+	</table>
+	<table name="topic_lesson" isCrossRef="true">
+		<column name="lesson_id" primaryKey="true" type="integer" />
+		<column name="topic_id" primaryKey="true" type="integer" />
+		<foreign-key foreignTable="lesson" onDelete="cascade">
+			<reference foreign="id" local="lesson_id" />
+		</foreign-key>
 		<foreign-key foreignTable="topic" onDelete="cascade">
 			<reference foreign="id" local="topic_id" />
 		</foreign-key>
 	</table>
-	<table name="topic_lesson">
-		<column name="lesson_id" required="true" type="integer" />
+	<table name="topic_adoptee">
+		<column name="adoptee_id" required="true" type="integer" />
 		<column name="topic_id" required="true" type="integer" />
-		<foreign-key foreignTable="lesson" onDelete="cascade">
-			<reference foreign="id" local="lesson_id" />
-		</foreign-key>
 		<foreign-key foreignTable="topic" onDelete="cascade">
 			<reference foreign="id" local="topic_id" />
 		</foreign-key>
@@ -134,16 +132,6 @@
 	</table>
 
 	<!-- Lesson tables -->
-	<table name="lesson">
-		<behavior name="aggregate_column">
-			<parameter name="name" value="tag_count" />
-			<parameter name="foreign_table" value="lesson_tag" />
-			<parameter name="expression" value="COUNT(lesson_id)" />
-		</behavior>
-		<behavior name="nested_set" />
-		<column name="summary" required="true" size="1000" type="varchar" />
-		<column defaultValue="0" name="tag_count" required="true" type="integer" />
-	</table>
 	<table name="lesson_note">
 		<column name="lesson_id" required="true" type="integer" />
 		<column name="note_id" required="true" type="integer" />
