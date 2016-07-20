@@ -54,8 +54,77 @@ function getLessonData($lesson_id) {
 	}
 	$lesson_data['summary']['formatted'] .= $lesson_data['Summary'];
 
+	# Define lesson counts
+	$lesson_data['counts']['lessons'] = $lesson_object->getChildren()
+		->count();
+	$lesson_data['counts']['tags'] = $lesson_object->getLessonTags()
+		->count();
+
+	# Define expandable status
+	if ($lesson_data['counts']['lessons']) {
+		$lesson_data['expandable'] = 'expandable';
+	} else {
+		$lesson_data['expandable'] = '';
+	}
+
 	# Return lesson data
 	return $lesson_data;
+
+}
+
+function getListItemHtml($item_id, $item_type, $item_options = []) {
+
+	if ($item_type == 'lesson') {
+		return getLessonListItemHTML($item_id, $item_options);
+	}
+
+}
+
+function getLessonListItemHTML($lesson_id, $list_item_options = []) {
+
+	# Get lesson object, data and children
+	$lesson_object = getLesson($lesson_id);
+	$lesson_data = getLessonData($lesson_id);
+	$lesson_children = $lesson_object->getChildren();
+
+	# Start building HTML
+	$lesson_html = <<<s
+<div class="list_item_wrapper">
+	<div class="list_item lesson">
+		<div class="expander {$lesson_data['expandable']}"></div>
+		<a class="link" data-lesson-id="{$lesson_data['Id']}" href="lesson.php?id={$lesson_data['Id']}">
+			<h4>{$lesson_data['Summary']}</h4>
+			<p>Lessons: {$lesson_data['counts']['lessons']} &middot; Tags: {$lesson_data['counts']['tags']}</p>
+		</a>
+	</div>
+s;
+
+	# Handle children
+	if ($lesson_children->count()) {
+
+		$lesson_html .= <<<s
+	<div class="children">
+s;
+
+		# Iterate through children
+		foreach ($lesson_children as $lesson_child_object) {
+
+			# Append each child's HTML to parent's HTML
+			$lesson_html .= getLessonListItemHTML($lesson_child_object->getId());
+
+		}
+
+		$lesson_html .= <<<s
+	</div>
+s;
+
+	}
+
+	$lesson_html .= <<<s
+</div>
+s;
+
+	return $lesson_html;
 
 }
 

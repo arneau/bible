@@ -216,99 +216,140 @@
 	width: 100%;
 }
 
-.topic_list_item, .lesson_list_item {
-	border-left: 8px solid transparent;
-	clear: both;
+.list_item_wrapper {
 	float: left;
-	margin-bottom: 10px;
-	padding: 10px 28px 10px 20px;
-
-	&:hover, &.active, &.below {
-		color: #fff;
-
-		p {
-			color: rgba(255, 255, 255, 0.5);
-		}
-	}
-
-	$level: 0;
-	@while ($level <= 10) {
-		&[data-list-item-level=level_#{$level}] {
-			margin-left: 20px * $level;
-		}
-		$level: $level + 1;
-	}
-
-	h4 {
-		@extend %h4;
-	}
-	p {
-		@extend %p;
-
-		clear: both;
-		color: rgba(0, 0, 0, 0.38);
-		font-size: 0.9em !important;
-	}
-}
-.topic_list_item {
-	border-left-color: $dark_blue;
-
-	&:hover, &.active, &.below {
-		background-color: $dark_blue;
-	}
-}
-.lesson_list_item {
-	border-left-color: $dark_green;
-
-	&:hover, &.active, &.below {
-		background-color: $dark_green;
-	}
-}
-
-.lesson {
-	background: #fff;
-	border: 1px solid #fff;
-	border-left: 0;
-	cursor: pointer;
-	float: left;
-	margin-bottom: 20px;
 	width: 100%;
 
-	&:hover {
-		box-shadow: 5px 5px rgba(0, 0, 0, 0.05);
-		border-color: #eee;
-	}
+	.list_item {
+		display: flex;
+		flex-flow: row nowrap;
+		margin-bottom: 10px;
 
-	&.ui-draggable-dragging {
-		z-index: 1;
-	}
+		&.topic {
 
-	.content {
-		border-left: 8px solid $yellow;
+			.link {
+				border-left-color: $dark_blue;
+
+				&:hover, &.active, &.below {
+					background: $dark_blue;
+				}
+			}
+		}
+		&.lesson {
+
+			.link {
+				border-left-color: $dark_green;
+
+				&:hover, &.active, &.below {
+					background: $dark_green;
+				}
+			}
+		}
+
+		.expander {
+			@extend %h4;
+
+			color: rgba(0, 0, 0, 0.38);
+			display: flex;
+			flex: 0 0 25px;
+			align-items: center;
+
+			&:hover {
+				color: rgba(0, 0, 0, 0.87);
+			}
+
+			&.expandable {
+				cursor: pointer;
+
+				&:before {
+					content: "+";
+				}
+			}
+			&.expanded {
+
+				&:before {
+					content: "-";
+				}
+			}
+		}
+		.link {
+			border-left: 8px solid transparent;
+			clear: both;
+			flex: 0 0 auto;
+			padding: 10px 28px 10px 20px;
+
+			&:hover, &.active, &.below {
+				color: #fff;
+
+				p {
+					color: rgba(255, 255, 255, 0.5);
+				}
+			}
+
+			h4 {
+				@extend %h4;
+			}
+			p {
+				@extend %p;
+
+				clear: both;
+				color: rgba(0, 0, 0, 0.38);
+				font-size: 0.9em !important;
+			}
+		}
+	}
+	.children {
+		display: none;
 		float: left;
-		padding: 10px 0 10px 20px;
+		padding-left: 25px;
 		width: 100%;
-
-		h3 {
-			@extend %h3;
-
-			&.current {
-				text-decoration: underline;
-			}
-		}
-		p {
-			@extend %p;
-
-			color: #d8d8d8;
-
-			.icon {
-				display: inline-block;
-				font-size: 16px;
-				margin: 7px 5px 0 0;
-			}
-		}
 	}
 }
+
+//.lesson {
+//	background: #fff;
+//	border: 1px solid #fff;
+//	border-left: 0;
+//	cursor: pointer;
+//	float: left;
+//	margin-bottom: 20px;
+//	width: 100%;
+//
+//	&:hover {
+//		box-shadow: 5px 5px rgba(0, 0, 0, 0.05);
+//		border-color: #eee;
+//	}
+//
+//	&.ui-draggable-dragging {
+//		z-index: 1;
+//	}
+//
+//	.content {
+//		border-left: 8px solid $yellow;
+//		float: left;
+//		padding: 10px 0 10px 20px;
+//		width: 100%;
+//
+//		h3 {
+//			@extend %h3;
+//
+//			&.current {
+//				text-decoration: underline;
+//			}
+//		}
+//		p {
+//			@extend %p;
+//
+//			color: #d8d8d8;
+//
+//			.icon {
+//				display: inline-block;
+//				font-size: 16px;
+//				margin: 7px 5px 0 0;
+//			}
+//		}
+//	}
+//}
 
 .popup {
 	align-items: center;

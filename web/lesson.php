@@ -87,6 +87,7 @@ echo <<<s
 						<p>
 							<a onclick="showPopup('add_lesson');">Add lesson</a>
 						</p>
+						<div class="lessons">
 s;
 
 $lesson_ancestors = $lesson_object->getAncestors();
@@ -95,19 +96,23 @@ if ($lesson_ancestors[1]) {
 } else {
 	$lesson_family_root_member_id = $lesson_object->getId();
 }
-$root_lesson_children_objects = LessonQuery::create()
-	->filterByPrimaryKeys([
-		$lesson_family_root_member_id,
-	])
-	->find();
 
-$lesson_family_members_list_items = getCategoryListItems($root_lesson_children_objects);
+echo getListItemHtml($lesson_family_root_member_id, 'lesson');
 
-foreach ($lesson_family_members_list_items as $lesson_family_member_list_item_data) {
-	echo getCategoryListItemHTML($lesson_family_member_list_item_data);
-}
+//$root_lesson_children_objects = LessonQuery::create()
+//	->filterByPrimaryKeys([
+//		$lesson_family_root_member_id,
+//	])
+//	->find();
+//
+//$lesson_family_members_list_items = getCategoryListItems($root_lesson_children_objects);
+//
+//foreach ($lesson_family_members_list_items as $lesson_family_member_list_item_data) {
+//	echo getCategoryListItemHTML($lesson_family_member_list_item_data);
+//}
 
 echo <<<s
+						</div>
 					</div>
 					<script>
 						$('[data-lesson-id={$lesson_data['Id']}]').addClass('active');

@@ -189,79 +189,52 @@ table {
   margin-bottom: 10px;
   width: 100%; }
 
-.topic_list_item, .lesson_list_item {
-  border-left: 8px solid transparent;
-  clear: both;
+.list_item_wrapper {
   float: left;
-  margin-bottom: 10px;
-  padding: 10px 28px 10px 20px; }
-  .topic_list_item:hover, .topic_list_item.active, .topic_list_item.below, .lesson_list_item:hover, .lesson_list_item.active, .lesson_list_item.below {
-    color: #fff; }
-    .topic_list_item:hover p, .topic_list_item.active p, .topic_list_item.below p, .lesson_list_item:hover p, .lesson_list_item.active p, .lesson_list_item.below p {
-      color: rgba(255, 255, 255, 0.5); }
-  .topic_list_item[data-list-item-level=level_0], .lesson_list_item[data-list-item-level=level_0] {
-    margin-left: 0px; }
-  .topic_list_item[data-list-item-level=level_1], .lesson_list_item[data-list-item-level=level_1] {
-    margin-left: 20px; }
-  .topic_list_item[data-list-item-level=level_2], .lesson_list_item[data-list-item-level=level_2] {
-    margin-left: 40px; }
-  .topic_list_item[data-list-item-level=level_3], .lesson_list_item[data-list-item-level=level_3] {
-    margin-left: 60px; }
-  .topic_list_item[data-list-item-level=level_4], .lesson_list_item[data-list-item-level=level_4] {
-    margin-left: 80px; }
-  .topic_list_item[data-list-item-level=level_5], .lesson_list_item[data-list-item-level=level_5] {
-    margin-left: 100px; }
-  .topic_list_item[data-list-item-level=level_6], .lesson_list_item[data-list-item-level=level_6] {
-    margin-left: 120px; }
-  .topic_list_item[data-list-item-level=level_7], .lesson_list_item[data-list-item-level=level_7] {
-    margin-left: 140px; }
-  .topic_list_item[data-list-item-level=level_8], .lesson_list_item[data-list-item-level=level_8] {
-    margin-left: 160px; }
-  .topic_list_item[data-list-item-level=level_9], .lesson_list_item[data-list-item-level=level_9] {
-    margin-left: 180px; }
-  .topic_list_item[data-list-item-level=level_10], .lesson_list_item[data-list-item-level=level_10] {
-    margin-left: 200px; }
-  .topic_list_item p, .lesson_list_item p {
-    clear: both;
-    color: rgba(0, 0, 0, 0.38);
-    font-size: 0.9em !important; }
-
-.topic_list_item {
-  border-left-color: #17b; }
-  .topic_list_item:hover, .topic_list_item.active, .topic_list_item.below {
-    background-color: #17b; }
-
-.lesson_list_item {
-  border-left-color: #1a7; }
-  .lesson_list_item:hover, .lesson_list_item.active, .lesson_list_item.below {
-    background-color: #1a7; }
-
-.lesson {
-  background: #fff;
-  border: 1px solid #fff;
-  border-left: 0;
-  cursor: pointer;
-  float: left;
-  margin-bottom: 20px;
   width: 100%; }
-  .lesson:hover {
-    box-shadow: 5px 5px rgba(0, 0, 0, 0.05);
-    border-color: #eee; }
-  .lesson.ui-draggable-dragging {
-    z-index: 1; }
-  .lesson .content {
-    border-left: 8px solid #fc4;
+  .list_item_wrapper .list_item {
+    display: flex;
+    flex-flow: row nowrap;
+    margin-bottom: 10px; }
+    .list_item_wrapper .list_item.topic .link {
+      border-left-color: #17b; }
+      .list_item_wrapper .list_item.topic .link:hover, .list_item_wrapper .list_item.topic .link.active, .list_item_wrapper .list_item.topic .link.below {
+        background: #17b; }
+    .list_item_wrapper .list_item.lesson .link {
+      border-left-color: #1a7; }
+      .list_item_wrapper .list_item.lesson .link:hover, .list_item_wrapper .list_item.lesson .link.active, .list_item_wrapper .list_item.lesson .link.below {
+        background: #1a7; }
+    .list_item_wrapper .list_item .expander {
+      color: rgba(0, 0, 0, 0.38);
+      display: flex;
+      flex: 0 0 25px;
+      align-items: center; }
+      .list_item_wrapper .list_item .expander:hover {
+        color: rgba(0, 0, 0, 0.87); }
+      .list_item_wrapper .list_item .expander.expandable {
+        cursor: pointer; }
+        .list_item_wrapper .list_item .expander.expandable:before {
+          content: "+"; }
+      .list_item_wrapper .list_item .expander.expanded:before {
+        content: "-"; }
+    .list_item_wrapper .list_item .link {
+      border-left: 8px solid transparent;
+      clear: both;
+      flex: 0 0 auto;
+      padding: 10px 28px 10px 20px; }
+      .list_item_wrapper .list_item .link:hover, .list_item_wrapper .list_item .link.active, .list_item_wrapper .list_item .link.below {
+        color: #fff; }
+        .list_item_wrapper .list_item .link:hover p, .list_item_wrapper .list_item .link.active p, .list_item_wrapper .list_item .link.below p {
+          color: rgba(255, 255, 255, 0.5); }
+      .list_item_wrapper .list_item .link p {
+        clear: both;
+        color: rgba(0, 0, 0, 0.38);
+        font-size: 0.9em !important; }
+  .list_item_wrapper .children {
+    display: none;
     float: left;
-    padding: 10px 0 10px 20px;
+    padding-left: 25px;
     width: 100%; }
-    .lesson .content h3.current {
-      text-decoration: underline; }
-    .lesson .content p {
-      color: #d8d8d8; }
-      .lesson .content p .icon {
-        display: inline-block;
-        font-size: 16px;
-        margin: 7px 5px 0 0; }
 
 .popup {
   align-items: center;
@@ -340,12 +313,12 @@ body {
   font: bold 1.75em/1.2 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
 
-.lesson .content h3, .popup .box .heading h3, #topics_page .topic h3 {
+.popup .box .heading h3, #topics_page .topic h3 {
   float: left;
   font: bold 1.5em/1.3 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
 
-.topic_list_item h4, .lesson_list_item h4 {
+.list_item_wrapper .list_item .expander, .list_item_wrapper .list_item .link h4 {
   float: left;
   font: bold 1.25em/1.4 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
@@ -370,7 +343,7 @@ body {
   font: 1em/1.6 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
 
-.passage .text p, .passage .footer, .topic_list_item p, .lesson_list_item p, .lesson .content p, .popup .box .content p, #read_page section p, #topic_page #passages .content .actions p, #topic_page #topics_and_lessons .content .actions, #lesson_page #passages .content .actions p, #lesson_page #lessons .content p {
+.passage .text p, .passage .footer, .list_item_wrapper .list_item .link p, .popup .box .content p, #read_page section p, #topic_page #passages .content .actions p, #topic_page #topics_and_lessons .content .actions, #lesson_page #passages .content .actions p, #lesson_page #lessons .content p {
   float: left;
   font: 1em/1.6 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
