@@ -89,9 +89,9 @@ function getLessonListItemHTML($lesson_id, $list_item_options = []) {
 
 	# Start building HTML
 	$lesson_html = <<<s
-<div class="list_item_wrapper">
-	<div class="list_item lesson">
-		<div class="expander {$lesson_data['expandable']}"></div>
+<div class="list_item">
+	<div class="self lesson">
+		<div class="expander {$lesson_data['expandable']}" onclick="$(this).closest('.list_item').toggleClass('expanded');"></div>
 		<a class="link" data-lesson-id="{$lesson_data['Id']}" href="lesson.php?id={$lesson_data['Id']}">
 			<h4>{$lesson_data['Summary']}</h4>
 			<p>Lessons: {$lesson_data['counts']['lessons']} &middot; Tags: {$lesson_data['counts']['tags']}</p>

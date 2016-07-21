@@ -216,11 +216,27 @@
 	width: 100%;
 }
 
-.list_item_wrapper {
+.list_item {
 	float: left;
 	width: 100%;
 
-	.list_item {
+	&.expanded {
+
+		> .self {
+
+			.expander.expandable {
+
+				&:before {
+					content: "-";
+				}
+			}
+		}
+		> .children {
+			display: block;
+		}
+	}
+
+	.self {
 		display: flex;
 		flex-flow: row nowrap;
 		margin-bottom: 10px;
@@ -263,12 +279,6 @@
 
 				&:before {
 					content: "+";
-				}
-			}
-			&.expanded {
-
-				&:before {
-					content: "-";
 				}
 			}
 		}

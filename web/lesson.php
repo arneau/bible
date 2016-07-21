@@ -116,6 +116,7 @@ echo <<<s
 					</div>
 					<script>
 						$('[data-lesson-id={$lesson_data['Id']}]').addClass('active');
+						$('[data-lesson-id={$lesson_data['Id']}]').parents('.list_item').addClass('expanded');
 					</script>
 				</section>
 				<section id="notes">
