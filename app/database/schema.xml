@@ -132,6 +132,20 @@
 	</table>
 
 	<!-- Lesson tables -->
+	<table name="new_lesson">
+		<column name="is_root" size="1" type="integer" />
+		<column name="summary" required="true" size="1000" type="varchar" />
+	</table>
+	<table name="new_lesson_parent">
+		<column name="lesson_id" primaryKey="true" type="integer" />
+		<column name="parent_id" primaryKey="true" type="integer" />
+		<foreign-key foreignTable="new_lesson" onDelete="cascade">
+			<reference foreign="id" local="lesson_id" />
+		</foreign-key>
+		<foreign-key foreignTable="new_lesson" onDelete="cascade" phpName="x">
+			<reference foreign="id" local="parent_id" />
+		</foreign-key>
+	</table>
 	<table name="lesson_note">
 		<column name="lesson_id" required="true" type="integer" />
 		<column name="note_id" required="true" type="integer" />
@@ -144,9 +158,13 @@
 	</table>
 	<table name="lesson_tag">
 		<column name="lesson_id" required="true" type="integer" />
+		<column name="new_lesson_id" required="true" type="integer" />
 		<column name="tag_id" required="true" type="integer" />
 		<foreign-key foreignTable="lesson" onDelete="cascade">
 			<reference foreign="id" local="lesson_id" />
+		</foreign-key>
+		<foreign-key foreignTable="new_lesson" onDelete="cascade">
+			<reference foreign="id" local="new_lesson_id" />
 		</foreign-key>
 		<foreign-key foreignTable="tag" onDelete="cascade">
 			<reference foreign="id" local="tag_id" />

@@ -11,15 +11,7 @@ $root_topic_children_objects = TopicQuery::create()
 	->getChildren();
 $topics_and_lessons_list_items = getCategoryListItems($root_topic_children_objects);
 
-$root_lesson_object_id = LessonQuery::create()
-	->findRoot()
-	->getId();
-$root_lesson_children_objects = LessonQuery::create()
-	->filterByPrimaryKeys([
-		$root_lesson_object_id,
-	])
-	->find();
-$lessons_list_items = getCategoryListItems($root_lesson_children_objects);
+$formatted_lessons_array = getFormattedLessonsArray();
 
 echo <<<s
 	<div class="page" id="overview_page">
@@ -49,16 +41,9 @@ echo <<<s
 					<div class="lesson_family">
 s;
 
-foreach ($lessons_list_items as $lessons_list_item_data) {
+foreach ($formatted_lessons_array as $formatted_lesson_data) {
 
-	if ($lessons_list_item_data['level'] == 1) {
-		echo <<<s
-					</div>
-					<div class="lesson_family">
-s;
-	}
-
-	echo getCategoryListItemHTML($lessons_list_item_data);
+	echo getListItemHtml($formatted_lesson_data, 'lesson');
 
 }
 

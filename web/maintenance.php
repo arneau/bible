@@ -1,5 +1,9 @@
 <?
 
+# Display errors
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 # Require files
 require_once '../vendor/autoload.php';
 require_once '../generated-conf/config.php';
@@ -115,6 +119,62 @@ if (0) {
 			$tag_object->delete();
 		}
 
+	}
+
+}
+
+# Migrate lessons from old structure to new
+if (0) {
+
+	function recurseThroughLessons($lesson_id, $parent_id = null) {
+
+		$lesson_object = getLesson($lesson_id);
+		$lesson_data = $lesson_object->toArray();
+
+		$new_lesson_object = new NewLesson();
+		$new_lesson_object->setSummary($lesson_data['Summary'])
+			->setIsRoot(is_null($parent_id))
+			->save();
+
+		if ($parent_id) {
+
+			$new_lesson_parent_object = new NewLessonParent();
+			$new_lesson_parent_object->setLessonId($new_lesson_object->getId())
+				->setParentId($parent_id)
+				->save();
+
+		}
+
+		$lesson_children_ids = $lesson_object->getChildren()->getPrimaryKeys();
+		$lesson_children = LessonQuery::create()
+			->filterByPrimaryKeys($lesson_children_ids)
+			->orderBySummary()
+			->find();
+
+		foreach ($lesson_children as $lesson_child) {
+			recurseThroughLessons($lesson_child->getId(), $new_lesson_object->getId());
+		}
+
+		$lesson_tags = $lesson_object->getLessonTags();
+
+		foreach ($lesson_tags as $lesson_tag) {
+			$lesson_tag->setNewLessonId($new_lesson_object->getId())
+				->save();
+		}
+
+	}
+
+	$root_lesson_object = LessonQuery::create()
+		->findRoot();
+	$root_lesson_children_ids = $root_lesson_object->getChildren()
+		->getPrimaryKeys();
+	$root_lesson_children = LessonQuery::create()
+		->filterByPrimaryKeys($root_lesson_children_ids)
+		->orderBySummary()
+		->find();
+
+	foreach ($root_lesson_children as $root_lesson_child) {
+		recurseThroughLessons($root_lesson_child->getId());
 	}
 
 }
