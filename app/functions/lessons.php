@@ -89,6 +89,7 @@ function getLessonListItemHTML($list_item_data, $list_item_options = []) {
 	} else {
 		$list_item_expandable_class = '';
 	}
+	$list_item_tags_count = count($list_item_data['Tags']);
 
 	# Start building HTML
 	$list_item_html = <<<s
@@ -97,7 +98,7 @@ function getLessonListItemHTML($list_item_data, $list_item_options = []) {
 		<div class="expander {$list_item_expandable_class}" onclick="$(this).closest('.list_item').toggleClass('expanded');"></div>
 		<a class="link" data-lesson-id="{$list_item_data['Id']}" href="lesson.php?id={$list_item_data['Id']}">
 			<h4>{$list_item_data['Summary']}</h4>
-			<p>Lessons: {$list_item_children_count} &middot; Tags: {$lesson_data['counts']['tags']}</p>
+			<p>Lessons: {$list_item_children_count} &middot; Tags: {$list_item_tags_count}</p>
 		</a>
 	</div>
 s;
@@ -201,11 +202,10 @@ function getLessonsArray($only_return_roots = false) {
 
 function getLessonsChildrenArray() {
 
-	$lessons_children_array_to_return = [];
-
 	$lessons_parents_objects = NewLessonParentQuery::create()
 		->find();
 
+	$lessons_children_array_to_return = [];
 	foreach ($lessons_parents_objects->toArray() as $lesson_parent_data) {
 		$lessons_children_array_to_return[$lesson_parent_data['ParentId']][] = $lesson_parent_data['LessonId'];
 	}
@@ -214,31 +214,47 @@ function getLessonsChildrenArray() {
 
 }
 
-function getFormattedLessonsArray() {
+function getLessonsTagsArray() {
 
-	$lessons_array_to_return = [];
+	$lessons_tags_objects = LessonTagQuery::create()
+		->find();
+
+	$lessons_tags_array_to_return = [];
+	foreach ($lessons_tags_objects->toArray() as $lesson_tag_data) {
+		$lessons_tags_array_to_return[$lesson_tag_data['NewLessonId']][] = $lesson_tag_data['TagId'];
+	}
+
+	return $lessons_tags_array_to_return;
+
+}
+
+function getFormattedLessonsArray() {
 
 	$lessons_array = getLessonsArray();
 	$root_lessons_array = getLessonsArray(true);
 	$lessons_children_array = getLessonsChildrenArray();
+	$lessons_tags_array = getLessonsTagsArray();
 
+	$lessons_array_to_return = [];
 	foreach ($root_lessons_array as $lesson_data) {
-		$lessons_array_to_return[] = getFormattedLessonsArrayRecursor($lessons_array_to_return, $lessons_array, $lessons_children_array, $lesson_data);
+		$lessons_array_to_return[] = getFormattedLessonsArrayRecursor($lessons_array, $lessons_children_array, $lessons_tags_array, $lesson_data);
 	}
 
 	return $lessons_array_to_return;
 
 }
 
-function getFormattedLessonsArrayRecursor($lessons_array_to_return, $lessons_array, $lessons_children_array, $lesson_data) {
+function getFormattedLessonsArrayRecursor($lessons_array, $lessons_children_array, $lessons_tags_array, $lesson_data) {
 
 	$lesson_data_to_return = $lesson_data;
+
+	$lesson_data_to_return['Tags'] = $lessons_tags_array[$lesson_data['Id']];
 
 	if ($lessons_children_array[$lesson_data['Id']]) {
 
 		foreach ($lessons_children_array[$lesson_data['Id']] as $lesson_child_id) {
 			$lesson_child_data = $lessons_array[$lesson_child_id];
-			$lesson_data_to_return['Children'][] = getFormattedLessonsArrayRecursor($lessons_array_to_return, $lessons_array, $lessons_children_array, $lesson_child_data);
+			$lesson_data_to_return['Children'][] = getFormattedLessonsArrayRecursor($lessons_array, $lessons_children_array, $lessons_tags_array, $lesson_child_data);
 		}
 
 	}

@@ -145,7 +145,8 @@ if (0) {
 
 		}
 
-		$lesson_children_ids = $lesson_object->getChildren()->getPrimaryKeys();
+		$lesson_children_ids = $lesson_object->getChildren()
+			->getPrimaryKeys();
 		$lesson_children = LessonQuery::create()
 			->filterByPrimaryKeys($lesson_children_ids)
 			->orderBySummary()
