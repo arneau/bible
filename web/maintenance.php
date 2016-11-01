@@ -163,6 +163,15 @@ if (0) {
 				->save();
 		}
 
+		$lesson_topics_lessons = TopicLessonQuery::create()
+			->filterByLessonId($lesson_id)
+			->find();
+
+		foreach ($lesson_topics_lessons as $lesson_topic_lesson) {
+			$lesson_topic_lesson->setNewLessonId($new_lesson_object->getId())
+				->save();
+		}
+
 	}
 
 	$root_lesson_object = LessonQuery::create()

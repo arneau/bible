@@ -286,7 +286,7 @@ function getCategoryListItemRecursor(&$category_list_items, $level_objects, $inc
 
 		}
 
-		if (get_class($level_object) == 'Lesson') {
+		if (get_class($level_object) == 'Lesson' && 0) {
 
 			$level_object_lessons_objects = $level_object->getChildren();
 			if ($level_object_lessons_objects->count()) {
@@ -318,7 +318,7 @@ function getCategoryListItemData($list_item_object, $list_item_level) {
 		$list_item_data['type'] = 'topic';
 
 	}
-	if (get_class($list_item_object) == 'Lesson') {
+	if (get_class($list_item_object) == 'Lesson' && 0) {
 
 		$list_item_data['lessons_count'] = $list_item_object->getChildren()
 			->count();

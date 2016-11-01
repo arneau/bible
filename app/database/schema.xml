@@ -82,9 +82,12 @@
 		<behavior name="nested_set" />
 		<column name="name" required="true" size="255" type="varchar" />
 	</table>
-	<table name="lesson">
-		<behavior name="nested_set" />
-		<column name="summary" required="true" size="1000" type="varchar" />
+	<table name="topic_adoptee">
+		<column name="adoptee_id" required="true" type="integer" />
+		<column name="topic_id" required="true" type="integer" />
+		<foreign-key foreignTable="topic" onDelete="cascade">
+			<reference foreign="id" local="topic_id" />
+		</foreign-key>
 	</table>
 	<table name="topic_lesson" isCrossRef="true">
 		<column name="lesson_id" primaryKey="true" type="integer" />
@@ -92,13 +95,6 @@
 		<foreign-key foreignTable="lesson" onDelete="cascade">
 			<reference foreign="id" local="lesson_id" />
 		</foreign-key>
-		<foreign-key foreignTable="topic" onDelete="cascade">
-			<reference foreign="id" local="topic_id" />
-		</foreign-key>
-	</table>
-	<table name="topic_adoptee">
-		<column name="adoptee_id" required="true" type="integer" />
-		<column name="topic_id" required="true" type="integer" />
 		<foreign-key foreignTable="topic" onDelete="cascade">
 			<reference foreign="id" local="topic_id" />
 		</foreign-key>
@@ -132,17 +128,17 @@
 	</table>
 
 	<!-- Lesson tables -->
-	<table name="new_lesson">
+	<table name="lesson">
 		<column name="is_root" size="1" type="integer" />
 		<column name="summary" required="true" size="1000" type="varchar" />
 	</table>
-	<table name="new_lesson_parent">
+	<table name="lesson_parent">
 		<column name="lesson_id" primaryKey="true" type="integer" />
 		<column name="parent_id" primaryKey="true" type="integer" />
-		<foreign-key foreignTable="new_lesson" onDelete="cascade">
+		<foreign-key foreignTable="lesson" onDelete="cascade">
 			<reference foreign="id" local="lesson_id" />
 		</foreign-key>
-		<foreign-key foreignTable="new_lesson" onDelete="cascade" phpName="x">
+		<foreign-key foreignTable="lesson" onDelete="cascade" phpName="x">
 			<reference foreign="id" local="parent_id" />
 		</foreign-key>
 	</table>
@@ -158,13 +154,9 @@
 	</table>
 	<table name="lesson_tag">
 		<column name="lesson_id" required="true" type="integer" />
-		<column name="new_lesson_id" required="true" type="integer" />
 		<column name="tag_id" required="true" type="integer" />
 		<foreign-key foreignTable="lesson" onDelete="cascade">
 			<reference foreign="id" local="lesson_id" />
-		</foreign-key>
-		<foreign-key foreignTable="new_lesson" onDelete="cascade">
-			<reference foreign="id" local="new_lesson_id" />
 		</foreign-key>
 		<foreign-key foreignTable="tag" onDelete="cascade">
 			<reference foreign="id" local="tag_id" />

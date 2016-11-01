@@ -90,12 +90,12 @@ echo <<<s
 						<div class="lessons">
 s;
 
-$lesson_ancestors = $lesson_object->getAncestors();
-if ($lesson_ancestors[1]) {
-	$lesson_family_root_member_id = $lesson_ancestors[1]->getId();
-} else {
-	$lesson_family_root_member_id = $lesson_object->getId();
-}
+//$lesson_ancestors = $lesson_object->getAncestors();
+//if ($lesson_ancestors[1]) {
+//	$lesson_family_root_member_id = $lesson_ancestors[1]->getId();
+//} else {
+//	$lesson_family_root_member_id = $lesson_object->getId();
+//}
 
 echo getListItemHtml($lesson_family_root_member_id, 'lesson');
 

@@ -36,11 +36,11 @@ function getLessonData($lesson_id) {
 	$lesson_data = $lesson_object->toArray();
 
 	# Get all but root ancestors
-	$lesson_ancestors_objects = $lesson_object->getAncestors();
-	if ($lesson_ancestors_objects) {
-		$lesson_ancestors_datas = $lesson_ancestors_objects->toArray();
-		unset($lesson_ancestors_datas[0]);
-	}
+//	$lesson_ancestors_objects = $lesson_object->getAncestors();
+//	if ($lesson_ancestors_objects) {
+//		$lesson_ancestors_datas = $lesson_ancestors_objects->toArray();
+//		unset($lesson_ancestors_datas[0]);
+//	}
 
 	# Define lesson summary
 	$lesson_data['summary'] = [
@@ -55,8 +55,8 @@ function getLessonData($lesson_id) {
 	$lesson_data['summary']['formatted'] .= $lesson_data['Summary'];
 
 	# Define lesson counts
-	$lesson_data['counts']['lessons'] = $lesson_object->getChildren()
-		->count();
+//	$lesson_data['counts']['lessons'] = $lesson_object->getChildren()
+//		->count();
 	$lesson_data['counts']['tags'] = $lesson_object->getLessonTags()
 		->count();
 
@@ -181,11 +181,11 @@ function getLessonsArray($only_return_roots = false) {
 
 	$lessons_array_to_return = [];
 
-	$lessons_objects = NewLessonQuery::create()
+	$lessons_objects = LessonQuery::create()
 		->find();
 
-	foreach ($lessons_objects->toArray() as $lesson_data) {
-		$lessons_array_to_return[$lesson_data['Id']] = $lesson_data;
+	foreach ($lessons_objects as $lesson_object) {
+		$lessons_array_to_return[$lesson_object->getId()] = $lesson_object->toArray();
 	}
 
 	if ($only_return_roots) {
@@ -202,12 +202,12 @@ function getLessonsArray($only_return_roots = false) {
 
 function getLessonsChildrenArray() {
 
-	$lessons_parents_objects = NewLessonParentQuery::create()
+	$lessons_parents_objects = LessonParentQuery::create()
 		->find();
 
 	$lessons_children_array_to_return = [];
-	foreach ($lessons_parents_objects->toArray() as $lesson_parent_data) {
-		$lessons_children_array_to_return[$lesson_parent_data['ParentId']][] = $lesson_parent_data['LessonId'];
+	foreach ($lessons_parents_objects as $lesson_parent_object) {
+		$lessons_children_array_to_return[$lesson_parent_object->getParentId()][] = $lesson_parent_object->getLessonId();
 	}
 
 	return $lessons_children_array_to_return;
@@ -220,8 +220,8 @@ function getLessonsTagsArray() {
 		->find();
 
 	$lessons_tags_array_to_return = [];
-	foreach ($lessons_tags_objects->toArray() as $lesson_tag_data) {
-		$lessons_tags_array_to_return[$lesson_tag_data['NewLessonId']][] = $lesson_tag_data['TagId'];
+	foreach ($lessons_tags_objects as $lesson_tag_object) {
+		$lessons_tags_array_to_return[$lesson_tag_object->getLessonId()][] = $lesson_tag_object->getTagId();
 	}
 
 	return $lessons_tags_array_to_return;
