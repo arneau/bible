@@ -12,6 +12,14 @@ require_once 'components/header.php';
 $lesson_object = getLesson($_GET['id']);
 $lesson_data = getLessonData($_GET['id']);
 $lesson_tags = getLessonTags($_GET['id'], $_GET['order_passages_by']);
+if (!$lesson_data['Ancestors']) {
+	$lesson_branch_root_id = $_GET['id'];
+} else {
+	$lesson_branch_root_id = $lesson_data['Ancestors'][0];
+}
+$lesson_branch = getLessonsTree([
+	$lesson_branch_root_id
+]);
 
 # Get topics select options
 $topics_select_options = getTopicsSelectOptions();
@@ -20,7 +28,7 @@ $topics_select_options = getTopicsSelectOptions();
 echo <<<s
 	<div class="page" id="lesson_page">
 		<section class="page_heading">
-			<h1>{$lesson_data['summary']['formatted']}</h1>
+			<h1>{$lesson_data['FormattedSummary']}</h1>
 			<button class="icon-pencil" onclick="showPopup('edit_lesson_summary');"></button>
 			<button class="icon-topics" onclick="showPopup('link_lesson_to_topic');"></button>
 			<button class="icon-close" onclick="deleteLesson('{$lesson_data['Id']}');"></button>
@@ -90,14 +98,7 @@ echo <<<s
 						<div class="lessons">
 s;
 
-//$lesson_ancestors = $lesson_object->getAncestors();
-//if ($lesson_ancestors[1]) {
-//	$lesson_family_root_member_id = $lesson_ancestors[1]->getId();
-//} else {
-//	$lesson_family_root_member_id = $lesson_object->getId();
-//}
-
-echo getListItemHtml($lesson_family_root_member_id, 'lesson');
+echo getListItemHtml($lesson_branch[0], 'lesson');
 
 //$root_lesson_children_objects = LessonQuery::create()
 //	->filterByPrimaryKeys([

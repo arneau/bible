@@ -18,11 +18,9 @@ function addLesson($lesson_parent_id, $lesson_summary) {
 
 function getLesson($lesson_id) {
 
-	# Get lesson object
 	$lesson_object = LessonQuery::create()
 		->findOneById($lesson_id);
 
-	# Return lesson object
 	return $lesson_object;
 
 }
@@ -35,28 +33,39 @@ function getLessonData($lesson_id) {
 	# Get lesson data
 	$lesson_data = $lesson_object->toArray();
 
-	# Get all but root ancestors
-//	$lesson_ancestors_objects = $lesson_object->getAncestors();
-//	if ($lesson_ancestors_objects) {
-//		$lesson_ancestors_datas = $lesson_ancestors_objects->toArray();
-//		unset($lesson_ancestors_datas[0]);
-//	}
+	# Get lessons parents array
+	$lessons_parents_array = getLessonsParentsArray();
 
-	# Define lesson summary
-	$lesson_data['summary'] = [
-		'default' => $lesson_data['Summary'],
-		'formatted' => '',
-	];
-	if ($lesson_ancestors_datas) {
-		foreach ($lesson_ancestors_datas as $lesson_ancestor_data) {
-			$lesson_data['summary']['formatted'] .= '<span>' . $lesson_ancestor_data['Summary'] . ' / </span>';
+	# Get lesson ancestors
+	$current_lesson_object = $lesson_object;
+	$found_first_ancestor = false;
+	$lesson_ancestors_array = [];
+	while (!$found_first_ancestor) {
+		if ($current_lesson_object->getIsRoot()) {
+			$found_first_ancestor = true;
+		} else {
+			$current_lesson_object = getLesson($lessons_parents_array[$current_lesson_object->getId()][0]);
+			$lesson_ancestors_array[] = $current_lesson_object->getId();
 		}
 	}
-	$lesson_data['summary']['formatted'] .= $lesson_data['Summary'];
+	$lesson_ancestors_array = array_reverse($lesson_ancestors_array);
+
+	# Define lesson ancestors
+	$lesson_data['Ancestors'] = $lesson_ancestors_array;
+
+	# Define lesson summary
+	$lesson_data['FormattedSummary'] = '';
+	if ($lesson_data['Ancestors']) {
+		foreach ($lesson_data['Ancestors'] as $lesson_ancestor_id) {
+			$lesson_ancestor_object = getLesson($lesson_ancestor_id);
+			$lesson_data['FormattedSummary'] .= '<span>' . $lesson_ancestor_object->getSummary() . ' / </span>';
+		}
+	}
+	$lesson_data['FormattedSummary'] .= $lesson_data['Summary'];
 
 	# Define lesson counts
-//	$lesson_data['counts']['lessons'] = $lesson_object->getChildren()
-//		->count();
+	//	$lesson_data['counts']['lessons'] = $lesson_object->getChildren()
+	//		->count();
 	$lesson_data['counts']['tags'] = $lesson_object->getLessonTags()
 		->count();
 
@@ -177,26 +186,17 @@ function getLessonTags($lesson_id, $order_by = 'vote_count') {
 
 }
 
-function getLessonsArray($only_return_roots = false) {
+function getLessonsParentsArray() {
 
-	$lessons_array_to_return = [];
-
-	$lessons_objects = LessonQuery::create()
+	$lessons_parents_objects = LessonParentQuery::create()
 		->find();
 
-	foreach ($lessons_objects as $lesson_object) {
-		$lessons_array_to_return[$lesson_object->getId()] = $lesson_object->toArray();
+	$lessons_parents_array_to_return = [];
+	foreach ($lessons_parents_objects as $lesson_parent_object) {
+		$lessons_parents_array_to_return[$lesson_parent_object->getLessonId()][] = $lesson_parent_object->getParentId();
 	}
 
-	if ($only_return_roots) {
-
-		$lessons_array_to_return = array_filter($lessons_array_to_return, function ($lesson_data) {
-			return $lesson_data['IsRoot'];
-		});
-
-	}
-
-	return $lessons_array_to_return;
+	return $lessons_parents_array_to_return;
 
 }
 
@@ -228,23 +228,57 @@ function getLessonsTagsArray() {
 
 }
 
-function getFormattedLessonsArray() {
-
-	$lessons_array = getLessonsArray();
-	$root_lessons_array = getLessonsArray(true);
-	$lessons_children_array = getLessonsChildrenArray();
-	$lessons_tags_array = getLessonsTagsArray();
+function getLessonsDatas($lessons_ids = []) {
 
 	$lessons_array_to_return = [];
-	foreach ($root_lessons_array as $lesson_data) {
-		$lessons_array_to_return[] = getFormattedLessonsArrayRecursor($lessons_array, $lessons_children_array, $lessons_tags_array, $lesson_data);
+
+	$lessons_objects = LessonQuery::create()
+		->_if($lessons_ids)
+		->filterByPrimaryKeys($lessons_ids)
+		->_endif()
+		->find();
+
+	foreach ($lessons_objects as $lesson_object) {
+		$lessons_array_to_return[$lesson_object->getId()] = $lesson_object->toArray();
 	}
 
 	return $lessons_array_to_return;
 
 }
 
-function getFormattedLessonsArrayRecursor($lessons_array, $lessons_children_array, $lessons_tags_array, $lesson_data) {
+function getRootLessonsIds() {
+
+	$lessons_object = LessonQuery::create()
+		->filterByIsRoot(1)
+		->find();
+
+	return $lessons_object->getPrimaryKeys();
+
+}
+
+function getLessonsTree($lesson_ids = []) {
+
+	$lessons_datas_array = getLessonsDatas();
+	$lessons_children_array = getLessonsChildrenArray();
+	$lessons_tags_array = getLessonsTagsArray();
+
+	if ($lesson_ids) {
+		$lessons_datas = getLessonsDatas($lesson_ids);
+	} else {
+		$root_lessons_ids = getRootLessonsIds();
+		$lessons_datas = getLessonsDatas($root_lessons_ids);
+	}
+
+	$formatted_lessons_array_to_return = [];
+	foreach ($lessons_datas as $lesson_data) {
+		$formatted_lessons_array_to_return[] = getLessonsTreePartData($lessons_datas_array, $lessons_children_array, $lessons_tags_array, $lesson_data);
+	}
+
+	return $formatted_lessons_array_to_return;
+
+}
+
+function getLessonsTreePartData($lessons_array, $lessons_children_array, $lessons_tags_array, $lesson_data) {
 
 	$lesson_data_to_return = $lesson_data;
 
@@ -254,7 +288,7 @@ function getFormattedLessonsArrayRecursor($lessons_array, $lessons_children_arra
 
 		foreach ($lessons_children_array[$lesson_data['Id']] as $lesson_child_id) {
 			$lesson_child_data = $lessons_array[$lesson_child_id];
-			$lesson_data_to_return['Children'][] = getFormattedLessonsArrayRecursor($lessons_array, $lessons_children_array, $lessons_tags_array, $lesson_child_data);
+			$lesson_data_to_return['Children'][] = getLessonsTreePartData($lessons_array, $lessons_children_array, $lessons_tags_array, $lesson_child_data);
 		}
 
 	}

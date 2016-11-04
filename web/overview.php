@@ -11,7 +11,7 @@ $root_topic_children_objects = TopicQuery::create()
 	->getChildren();
 $topics_and_lessons_list_items = getCategoryListItems($root_topic_children_objects);
 
-$formatted_lessons_array = getFormattedLessonsArray();
+$lessons_tree = getLessonsTree();
 
 echo <<<s
 	<div class="page" id="overview_page">
@@ -41,9 +41,9 @@ echo <<<s
 					<div class="lesson_family">
 s;
 
-foreach ($formatted_lessons_array as $formatted_lesson_data) {
+foreach ($lessons_tree as $lesson_branch_data) {
 
-	echo getListItemHtml($formatted_lesson_data, 'lesson');
+	echo getListItemHtml($lesson_branch_data, 'lesson');
 
 }
 
