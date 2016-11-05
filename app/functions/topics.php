@@ -4,38 +4,20 @@ use Propel\Runtime\Propel;
 
 function addTopic($topic_parent_id, $topic_name) {
 
-	# Get parent
 	$parent_object = TopicQuery::create()
 		->findOneById($topic_parent_id);
 
-	# Add topic
 	$topic_object = new Topic();
 	$topic_object->setName($topic_name)
 		->insertAsLastChildOf($parent_object)
 		->save();
 
-	# Add topic synonym
 	$topic_synonym_object = new TopicSynonym();
 	$topic_synonym_object->setName($topic_name)
 		->setTopic($topic_object)
 		->save();
 
-	# Return ID
 	return $topic_object->getId();
-
-}
-
-function addTopicAdoptee($topic_parent_id, $topic_adoptee_id) {
-
-	# Get parent
-	$parent_object = TopicQuery::create()
-		->findOneById($topic_parent_id);
-
-	# Add topic adoptee
-	$topic_adoptee_object = new TopicAdoptee();
-	$topic_adoptee_object->setAdopteeId($topic_adoptee_id)
-		->setTopic($parent_object)
-		->save();
 
 }
 
@@ -50,41 +32,33 @@ function addTopicLesson($topic_id, $lesson_id) {
 
 function deleteTopic($topic_id) {
 
-	# Get topic object
 	$topic_object = getTopic($topic_id);
 
-	# Delete topic
 	$topic_object->delete();
 
 }
 
 function getTopic($topic_id) {
 
-	# Get topic object
 	$topic_object = TopicQuery::create()
 		->findOneById($topic_id);
 
-	# Return topic object
 	return $topic_object;
 
 }
 
 function getTopicData($topic_id) {
 
-	# Get topic object
 	$topic_object = getTopic($topic_id);
 
-	# Get topic data
 	$topic_data = $topic_object->toArray();
 
-	# Get all but root ancestors
 	$topic_ancestors_objects = $topic_object->getAncestors();
 	if ($topic_ancestors_objects) {
 		$topic_ancestors_datas = $topic_ancestors_objects->toArray();
 		unset($topic_ancestors_datas[0]);
 	}
 
-	# Define topic summary
 	$topic_data['name'] = [
 		'default' => $topic_data['Name'],
 		'formatted' => '',
@@ -96,7 +70,6 @@ function getTopicData($topic_id) {
 	}
 	$topic_data['name']['formatted'] .= $topic_data['Name'];
 
-	# Return topic data
 	return $topic_data;
 
 }
@@ -143,215 +116,6 @@ function getTopicTags($topic_id, $order_by = 'vote_count') {
 
 	# Return topic tags
 	return $topic_tags_to_return;
-
-}
-
-function getTopicAdoptees($topic_id) {
-
-	# Get topic adoptees IDs
-	$topic_adoptees_ids_array = TopicAdopteeQuery::create()
-		->filterByTopicId($topic_id)
-		->select([
-			'AdopteeId',
-		])
-		->find()
-		->toArray();
-
-	# Get topic adoptees array
-	$topic_adoptees_array = TopicQuery::create()
-		->filterByPrimaryKeys($topic_adoptees_ids_array)
-		->find()
-		->toArray();
-
-	# Add IsAdoptee to each adoptee
-	array_walk($topic_adoptees_array, function (&$topic_adoptee_data) {
-
-		$topic_adoptee_data['IsAdoptee'] = true;
-	});
-
-	# Return topic adoptees array
-	return $topic_adoptees_array;
-
-}
-
-function getTopicsList($include_adoptees = false) {
-
-	# Get root topic object
-	$root_topic_object = TopicQuery::create()
-		->findRoot();
-
-	# Get root topic children array
-	$root_topic_children_array = $root_topic_object->getChildren()
-		->toArray();
-
-	# Define topics list
-	$topics_list = [];
-
-	# Build topics list
-	getTopicsListRecursor($topics_list, $root_topic_children_array, $include_adoptees);
-
-	# Return topics list
-	return $topics_list;
-
-}
-
-function getTopicsListRecursor(&$topics_list, $topics_array, $include_adoptees = false, $list_level = 0) {
-
-	# Sort topics alphabetically
-	uasort($topics_array, function ($a, $b) {
-
-		return strcmp($a['Name'], $b['Name']);
-
-	});
-
-	# Handle topics
-	foreach ($topics_array as $topic_data) {
-
-		# Add level to topic data
-		$topic_data['ListLevel'] = $list_level;
-
-		# Append topic data to topics list
-		$topics_list[] = $topic_data;
-
-		# Get topic object
-		$topic_object = getTopic($topic_data['Id']);
-
-		# Get topic children array
-		$topic_children_array = $topic_object->getChildren()
-			->toArray();
-
-		if ($include_adoptees) {
-			$topic_adoptees_array = getTopicAdoptees($topic_data['Id']);
-			$topic_dependants_array = array_merge($topic_children_array, $topic_adoptees_array);
-		} else {
-			$topic_dependants_array = $topic_children_array;
-		}
-
-		# Recurse through topic children (if applicable)
-		if ($topic_dependants_array) {
-			getTopicsListRecursor($topics_list, $topic_dependants_array, $include_adoptees, $list_level + 1);
-		}
-
-	}
-
-}
-
-function getCategoryListItems($root_objects, $include_topics = true, $include_adoptees = false) {
-
-	$category_list_items = [];
-	getCategoryListItemRecursor($category_list_items, $root_objects, $include_topics, $include_adoptees);
-
-	return $category_list_items;
-
-}
-
-function getCategoryListItemRecursor(&$category_list_items, $level_objects, $include_topics = false, $include_adoptees = false, $list_level = 0) {
-
-	if (get_class($level_objects[0]) == 'Topic') {
-
-		$level_objects = TopicQuery::create()
-			->filterByPrimaryKeys($level_objects->getPrimaryKeys())
-			->orderByName()
-			->find();
-	}
-	if (get_class($level_objects[0]) == 'Lesson') {
-
-		$level_objects = LessonQuery::create()
-			->filterByPrimaryKeys($level_objects->getPrimaryKeys())
-			->orderBySummary()
-			->find();
-	}
-
-	foreach ($level_objects as $level_object) {
-
-		$level_object_data = getCategoryListItemData($level_object, $list_level);
-
-		$category_list_items[] = $level_object_data;
-
-		if (get_class($level_object) == 'Topic') {
-
-			if ($include_topics) {
-
-				$level_object_lessons_objects = $level_object->getLessons();
-				if ($level_object_lessons_objects->count()) {
-					getCategoryListItemRecursor($category_list_items, $level_object_lessons_objects, $include_topics, $include_adoptees, $list_level + 1);
-				}
-
-			}
-
-			$level_object_topics_objects = $level_object->getChildren();
-			if ($level_object_topics_objects->count()) {
-				getCategoryListItemRecursor($category_list_items, $level_object_topics_objects, $include_topics, $include_adoptees, $list_level + 1);
-			}
-
-		}
-
-		if (get_class($level_object) == 'Lesson' && 0) {
-
-			$level_object_lessons_objects = $level_object->getChildren();
-			if ($level_object_lessons_objects->count()) {
-				getCategoryListItemRecursor($category_list_items, $level_object_lessons_objects, $include_topics, $include_adoptees, $list_level + 1);
-			}
-
-		}
-
-	}
-
-}
-
-function getCategoryListItemData($list_item_object, $list_item_level) {
-
-	$list_item_data = [
-		'id' => $list_item_object->getId(),
-		'level' => $list_item_level,
-	];
-
-	if (get_class($list_item_object) == 'Topic') {
-
-		$list_item_data['lessons_count'] = $list_item_object->getTopicLessons()
-			->count();
-		$list_item_data['tags_count'] = $list_item_object->getTopicTags()
-			->count();
-		$list_item_data['topics_count'] = $list_item_object->getChildren()
-			->count();
-		$list_item_data['title'] = $list_item_object->getName();
-		$list_item_data['type'] = 'topic';
-
-	}
-	if (get_class($list_item_object) == 'Lesson' && 0) {
-
-		$list_item_data['lessons_count'] = $list_item_object->getChildren()
-			->count();
-		$list_item_data['tags_count'] = $list_item_object->getLessonTags()
-			->count();
-		$list_item_data['title'] = $list_item_object->getSummary();
-		$list_item_data['type'] = 'lesson';
-
-	}
-
-	return $list_item_data;
-
-}
-
-function getCategoryListItemHTML($category_list_item_data) {
-
-	if ($category_list_item_data['type'] == 'topic') {
-		$category_list_item_link = 'topic.php?id=' . $category_list_item_data['id'];
-		$category_list_item_counts = 'Topics: ' . $category_list_item_data['topics_count'] . ' &middot; Lessons: ' . $category_list_item_data['lessons_count'] . ' &middot; Tags: ' . $category_list_item_data['tags_count'];
-	}
-	if ($category_list_item_data['type'] == 'lesson') {
-		$category_list_item_link = 'lesson.php?id=' . $category_list_item_data['id'];
-		$category_list_item_counts = 'Lessons: ' . $category_list_item_data['lessons_count'] . ' &middot; Tags: ' . $category_list_item_data['tags_count'];
-	}
-
-	$topic_list_item_html = <<<s
-<a class="{$category_list_item_data['type']}_list_item" data-{$category_list_item_data['type']}-id="{$category_list_item_data['id']}" data-list-item-level="level_{$category_list_item_data['level']}" href="{$category_list_item_link}">
-	<h4>{$category_list_item_data['title']}</h4>
-	<p>{$category_list_item_counts}</p>
-</a>
-s;
-
-	return $topic_list_item_html;
 
 }
 
@@ -406,5 +170,75 @@ function renameTopic($topic_id, $topic_name) {
 
 	# Return topic object
 	return $topic_object;
+
+}
+
+function getRootTopicsIds() {
+
+	$topics_object = TopicQuery::create()
+		->filterByIsRoot(1)
+		->find();
+
+	return $topics_object->getPrimaryKeys();
+
+}
+
+function getTopicsDatas($topics_ids = []) {
+
+	$topics_array_to_return = [];
+
+	$topics_objects = TopicQuery::create()
+		->_if($topics_ids)
+		->filterByPrimaryKeys($topics_ids)
+		->_endif()
+		->find();
+
+	foreach ($topics_objects as $topic_object) {
+		$topics_array_to_return[$topic_object->getId()] = $topic_object->toArray();
+	}
+
+	return $topics_array_to_return;
+
+}
+
+function getTopicsChildrenArray() {
+
+	$topics_parents_objects = TopicParentQuery::create()
+		->find();
+
+	$topics_children_array_to_return = [];
+	foreach ($topics_parents_objects as $topic_parent_object) {
+		$topics_children_array_to_return[$topic_parent_object->getParentId()][] = $topic_parent_object->getTopicId();
+	}
+
+	return $topics_children_array_to_return;
+
+}
+
+function getTopicsLessonsArray() {
+
+	$topics_lessons_objects = TopicLessonQuery::create()
+		->find();
+
+	$topics_lessons_array = [];
+	foreach ($topics_lessons_objects as $topic_lesson_object) {
+		$topics_lessons_array[$topic_lesson_object->getTopicId()][] = $topic_lesson_object->getLessonId();
+	}
+
+	return $topics_lessons_array;
+
+}
+
+function getTopicsTagsArray() {
+
+	$topics_tags_objects = TopicTagQuery::create()
+		->find();
+
+	$topics_tags_array_to_return = [];
+	foreach ($topics_tags_objects as $topic_tag_object) {
+		$topics_tags_array_to_return[$topic_tag_object->getTopicId()][] = $topic_tag_object->getTagId();
+	}
+
+	return $topics_tags_array_to_return;
 
 }

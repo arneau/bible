@@ -6,12 +6,8 @@ require_once '../app/functions/functions.php';
 
 require_once 'components/header.php';
 
-$root_topic_children_objects = TopicQuery::create()
-	->findRoot()
-	->getChildren();
-$topics_and_lessons_list_items = getCategoryListItems($root_topic_children_objects);
-
-$lessons_tree = getLessonsTree();
+$topics_families = getTopicsFamilies();
+$lessons_families = getLessonsFamilies();
 
 echo <<<s
 	<div class="page" id="overview_page">
@@ -23,9 +19,9 @@ echo <<<s
 				<section style="max-height: 800px; overflow-x: scroll;">
 s;
 
-foreach ($topics_and_lessons_list_items as $topics_and_lessons_list_item_data) {
+foreach ($topics_families as $topic_family_data) {
 
-	echo getCategoryListItemHTML($topics_and_lessons_list_item_data);
+	echo getFamilyHtml($topic_family_data, 'topic');
 
 }
 
@@ -41,9 +37,9 @@ echo <<<s
 					<div class="lesson_family">
 s;
 
-foreach ($lessons_tree as $lesson_branch_data) {
+foreach ($lessons_families as $lessons_family_data) {
 
-	echo getListItemHtml($lesson_branch_data, 'lesson');
+	echo getFamilyHtml($lessons_family_data, 'lesson');
 
 }
 

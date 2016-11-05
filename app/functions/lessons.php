@@ -58,7 +58,7 @@ function getLessonData($lesson_id) {
 	if ($lesson_data['Ancestors']) {
 		foreach ($lesson_data['Ancestors'] as $lesson_ancestor_id) {
 			$lesson_ancestor_object = getLesson($lesson_ancestor_id);
-			$lesson_data['FormattedSummary'] .= '<span>' . $lesson_ancestor_object->getSummary() . ' / </span>';
+			$lesson_data['FormattedSummary'] .= '<span>' . $lesson_ancestor_object->getTitle() . ' / </span>';
 		}
 	}
 	$lesson_data['FormattedSummary'] .= $lesson_data['Summary'];
@@ -78,66 +78,6 @@ function getLessonData($lesson_id) {
 
 	# Return lesson data
 	return $lesson_data;
-
-}
-
-function getListItemHtml($list_item_data, $list_item_type, $list_item_options = []) {
-
-	if ($list_item_type == 'lesson') {
-		return getLessonListItemHTML($list_item_data, $list_item_options);
-	}
-
-}
-
-function getLessonListItemHTML($list_item_data, $list_item_options = []) {
-
-	# Define additional list item data
-	$list_item_children_count = count($list_item_data['Children']);
-	if ($list_item_children_count) {
-		$list_item_expandable_class = 'expandable';
-	} else {
-		$list_item_expandable_class = '';
-	}
-	$list_item_tags_count = count($list_item_data['Tags']);
-
-	# Start building HTML
-	$list_item_html = <<<s
-<div class="list_item">
-	<div class="self lesson">
-		<div class="expander {$list_item_expandable_class}" onclick="$(this).closest('.list_item').toggleClass('expanded');"></div>
-		<a class="link" data-lesson-id="{$list_item_data['Id']}" href="lesson.php?id={$list_item_data['Id']}">
-			<h4>{$list_item_data['Summary']}</h4>
-			<p>Lessons: {$list_item_children_count} &middot; Tags: {$list_item_tags_count}</p>
-		</a>
-	</div>
-s;
-
-	# Handle children
-	if ($list_item_children_count) {
-
-		$list_item_html .= <<<s
-	<div class="children">
-s;
-
-		# Iterate through children
-		foreach ($list_item_data['Children'] as $list_item_child) {
-
-			# Append each child's HTML to parent's HTML
-			$list_item_html .= getLessonListItemHTML($list_item_child);
-
-		}
-
-		$list_item_html .= <<<s
-	</div>
-s;
-
-	}
-
-	$list_item_html .= <<<s
-</div>
-s;
-
-	return $list_item_html;
 
 }
 
@@ -200,6 +140,34 @@ function getLessonsParentsArray() {
 
 }
 
+function getRootLessonsIds() {
+
+	$lessons_object = LessonQuery::create()
+		->filterByIsRoot(1)
+		->find();
+
+	return $lessons_object->getPrimaryKeys();
+
+}
+
+function getLessonsDatas($lessons_ids = []) {
+
+	$lessons_array_to_return = [];
+
+	$lessons_objects = LessonQuery::create()
+		->_if($lessons_ids)
+		->filterByPrimaryKeys($lessons_ids)
+		->_endif()
+		->find();
+
+	foreach ($lessons_objects as $lesson_object) {
+		$lessons_array_to_return[$lesson_object->getId()] = $lesson_object->toArray();
+	}
+
+	return $lessons_array_to_return;
+
+}
+
 function getLessonsChildrenArray() {
 
 	$lessons_parents_objects = LessonParentQuery::create()
@@ -225,75 +193,6 @@ function getLessonsTagsArray() {
 	}
 
 	return $lessons_tags_array_to_return;
-
-}
-
-function getLessonsDatas($lessons_ids = []) {
-
-	$lessons_array_to_return = [];
-
-	$lessons_objects = LessonQuery::create()
-		->_if($lessons_ids)
-		->filterByPrimaryKeys($lessons_ids)
-		->_endif()
-		->find();
-
-	foreach ($lessons_objects as $lesson_object) {
-		$lessons_array_to_return[$lesson_object->getId()] = $lesson_object->toArray();
-	}
-
-	return $lessons_array_to_return;
-
-}
-
-function getRootLessonsIds() {
-
-	$lessons_object = LessonQuery::create()
-		->filterByIsRoot(1)
-		->find();
-
-	return $lessons_object->getPrimaryKeys();
-
-}
-
-function getLessonsTree($lesson_ids = []) {
-
-	$lessons_datas_array = getLessonsDatas();
-	$lessons_children_array = getLessonsChildrenArray();
-	$lessons_tags_array = getLessonsTagsArray();
-
-	if ($lesson_ids) {
-		$lessons_datas = getLessonsDatas($lesson_ids);
-	} else {
-		$root_lessons_ids = getRootLessonsIds();
-		$lessons_datas = getLessonsDatas($root_lessons_ids);
-	}
-
-	$formatted_lessons_array_to_return = [];
-	foreach ($lessons_datas as $lesson_data) {
-		$formatted_lessons_array_to_return[] = getLessonsTreePartData($lessons_datas_array, $lessons_children_array, $lessons_tags_array, $lesson_data);
-	}
-
-	return $formatted_lessons_array_to_return;
-
-}
-
-function getLessonsTreePartData($lessons_array, $lessons_children_array, $lessons_tags_array, $lesson_data) {
-
-	$lesson_data_to_return = $lesson_data;
-
-	$lesson_data_to_return['Tags'] = $lessons_tags_array[$lesson_data['Id']];
-
-	if ($lessons_children_array[$lesson_data['Id']]) {
-
-		foreach ($lessons_children_array[$lesson_data['Id']] as $lesson_child_id) {
-			$lesson_child_data = $lessons_array[$lesson_child_id];
-			$lesson_data_to_return['Children'][] = getLessonsTreePartData($lessons_array, $lessons_children_array, $lessons_tags_array, $lesson_child_data);
-		}
-
-	}
-
-	return $lesson_data_to_return;
 
 }
 

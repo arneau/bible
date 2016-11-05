@@ -17,7 +17,7 @@ if (!$lesson_data['Ancestors']) {
 } else {
 	$lesson_branch_root_id = $lesson_data['Ancestors'][0];
 }
-$lesson_branch = getLessonsTree([
+$lesson_branch = getLessonsFamilies([
 	$lesson_branch_root_id
 ]);
 
@@ -98,19 +98,7 @@ echo <<<s
 						<div class="lessons">
 s;
 
-echo getListItemHtml($lesson_branch[0], 'lesson');
-
-//$root_lesson_children_objects = LessonQuery::create()
-//	->filterByPrimaryKeys([
-//		$lesson_family_root_member_id,
-//	])
-//	->find();
-//
-//$lesson_family_members_list_items = getCategoryListItems($root_lesson_children_objects);
-//
-//foreach ($lesson_family_members_list_items as $lesson_family_member_list_item_data) {
-//	echo getCategoryListItemHTML($lesson_family_member_list_item_data);
-//}
+echo getFamilyHtml($lesson_branch[0], 'lesson');
 
 echo <<<s
 						</div>

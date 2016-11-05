@@ -189,4 +189,74 @@ if (0) {
 
 }
 
+# Migrate topics from old structure to new
+if (0) {
+
+	function recurseThroughTopics($topic_id, $parent_id = null) {
+
+		$topic_object = getTopic($topic_id);
+		$topic_data = $topic_object->toArray();
+
+		$new_topic_object = new NewTopic();
+		$new_topic_object->setTitle($topic_data['Name'])
+			->setIsRoot(is_null($parent_id))
+			->save();
+
+		if ($parent_id) {
+
+			$new_topic_parent_object = new NewTopicParent();
+			$new_topic_parent_object->setTopicId($new_topic_object->getId())
+				->setParentId($parent_id)
+				->save();
+
+		}
+
+		$topic_children_ids = $topic_object->getChildren()
+			->getPrimaryKeys();
+		$topic_children = TopicQuery::create()
+			->filterByPrimaryKeys($topic_children_ids)
+			->orderByName()
+			->find();
+
+		foreach ($topic_children as $topic_child) {
+			recurseThroughTopics($topic_child->getId(), $new_topic_object->getId());
+		}
+
+		$topic_tags = $topic_object->getTopicTags();
+
+		foreach ($topic_tags as $topic_tag) {
+			$new_topic_tag_object = new NewTopicTag();
+			$new_topic_tag_object->setTagId($topic_tag->getTagId())
+				->setTopicId($new_topic_object->getId())
+				->save();
+		}
+
+		$topic_lessons = TopicLessonQuery::create()
+			->filterByTopicId($topic_id)
+			->find();
+
+		foreach ($topic_lessons as $topic_lesson) {
+			$new_topic_lesson_object = new NewTopicLesson();
+			$new_topic_lesson_object->setLessonId($topic_lesson->getLessonId())
+				->setTopicId($new_topic_object->getId())
+				->save();
+		}
+
+	}
+
+	$root_topic_object = TopicQuery::create()
+		->findRoot();
+	$root_topic_children_ids = $root_topic_object->getChildren()
+		->getPrimaryKeys();
+	$root_topic_children = TopicQuery::create()
+		->filterByPrimaryKeys($root_topic_children_ids)
+		->orderByName()
+		->find();
+
+	foreach ($root_topic_children as $root_topic_child) {
+		recurseThroughTopics($root_topic_child->getId());
+	}
+
+}
+
 ?>
