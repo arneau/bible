@@ -2,13 +2,13 @@
 
 use Propel\Runtime\Propel;
 
-function addLesson($lesson_parent_id, $lesson_summary) {
+function addLesson($lesson_ancestor_id, $lesson_summary) {
 
-	$parent_object = LessonQuery::create()
-		->findOneById($lesson_parent_id);
+	$ancestor_object = LessonQuery::create()
+		->findOneById($lesson_ancestor_id);
 
 	$lesson_object = new Lesson();
-	$lesson_object->insertAsLastChildOf($parent_object)
+	$lesson_object->insertAsLastDescendantOf($ancestor_object)
 		->setSummary($lesson_summary)
 		->save();
 
@@ -33,8 +33,8 @@ function getLessonData($lesson_id) {
 	# Get lesson data
 	$lesson_data = $lesson_object->toArray();
 
-	# Get lessons parents array
-	$lessons_parents_array = getLessonsParentsArray();
+	# Get lessons ancestors array
+	$lessons_ancestors_array = getLessonsAncestorsArray();
 
 	# Get lesson ancestors
 	$current_lesson_object = $lesson_object;
@@ -44,7 +44,7 @@ function getLessonData($lesson_id) {
 		if ($current_lesson_object->getIsRoot()) {
 			$found_first_ancestor = true;
 		} else {
-			$current_lesson_object = getLesson($lessons_parents_array[$current_lesson_object->getId()][0]);
+			$current_lesson_object = getLesson($lessons_ancestors_array[$current_lesson_object->getId()][0]);
 			$lesson_ancestors_array[] = $current_lesson_object->getId();
 		}
 	}
@@ -54,17 +54,16 @@ function getLessonData($lesson_id) {
 	$lesson_data['Ancestors'] = $lesson_ancestors_array;
 
 	# Define lesson summary
-	$lesson_data['FormattedSummary'] = '';
+	$lesson_data['Breadcrumb'] = '';
 	if ($lesson_data['Ancestors']) {
 		foreach ($lesson_data['Ancestors'] as $lesson_ancestor_id) {
 			$lesson_ancestor_object = getLesson($lesson_ancestor_id);
-			$lesson_data['FormattedSummary'] .= '<span>' . $lesson_ancestor_object->getTitle() . ' / </span>';
+			$lesson_data['Breadcrumb'] .= '<span>' . $lesson_ancestor_object->getTitle() . ' / </span>';
 		}
 	}
-	$lesson_data['FormattedSummary'] .= $lesson_data['Summary'];
 
 	# Define lesson counts
-	//	$lesson_data['counts']['lessons'] = $lesson_object->getChildren()
+	//	$lesson_data['counts']['lessons'] = $lesson_object->getDescendants()
 	//		->count();
 	$lesson_data['counts']['tags'] = $lesson_object->getLessonTags()
 		->count();
@@ -126,17 +125,17 @@ function getLessonTags($lesson_id, $order_by = 'vote_count') {
 
 }
 
-function getLessonsParentsArray() {
+function getLessonsAncestorsArray() {
 
-	$lessons_parents_objects = LessonParentQuery::create()
+	$lessons_ancestors_objects = LessonAncestorQuery::create()
 		->find();
 
-	$lessons_parents_array_to_return = [];
-	foreach ($lessons_parents_objects as $lesson_parent_object) {
-		$lessons_parents_array_to_return[$lesson_parent_object->getLessonId()][] = $lesson_parent_object->getParentId();
+	$lessons_ancestors_array_to_return = [];
+	foreach ($lessons_ancestors_objects as $lesson_ancestor_object) {
+		$lessons_ancestors_array_to_return[$lesson_ancestor_object->getLessonId()][] = $lesson_ancestor_object->getAncestorId();
 	}
 
-	return $lessons_parents_array_to_return;
+	return $lessons_ancestors_array_to_return;
 
 }
 
@@ -168,17 +167,17 @@ function getLessonsDatas($lessons_ids = []) {
 
 }
 
-function getLessonsChildrenArray() {
+function getLessonsDescendantsArray() {
 
-	$lessons_parents_objects = LessonParentQuery::create()
+	$lessons_ancestors_objects = LessonAncestorQuery::create()
 		->find();
 
-	$lessons_children_array_to_return = [];
-	foreach ($lessons_parents_objects as $lesson_parent_object) {
-		$lessons_children_array_to_return[$lesson_parent_object->getParentId()][] = $lesson_parent_object->getLessonId();
+	$lessons_descendants_array_to_return = [];
+	foreach ($lessons_ancestors_objects as $lesson_ancestor_object) {
+		$lessons_descendants_array_to_return[$lesson_ancestor_object->getAncestorId()][] = $lesson_ancestor_object->getLessonId();
 	}
 
-	return $lessons_children_array_to_return;
+	return $lessons_descendants_array_to_return;
 
 }
 
@@ -202,15 +201,15 @@ function getLessonsList() {
 	$root_lesson_object = LessonQuery::create()
 		->findRoot();
 
-	# Get root lesson children array
-	$root_lesson_children_array = $root_lesson_object->getChildren()
+	# Get root lesson descendants array
+	$root_lesson_descendants_array = $root_lesson_object->getDescendants()
 		->toArray();
 
 	# Define lessons list
 	$lessons_list = [];
 
 	# Build lessons list
-	getLessonsListRecursor($root_lesson_children_array, $lessons_list);
+	getLessonsListRecursor($root_lesson_descendants_array, $lessons_list);
 
 	# Return lessons list
 	return $lessons_list;
@@ -237,13 +236,13 @@ function getLessonsListRecursor($lessons_array, &$lessons_list, $level = 0) {
 		# Get lesson object
 		$lesson_object = getLesson($lesson_data['Id']);
 
-		# Get lesson children array
-		$lesson_children_array = $lesson_object->getChildren()
+		# Get lesson descendants array
+		$lesson_descendants_array = $lesson_object->getDescendants()
 			->toArray();
 
-		# Recurse through lesson children (if applicable)
-		if ($lesson_children_array) {
-			getLessonsListRecursor($lesson_children_array, $lessons_list, $level + 1);
+		# Recurse through lesson descendants (if applicable)
+		if ($lesson_descendants_array) {
+			getLessonsListRecursor($lesson_descendants_array, $lessons_list, $level + 1);
 		}
 
 	}
@@ -273,16 +272,16 @@ function getLessonsSelectOptions($selected_lesson_id = false) {
 
 }
 
-function moveLesson($lesson_id, $lesson_parent_id) {
+function moveLesson($lesson_id, $lesson_ancestor_id) {
 
 	# Get lesson object
 	$lesson_object = getLesson($lesson_id);
 
-	# Get parent lesson object
-	$parent_lesson_object = getLesson($lesson_parent_id);
+	# Get ancestor lesson object
+	$ancestor_lesson_object = getLesson($lesson_ancestor_id);
 
 	# Rename lesson and save
-	$lesson_object->moveToLastChildOf($parent_lesson_object)
+	$lesson_object->moveToLastDescendantOf($ancestor_lesson_object)
 		->save();
 
 	# Return lesson object

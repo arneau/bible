@@ -2,14 +2,14 @@
 
 use Propel\Runtime\Propel;
 
-function addTopic($topic_parent_id, $topic_name) {
+function addTopic($topic_ancestor_id, $topic_name) {
 
-	$parent_object = TopicQuery::create()
-		->findOneById($topic_parent_id);
+	$ancestor_object = TopicQuery::create()
+		->findOneById($topic_ancestor_id);
 
 	$topic_object = new Topic();
 	$topic_object->setName($topic_name)
-		->insertAsLastChildOf($parent_object)
+		->insertAsLastDescendantOf($ancestor_object)
 		->save();
 
 	$topic_synonym_object = new TopicSynonym();
@@ -142,16 +142,16 @@ function getTopicsSelectOptions($selected_topic_id = false) {
 
 }
 
-function moveTopic($topic_id, $topic_parent_id) {
+function moveTopic($topic_id, $topic_ancestor_id) {
 
 	# Get topic object
 	$topic_object = getTopic($topic_id);
 
-	# Get parent topic object
-	$parent_topic_object = getTopic($topic_parent_id);
+	# Get ancestor topic object
+	$ancestor_topic_object = getTopic($topic_ancestor_id);
 
 	# Rename topic and save
-	$topic_object->moveToLastChildOf($parent_topic_object)
+	$topic_object->moveToLastDescendantOf($ancestor_topic_object)
 		->save();
 
 	# Return topic object
@@ -201,17 +201,17 @@ function getTopicsDatas($topics_ids = []) {
 
 }
 
-function getTopicsChildrenArray() {
+function getTopicsDescendantsArray() {
 
-	$topics_parents_objects = TopicParentQuery::create()
+	$topics_ancestors_objects = TopicAncestorQuery::create()
 		->find();
 
-	$topics_children_array_to_return = [];
-	foreach ($topics_parents_objects as $topic_parent_object) {
-		$topics_children_array_to_return[$topic_parent_object->getParentId()][] = $topic_parent_object->getTopicId();
+	$topics_descendants_array_to_return = [];
+	foreach ($topics_ancestors_objects as $topic_ancestor_object) {
+		$topics_descendants_array_to_return[$topic_ancestor_object->getAncestorId()][] = $topic_ancestor_object->getTopicId();
 	}
 
-	return $topics_children_array_to_return;
+	return $topics_descendants_array_to_return;
 
 }
 

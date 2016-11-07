@@ -189,50 +189,58 @@ table {
   margin-bottom: 10px;
   width: 100%; }
 
-.list_item {
+.family_tree_part {
   float: left;
   width: 100%; }
-  .list_item.expanded > .self .expander.expandable:before {
+  .family_tree_part.expanded > .self .expander.expandable:before {
     content: "-"; }
-  .list_item.expanded > .children {
+  .family_tree_part.expanded > .descendants {
     display: block; }
-  .list_item .self {
+  .family_tree_part input[type=checkbox].toggler {
+    display: none; }
+    .family_tree_part input[type=checkbox].toggler + .member .link {
+      margin-left: 0; }
+    .family_tree_part input[type=checkbox].toggler:checked + .member label.toggler:before {
+      content: "-"; }
+    .family_tree_part input[type=checkbox].toggler:checked ~ .descendants {
+      display: block; }
+  .family_tree_part .member {
     display: flex;
     flex-flow: row nowrap;
     margin-bottom: 10px; }
-    .list_item .self.topic .link {
+    .family_tree_part .member.topic .link {
       border-left-color: #17b; }
-      .list_item .self.topic .link:hover, .list_item .self.topic .link.active, .list_item .self.topic .link.below {
+      .family_tree_part .member.topic .link:hover, .family_tree_part .member.topic .link.active, .family_tree_part .member.topic .link.below {
         background: #17b; }
-    .list_item .self.lesson .link {
+    .family_tree_part .member.lesson .link {
       border-left-color: #1a7; }
-      .list_item .self.lesson .link:hover, .list_item .self.lesson .link.active, .list_item .self.lesson .link.below {
+      .family_tree_part .member.lesson .link:hover, .family_tree_part .member.lesson .link.active, .family_tree_part .member.lesson .link.below {
         background: #1a7; }
-    .list_item .self .expander {
+    .family_tree_part .member label.toggler {
       color: rgba(0, 0, 0, 0.38);
+      cursor: pointer;
       display: flex;
       flex: 0 0 25px;
       align-items: center; }
-      .list_item .self .expander:hover {
+      .family_tree_part .member label.toggler:before {
+        content: "+"; }
+      .family_tree_part .member label.toggler:hover {
         color: rgba(0, 0, 0, 0.87); }
-      .list_item .self .expander.expandable {
-        cursor: pointer; }
-        .list_item .self .expander.expandable:before {
-          content: "+"; }
-    .list_item .self .link {
+    .family_tree_part .member .link {
       border-left: 8px solid transparent;
       clear: both;
       flex: 0 0 auto;
+      margin-left: 25px;
       padding: 10px 28px 10px 20px; }
-      .list_item .self .link:hover, .list_item .self .link.active, .list_item .self .link.below {
+      .family_tree_part .member .link:hover, .family_tree_part .member .link.active, .family_tree_part .member .link.below {
         color: #fff; }
-        .list_item .self .link:hover p, .list_item .self .link.active p, .list_item .self .link.below p {
+        .family_tree_part .member .link:hover p, .family_tree_part .member .link.active p, .family_tree_part .member .link.below p {
           color: rgba(255, 255, 255, 0.5); }
-      .list_item .self .link p {
+      .family_tree_part .member .link p {
         clear: both;
         color: rgba(0, 0, 0, 0.38);
         font-size: 0.9em !important; }
-  .list_item .children {
+  .family_tree_part .descendants {
     display: none;
     float: left;
     padding-left: 25px;
@@ -320,7 +328,7 @@ body {
   font: bold 1.5em/1.3 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
 
-.list_item .self .expander, .list_item .self .link h4 {
+.family_tree_part .member label.toggler, .family_tree_part .member .link h4 {
   float: left;
   font: bold 1.25em/1.4 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
@@ -345,7 +353,7 @@ body {
   font: 1em/1.6 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
 
-.passage .text p, .passage .footer, .list_item .self .link p, .popup .box .content p, #read_page section p, #topic_page #passages .content .actions p, #topic_page #topics_and_lessons .content .actions, #lesson_page #passages .content .actions p, #lesson_page #lessons .content p {
+.passage .text p, .passage .footer, .family_tree_part .member .link p, .popup .box .content p, #read_page section p, #topic_page #passages .content .actions p, #topic_page #topics_and_lessons .content .actions, #lesson_page #passages .content .actions p, #lesson_page #lessons .content p {
   float: left;
   font: 1em/1.6 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }

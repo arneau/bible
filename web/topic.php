@@ -13,7 +13,7 @@ $topic_object = getTopic($_GET['id']);
 $topic_data = getTopicData($_GET['id']);
 
 # Get topics select options
-$topics_select_options = getTopicsSelectOptions();
+//$topics_select_options = getTopicsSelectOptions();
 
 # Start page
 echo <<<s

@@ -22,13 +22,13 @@ $lesson_branch = getLessonsFamilies([
 ]);
 
 # Get topics select options
-$topics_select_options = getTopicsSelectOptions();
+//$topics_select_options = getTopicsSelectOptions();
 
 # Start page
 echo <<<s
 	<div class="page" id="lesson_page">
 		<section class="page_heading">
-			<h1>{$lesson_data['FormattedSummary']}</h1>
+			<h1>{$lesson_data['Breadcrumb']} {$lesson_data['Title']}</h1>
 			<button class="icon-pencil" onclick="showPopup('edit_lesson_summary');"></button>
 			<button class="icon-topics" onclick="showPopup('link_lesson_to_topic');"></button>
 			<button class="icon-close" onclick="deleteLesson('{$lesson_data['Id']}');"></button>
@@ -105,7 +105,9 @@ echo <<<s
 					</div>
 					<script>
 						$('[data-lesson-id={$lesson_data['Id']}]').addClass('active');
-						$('[data-lesson-id={$lesson_data['Id']}]').parents('.list_item').addClass('expanded');
+						$('[data-lesson-id={$lesson_data['Id']}]').parents('.family_tree_part').each(function () {
+							$(this).children('input[type=checkbox].toggler').prop('checked', true);
+						});
 					</script>
 				</section>
 				<section id="notes">
