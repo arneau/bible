@@ -6,8 +6,8 @@ require_once '../app/functions/functions.php';
 
 require_once 'components/header.php';
 
-$topics_families = getTopicsFamilies();
-$lessons_families = getLessonsFamilies();
+$topics_tree = getTopicsTree();
+$lessons_tree = getLessonsTree();
 
 echo <<<s
 	<div class="page" id="overview_page">
@@ -19,10 +19,8 @@ echo <<<s
 				<section style="max-height: 800px; overflow-x: scroll;">
 s;
 
-foreach ($topics_families as $topic_family_data) {
-
-	echo getFamilyHtml($topic_family_data, 'topic');
-
+foreach ($topics_tree as $topics_tree_topic_data) {
+	echo getTopicsTreeTopicHTML($topics_tree_topic_data);
 }
 
 echo <<<s
@@ -37,10 +35,8 @@ echo <<<s
 					<div class="lesson_family">
 s;
 
-foreach ($lessons_families as $lessons_family_data) {
-
-	echo getFamilyHtml($lessons_family_data, 'lesson');
-
+foreach ($lessons_tree as $lessons_tree_lesson_data) {
+	echo getLessonsTreeLessonHTML($lessons_tree_lesson_data);
 }
 
 echo <<<s

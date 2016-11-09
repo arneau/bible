@@ -210,36 +210,14 @@
 	}
 }
 
-.list {
-	float: left;
-	margin-bottom: 10px;
-	width: 100%;
-}
-
-.family_tree_part {
+.tree_item {
 	float: left;
 	width: 100%;
-
-	&.expanded {
-
-		> .self {
-
-			.expander.expandable {
-
-				&:before {
-					content: "-";
-				}
-			}
-		}
-		> .descendants {
-			display: block;
-		}
-	}
 
 	input[type=checkbox].toggler {
 		display: none;
 
-		& + .member {
+		& + .item {
 
 			.link {
 				margin-left: 0;
@@ -248,7 +226,7 @@
 
 		&:checked {
 
-			+ .member {
+			+ .item {
 
 				label.toggler {
 
@@ -257,13 +235,13 @@
 					}
 				}
 			}
-			~ .descendants {
+			~ .children {
 				display: block;
 			}
 		}
 	}
 
-	.member {
+	.item {
 		display: flex;
 		flex-flow: row nowrap;
 		margin-bottom: 10px;
@@ -332,58 +310,13 @@
 			}
 		}
 	}
-	.descendants {
+	.children {
 		display: none;
 		float: left;
 		padding-left: 25px;
 		width: 100%;
 	}
 }
-
-//.lesson {
-//	background: #fff;
-//	border: 1px solid #fff;
-//	border-left: 0;
-//	cursor: pointer;
-//	float: left;
-//	margin-bottom: 20px;
-//	width: 100%;
-//
-//	&:hover {
-//		box-shadow: 5px 5px rgba(0, 0, 0, 0.05);
-//		border-color: #eee;
-//	}
-//
-//	&.ui-draggable-dragging {
-//		z-index: 1;
-//	}
-//
-//	.content {
-//		border-left: 8px solid $yellow;
-//		float: left;
-//		padding: 10px 0 10px 20px;
-//		width: 100%;
-//
-//		h3 {
-//			@extend %h3;
-//
-//			&.current {
-//				text-decoration: underline;
-//			}
-//		}
-//		p {
-//			@extend %p;
-//
-//			color: #d8d8d8;
-//
-//			.icon {
-//				display: inline-block;
-//				font-size: 16px;
-//				margin: 7px 5px 0 0;
-//			}
-//		}
-//	}
-//}
 
 .popup {
 	align-items: center;

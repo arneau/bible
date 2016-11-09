@@ -13,13 +13,15 @@ $lesson_object = getLesson($_GET['id']);
 $lesson_data = getLessonData($_GET['id']);
 $lesson_tags = getLessonTags($_GET['id'], $_GET['order_passages_by']);
 if (!$lesson_data['Ancestors']) {
-	$lesson_branch_root_id = $_GET['id'];
+	$lesson_family_root_id = $_GET['id'];
 } else {
-	$lesson_branch_root_id = $lesson_data['Ancestors'][0];
+	$lesson_family_root_id = $lesson_data['Ancestors'][0];
 }
-$lesson_branch = getLessonsFamilies([
-	$lesson_branch_root_id
-]);
+$lesson_family = getLessonsArray([
+	$lesson_family_root_id
+])[0];
+
+$lessons_select_html = getLessonsFamiliesOptions($lesson_data['Id']);
 
 # Get topics select options
 //$topics_select_options = getTopicsSelectOptions();
@@ -98,7 +100,7 @@ echo <<<s
 						<div class="lessons">
 s;
 
-echo getFamilyHtml($lesson_branch[0], 'lesson');
+echo getLessonsTreeHTMLRecursor($lesson_family);
 
 echo <<<s
 						</div>
@@ -153,11 +155,14 @@ echo <<<s
 			</div>
 			<form action="add_lesson" class="content" data-type="api">
 				<p>
-					<label>Summary</label>
-					<input name="lesson_summary" type="text" />
+					<label>Title</label>
+					<input name="lesson_title" type="text" />
 				</p>
 				<p>
-					<input name="lesson_id" type="hidden" value="{$lesson_data['Id']}" />
+					<label>Parent</label>
+					{$lessons_select_html}
+				</p>
+				<p>
 					<button>Submit</button>
 				</p>
 			</form>

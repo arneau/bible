@@ -45,14 +45,14 @@
 		<column name="is_root" size="1" type="integer" />
 		<column name="title" required="true" size="1000" type="varchar" />
 	</table>
-	<table name="lesson_ancestor">
-		<column name="ancestor_id" primaryKey="true" type="integer" />
+	<table name="lesson_parent">
 		<column name="lesson_id" primaryKey="true" type="integer" />
-		<foreign-key foreignTable="lesson" onDelete="cascade" phpName="x">
-			<reference foreign="id" local="ancestor_id" />
-		</foreign-key>
+		<column name="parent_id" primaryKey="true" type="integer" />
 		<foreign-key foreignTable="lesson" onDelete="cascade">
 			<reference foreign="id" local="lesson_id" />
+		</foreign-key>
+		<foreign-key foreignTable="lesson" onDelete="cascade" phpName="x">
+			<reference foreign="id" local="parent_id" />
 		</foreign-key>
 	</table>
 	<table name="lesson_note">
@@ -130,14 +130,14 @@
 		<column name="is_root" size="1" type="integer" />
 		<column name="title" required="true" size="255" type="varchar" />
 	</table>
-	<table name="topic_ancestor">
-		<column name="ancestor_id" primaryKey="true" type="integer" />
+	<table name="topic_parent">
 		<column name="topic_id" primaryKey="true" type="integer" />
-		<foreign-key foreignTable="topic" onDelete="cascade" phpName="x">
-			<reference foreign="id" local="ancestor_id" />
-		</foreign-key>
+		<column name="parent_id" primaryKey="true" type="integer" />
 		<foreign-key foreignTable="topic" onDelete="cascade">
 			<reference foreign="id" local="topic_id" />
+		</foreign-key>
+		<foreign-key foreignTable="topic" onDelete="cascade" phpName="x">
+			<reference foreign="id" local="parent_id" />
 		</foreign-key>
 	</table>
 	<table name="topic_lesson" isCrossRef="true">
