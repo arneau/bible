@@ -50,4 +50,4 @@ or
 	mysqldump -u root defender-app > db.sql --no-create-db --no-create-info
 or
 ###### 4) Backup specific tables' data
-	mysqldump -u root defender-app defender_answer defender_answer_type defender_lesson defender_lesson_ancestor defender_lesson_note defender_lesson_tag defender_note defender_note_content defender_response defender_statement defender_tag defender_tag_highlighter defender_tag_verse defender_tag_vote defender_topic defender_topic_ancestor defender_topic_lesson defender_topic_note defender_topic_synonym defender_topic_tag > db.sql --no-create-db --no-create-info
+	mysqldump -u root defender-app defender_answer defender_answer_type defender_lesson defender_lesson_parent defender_lesson_note defender_lesson_tag defender_note defender_note_content defender_response defender_statement defender_tag defender_tag_highlighter defender_tag_verse defender_tag_vote defender_topic defender_topic_parent defender_topic_lesson defender_topic_note defender_topic_synonym defender_topic_tag > db.sql --no-create-db --no-create-info
