@@ -11,6 +11,14 @@ require_once 'components/header.php';
 # Get lesson and data
 $topic_object = getTopic($_GET['id']);
 $topic_data = getTopicData($_GET['id']);
+//if (!$topic_data['Ancestors']) {
+//	$topic_family_root_id = $_GET['id'];
+//} else {
+//	$topic_family_root_id = $topic_data['Ancestors'][0];
+//}
+$topic_family = getTopicsTree([
+	$_GET['id']
+])[0];
 
 # Get topics select options
 //$topics_select_options = getTopicsSelectOptions();
@@ -19,7 +27,7 @@ $topic_data = getTopicData($_GET['id']);
 echo <<<s
 	<div class="page" id="topic_page">
 		<section class="page_heading">
-			<h1>{$topic_data['name']['formatted']}</h1>
+			<h1>{$topic_data['Breadcrumb']} {$topic_data['Title']}</h1>
 			<button class="icon-pencil" onclick="showPopup('edit_topic');"></button>
 			<button class="icon-topics" onclick="showPopup('link_lesson_to_topic');"></button>
 			<button class="icon-close" onclick="deleteTopic('{$topic_data['Id']}');"></button>
@@ -80,26 +88,7 @@ echo <<<s
 						<div class="list">
 s;
 
-# Get root ID
-$topic_ancestors_objects = $topic_object->getAncestors();
-if ($topic_ancestors_objects[1]) {
-	$topic_root_id = $topic_ancestors_objects[1]->getId();
-} else {
-	$topic_root_id = $topic_object->getId();
-}
-
-# Display topic and lesson family
-$topics_objects = TopicQuery::create()
-	->filterByPrimaryKeys([
-		$topic_root_id
-	])
-	->find();
-if ($topics_objects->count()) {
-	$topic_children_list_items = getCategoryListItems($topics_objects);
-	foreach ($topic_children_list_items as $topic_children_list_item_data) {
-		echo getCategoryListItemHTML($topic_children_list_item_data);
-	}
-}
+echo getTopicsTreeTopicHTML($topic_family);
 
 echo <<<s
 						</div>

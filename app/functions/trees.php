@@ -65,11 +65,19 @@ function getLessonsTreeLesson($lesson_id) {
 	$lesson_data = $lessons_datas[$lesson_id];
 
 	if ($lessons_children[$lesson_id]) {
-
 		foreach ($lessons_children[$lesson_id] as $lesson_child_id) {
 			$lesson_data['Children'][] = getLessonsTreeLesson($lesson_child_id);
 		}
-
+		usort($lesson_data['Children'], function ($a, $b) {
+//			if ($a['Title'] < $b['Title']) {
+//				return -1;
+//			} elseif ($a['Title'] > $b['Title']) {
+//				return 1;
+//			} else {
+//				return 0;
+//			}
+			return $a['Title'] <=> $b['Title'];
+		});
 	}
 
 	$lesson_data['Tags'] = $lessons_tags[$lesson_id];
@@ -84,7 +92,7 @@ function getLessonsTreeLessonHTML($lesson_data) {
 	$lesson_tags_count = count($lesson_data['Tags']);
 
 	$lesson_html = <<<s
-<div class="tree_item">
+<div class="tree_item" data-type="lesson">
 s;
 
 	if ($lesson_children_count) {
@@ -94,7 +102,7 @@ s;
 	}
 
 	$lesson_html .= <<<s
-	<div class="item lesson">
+	<div class="self">
 s;
 
 	if ($lesson_children_count) {
@@ -104,7 +112,7 @@ s;
 	}
 
 	$lesson_html .= <<<s
-		<a class="link" data-lesson-id="{$lesson_data['Id']}" href="lesson.php?id={$lesson_data['Id']}">
+		<a class="link lesson" data-lesson-id="{$lesson_data['Id']}" href="lesson.php?id={$lesson_data['Id']}">
 			<h4>{$lesson_data['Title']}</h4>
 			<p>Lessons: {$lesson_children_count} &middot; Tags: {$lesson_tags_count}</p>
 		</a>
@@ -135,6 +143,42 @@ s;
 
 }
 
+function getLessonsTreeOptions($lesson_to_select_id = false) {
+
+	$lessons_tree = getLessonsTree();
+
+	$options_html = <<<s
+<option value="0">None</option>
+s;
+
+	foreach ($lessons_tree as $lesson_data) {
+		$options_html .= getLessonsTreeLessonOption($lesson_data, 0, $lesson_to_select_id);
+	}
+
+	return $options_html;
+
+}
+
+function getLessonsTreeLessonOption($lesson_data, $lesson_level = 0, $lesson_to_select_id = false) {
+
+	$lesson_option_selected_attribute = ($lesson_data['Id'] == $lesson_to_select_id) ? 'selected' : '';
+
+	$lesson_option_prefix = str_repeat('&dash;', $lesson_level);
+
+	$lesson_option_html = <<<s
+<option {$lesson_option_selected_attribute} value="{$lesson_data['Id']}">{$lesson_option_prefix} {$lesson_data['Title']}</option>
+s;
+
+	if (count($lesson_data['Children'])) {
+		foreach ($lesson_data['Children'] as $lesson_child_data) {
+			$lesson_option_html .= getLessonsTreeLessonOption($lesson_child_data, $lesson_level + 1, $lesson_to_select_id);
+		}
+	}
+
+	return $lesson_option_html;
+
+}
+
 function getTopicsTree($root_topics_ids = []) {
 
 	fetchTreeAssets(true, true);
@@ -159,19 +203,15 @@ function getTopicsTreeTopic($topic_id) {
 	$topic_data = $topics_datas[$topic_id];
 
 	if ($topics_children[$topic_id]) {
-
 		foreach ($topics_children[$topic_id] as $topic_child_id) {
 			$topic_data['Children'][] = getTopicsTreeTopic($topic_child_id);
 		}
-
 	}
 
 	if ($topics_lessons[$topic_id]) {
-
 		foreach ($topics_lessons[$topic_id] as $topic_lesson_id) {
 			$topic_data['Lessons'][] = getLessonsTreeLesson($topic_lesson_id);
 		}
-
 	}
 
 	$topic_data['Tags'] = $topics_tags[$topic_id];
@@ -187,7 +227,7 @@ function getTopicsTreeTopicHTML($topic_data) {
 	$topic_tags_count = count($topic_data['Tags']);
 
 	$topic_html = <<<s
-<div class="tree_item">
+<div class="tree_item" data-type="topic">
 s;
 
 	if ($topic_children_count || $topic_lessons_count) {
@@ -197,7 +237,7 @@ s;
 	}
 
 	$topic_html .= <<<s
-	<div class="item topic">
+	<div class="self">
 s;
 
 	if ($topic_children_count || $topic_lessons_count) {
@@ -207,7 +247,7 @@ s;
 	}
 
 	$topic_html .= <<<s
-		<a class="link" data-topic-id="{$topic_data['Id']}" href="topic.php?id={$topic_data['Id']}">
+		<a class="link topic" data-topic-id="{$topic_data['Id']}" href="topic.php?id={$topic_data['Id']}">
 			<h4>{$topic_data['Title']}</h4>
 			<p>Topics: {$topic_children_count} &middot; Lessons: {$topic_lessons_count} &middot; Tags: {$topic_tags_count}</p>
 		</a>
@@ -243,96 +283,5 @@ s;
 s;
 
 	return $topic_html;
-
-}
-
-function getLessonsFamiliesOptions($lesson_to_select_id) {
-
-	$lessons_families = getLessonsArray();
-
-	$options_html = '';
-	foreach ($lessons_families as $lessons_family_data) {
-		$options_html .= getLessonFamilyOptions($lessons_family_data, $lesson_to_select_id);
-	}
-
-}
-
-function getLessonsSelectOptions($selected_lesson_id = false) {
-
-	# Get lessons list
-	$lessons_list = getLessonsList();
-
-	# Begin lessons select options string
-	$lessons_select_options = '<option value="1">None</option>';
-
-	# Iterate through lessons
-	foreach ($lessons_list as $lesson_data) {
-		if ($selected_lesson_id && $selected_lesson_id == $lesson_data['Id']) {
-			$selected_attr = 'selected';
-		} else {
-			$selected_attr = '';
-		}
-		$lessons_select_options .= '<option ' . $selected_attr . ' value="' . $lesson_data['Id'] . '">' . str_repeat('--', $lesson_data['Level']) . ' ' . $lesson_data['Summary'] . '</option>';
-	}
-
-	# Return lessons select options string
-	return $lessons_select_options;
-
-}
-
-function getLessonFamilyOptions($member_data) {
-
-	$member_children_count = count($member_data['Children']);
-	$member_tags_count = count($member_data['Tags']);
-
-	$member_html = <<<s
-<div class="family_tree_part">
-s;
-
-	if ($member_children_count) {
-		$member_html .= <<<s
-	<input class="toggler" id="toggler[lesson_{$member_data['Id']}]" type="checkbox" />
-s;
-	}
-
-	$member_html .= <<<s
-	<div class="member lesson">
-s;
-
-	if ($member_children_count) {
-		$member_html .= <<<s
-		<label class="toggler" for="toggler[lesson_{$member_data['Id']}]"></label>
-s;
-	}
-
-	$member_html .= <<<s
-		<a class="link" data-lesson-id="{$member_data['Id']}" href="lesson.php?id={$member_data['Id']}">
-			<h4>{$member_data['Title']}</h4>
-			<p>Lessons: {$member_children_count} &middot; Tags: {$member_tags_count}</p>
-		</a>
-	</div>
-s;
-
-	if ($member_children_count) {
-
-		$member_html .= <<<s
-	<div class="children">
-s;
-
-		foreach ($member_data['Children'] as $member_child_data) {
-			$member_html .= getLessonsTreeHTMLRecursor($member_child_data);
-		}
-
-		$member_html .= <<<s
-	</div>
-s;
-
-	}
-
-	$member_html .= <<<s
-</div>
-s;
-
-	return $member_html;
 
 }

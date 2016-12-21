@@ -17,11 +17,11 @@ if (!$lesson_data['Ancestors']) {
 } else {
 	$lesson_family_root_id = $lesson_data['Ancestors'][0];
 }
-$lesson_family = getLessonsArray([
+$lesson_family = getLessonsTree([
 	$lesson_family_root_id
 ])[0];
 
-$lessons_select_html = getLessonsFamiliesOptions($lesson_data['Id']);
+$lessons_tree_options = getLessonsTreeOptions($lesson_data['Id']);
 
 # Get topics select options
 //$topics_select_options = getTopicsSelectOptions();
@@ -31,7 +31,7 @@ echo <<<s
 	<div class="page" id="lesson_page">
 		<section class="page_heading">
 			<h1>{$lesson_data['Breadcrumb']} {$lesson_data['Title']}</h1>
-			<button class="icon-pencil" onclick="showPopup('edit_lesson_summary');"></button>
+			<button class="icon-pencil" onclick="showPopup('edit_lesson_title');"></button>
 			<button class="icon-topics" onclick="showPopup('link_lesson_to_topic');"></button>
 			<button class="icon-close" onclick="deleteLesson('{$lesson_data['Id']}');"></button>
 		</section>
@@ -100,14 +100,14 @@ echo <<<s
 						<div class="lessons">
 s;
 
-echo getLessonsTreeHTMLRecursor($lesson_family);
+echo getLessonsTreeLessonHTML($lesson_family);
 
 echo <<<s
 						</div>
 					</div>
 					<script>
 						$('[data-lesson-id={$lesson_data['Id']}]').addClass('active');
-						$('[data-lesson-id={$lesson_data['Id']}]').parents('.family_tree_part').each(function () {
+						$('[data-lesson-id={$lesson_data['Id']}]').parents('.tree_item').each(function () {
 							$(this).children('input[type=checkbox].toggler').prop('checked', true);
 						});
 					</script>
@@ -125,18 +125,18 @@ echo <<<s
 			</div>
 		</div>
 	</div>
-	<div class="popup" id="edit_lesson_summary">
+	<div class="popup" id="edit_lesson_title">
 		<div class="box">
 			<div class="heading">
 				<h3>
 					<span class="icon icon-lesson"></span>
-					Edit summary
+					Edit title
 				</h3>
 			</div>
-			<form action="edit_lesson_summary" class="content" data-type="api">
+			<form action="edit_lesson_title" class="content" data-type="api">
 				<p>
-					<label>Summary</label>
-					<input name="lesson_summary" type="text" value="{$lesson_data['Summary']}" />
+					<label>Title</label>
+					<input name="lesson_title" type="text" value="{$lesson_data['Title']}" />
 				</p>
 				<p>
 					<input name="lesson_id" type="hidden" value="{$lesson_data['Id']}" />
@@ -160,7 +160,9 @@ echo <<<s
 				</p>
 				<p>
 					<label>Parent</label>
-					{$lessons_select_html}
+					<select name="lesson_parent_id">
+						{$lessons_tree_options}
+					</select>
 				</p>
 				<p>
 					<button>Submit</button>

@@ -217,7 +217,7 @@
 	input[type=checkbox].toggler {
 		display: none;
 
-		& + .item {
+		+ .self {
 
 			.link {
 				margin-left: 0;
@@ -226,7 +226,7 @@
 
 		&:checked {
 
-			+ .item {
+			+ .self {
 
 				label.toggler {
 
@@ -241,31 +241,10 @@
 		}
 	}
 
-	.item {
+	.self {
 		display: flex;
 		flex-flow: row nowrap;
 		margin-bottom: 10px;
-
-		&.topic {
-
-			.link {
-				border-left-color: $dark_blue;
-
-				&:hover, &.active, &.below {
-					background: $dark_blue;
-				}
-			}
-		}
-		&.lesson {
-
-			.link {
-				border-left-color: $dark_green;
-
-				&:hover, &.active, &.below {
-					background: $dark_green;
-				}
-			}
-		}
 
 		label.toggler {
 			@extend %h4;
@@ -295,6 +274,21 @@
 
 				p {
 					color: rgba(255, 255, 255, 0.5);
+				}
+			}
+
+			&.lesson {
+				border-left-color: $dark_green;
+
+				&:hover, &.active, &.below {
+					background: $dark_green;
+				}
+			}
+			&.topic {
+				border-left-color: $dark_blue;
+
+				&:hover, &.active, &.below {
+					background: $dark_blue;
 				}
 			}
 

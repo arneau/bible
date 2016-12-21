@@ -94,6 +94,120 @@ CREATE TABLE `defender_verse_translation`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- defender_lesson
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `defender_lesson`;
+
+CREATE TABLE `defender_lesson`
+(
+    `is_root` INTEGER(1),
+    `title` VARCHAR(1000) NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- defender_lesson_parent
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `defender_lesson_parent`;
+
+CREATE TABLE `defender_lesson_parent`
+(
+    `lesson_id` INTEGER NOT NULL,
+    `parent_id` INTEGER NOT NULL,
+    PRIMARY KEY (`lesson_id`,`parent_id`),
+    INDEX `defender_lesson_parent_fi_daf123` (`parent_id`),
+    CONSTRAINT `defender_lesson_parent_fk_df0bc4`
+        FOREIGN KEY (`lesson_id`)
+        REFERENCES `defender_lesson` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `defender_lesson_parent_fk_daf123`
+        FOREIGN KEY (`parent_id`)
+        REFERENCES `defender_lesson` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- defender_lesson_note
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `defender_lesson_note`;
+
+CREATE TABLE `defender_lesson_note`
+(
+    `lesson_id` INTEGER NOT NULL,
+    `note_id` INTEGER NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`),
+    INDEX `defender_lesson_note_fi_df0bc4` (`lesson_id`),
+    INDEX `defender_lesson_note_fi_777577` (`note_id`),
+    CONSTRAINT `defender_lesson_note_fk_df0bc4`
+        FOREIGN KEY (`lesson_id`)
+        REFERENCES `defender_lesson` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `defender_lesson_note_fk_777577`
+        FOREIGN KEY (`note_id`)
+        REFERENCES `defender_note` (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- defender_lesson_tag
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `defender_lesson_tag`;
+
+CREATE TABLE `defender_lesson_tag`
+(
+    `lesson_id` INTEGER NOT NULL,
+    `tag_id` INTEGER NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`),
+    INDEX `defender_lesson_tag_fi_df0bc4` (`lesson_id`),
+    INDEX `defender_lesson_tag_fi_f5ffad` (`tag_id`),
+    CONSTRAINT `defender_lesson_tag_fk_df0bc4`
+        FOREIGN KEY (`lesson_id`)
+        REFERENCES `defender_lesson` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `defender_lesson_tag_fk_f5ffad`
+        FOREIGN KEY (`tag_id`)
+        REFERENCES `defender_tag` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- defender_note
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `defender_note`;
+
+CREATE TABLE `defender_note`
+(
+    `title` VARCHAR(255) NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- defender_note_content
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `defender_note_content`;
+
+CREATE TABLE `defender_note_content`
+(
+    `note_id` INTEGER NOT NULL,
+    `value` BLOB NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`),
+    INDEX `defender_note_content_fi_777577` (`note_id`),
+    CONSTRAINT `defender_note_content_fk_777577`
+        FOREIGN KEY (`note_id`)
+        REFERENCES `defender_note` (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- defender_tag
 -- ---------------------------------------------------------------------
 
@@ -179,28 +293,32 @@ DROP TABLE IF EXISTS `defender_topic`;
 
 CREATE TABLE `defender_topic`
 (
-    `name` VARCHAR(255) NOT NULL,
-    `tree_left` INTEGER,
-    `tree_right` INTEGER,
-    `tree_level` INTEGER,
+    `is_root` INTEGER(1),
+    `title` VARCHAR(255) NOT NULL,
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- defender_lesson
+-- defender_topic_parent
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `defender_lesson`;
+DROP TABLE IF EXISTS `defender_topic_parent`;
 
-CREATE TABLE `defender_lesson`
+CREATE TABLE `defender_topic_parent`
 (
-    `summary` VARCHAR(1000) NOT NULL,
-    `tree_left` INTEGER,
-    `tree_right` INTEGER,
-    `tree_level` INTEGER,
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (`id`)
+    `topic_id` INTEGER NOT NULL,
+    `parent_id` INTEGER NOT NULL,
+    PRIMARY KEY (`topic_id`,`parent_id`),
+    INDEX `defender_topic_parent_fi_71f2e7` (`parent_id`),
+    CONSTRAINT `defender_topic_parent_fk_e13667`
+        FOREIGN KEY (`topic_id`)
+        REFERENCES `defender_topic` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `defender_topic_parent_fk_71f2e7`
+        FOREIGN KEY (`parent_id`)
+        REFERENCES `defender_topic` (`id`)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -220,25 +338,6 @@ CREATE TABLE `defender_topic_lesson`
         REFERENCES `defender_lesson` (`id`)
         ON DELETE CASCADE,
     CONSTRAINT `defender_topic_lesson_fk_e13667`
-        FOREIGN KEY (`topic_id`)
-        REFERENCES `defender_topic` (`id`)
-        ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- defender_topic_adoptee
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `defender_topic_adoptee`;
-
-CREATE TABLE `defender_topic_adoptee`
-(
-    `adoptee_id` INTEGER NOT NULL,
-    `topic_id` INTEGER NOT NULL,
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (`id`),
-    INDEX `defender_topic_adoptee_fi_e13667` (`topic_id`),
-    CONSTRAINT `defender_topic_adoptee_fk_e13667`
         FOREIGN KEY (`topic_id`)
         REFERENCES `defender_topic` (`id`)
         ON DELETE CASCADE
@@ -306,126 +405,6 @@ CREATE TABLE `defender_topic_tag`
     CONSTRAINT `defender_topic_tag_fk_e13667`
         FOREIGN KEY (`topic_id`)
         REFERENCES `defender_topic` (`id`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- defender_new_lesson
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `defender_new_lesson`;
-
-CREATE TABLE `defender_new_lesson`
-(
-    `is_root` INTEGER(1),
-    `summary` VARCHAR(1000) NOT NULL,
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- defender_new_lesson_parent
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `defender_new_lesson_parent`;
-
-CREATE TABLE `defender_new_lesson_parent`
-(
-    `lesson_id` INTEGER NOT NULL,
-    `parent_id` INTEGER NOT NULL,
-    PRIMARY KEY (`lesson_id`,`parent_id`),
-    INDEX `defender_new_lesson_parent_fi_0ca3dc` (`parent_id`),
-    CONSTRAINT `defender_new_lesson_parent_fk_410a28`
-        FOREIGN KEY (`lesson_id`)
-        REFERENCES `defender_new_lesson` (`id`)
-        ON DELETE CASCADE,
-    CONSTRAINT `defender_new_lesson_parent_fk_0ca3dc`
-        FOREIGN KEY (`parent_id`)
-        REFERENCES `defender_new_lesson` (`id`)
-        ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- defender_lesson_note
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `defender_lesson_note`;
-
-CREATE TABLE `defender_lesson_note`
-(
-    `lesson_id` INTEGER NOT NULL,
-    `note_id` INTEGER NOT NULL,
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (`id`),
-    INDEX `defender_lesson_note_fi_df0bc4` (`lesson_id`),
-    INDEX `defender_lesson_note_fi_777577` (`note_id`),
-    CONSTRAINT `defender_lesson_note_fk_df0bc4`
-        FOREIGN KEY (`lesson_id`)
-        REFERENCES `defender_lesson` (`id`)
-        ON DELETE CASCADE,
-    CONSTRAINT `defender_lesson_note_fk_777577`
-        FOREIGN KEY (`note_id`)
-        REFERENCES `defender_note` (`id`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- defender_lesson_tag
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `defender_lesson_tag`;
-
-CREATE TABLE `defender_lesson_tag`
-(
-    `lesson_id` INTEGER NOT NULL,
-    `new_lesson_id` INTEGER NOT NULL,
-    `tag_id` INTEGER NOT NULL,
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (`id`),
-    INDEX `defender_lesson_tag_fi_df0bc4` (`lesson_id`),
-    INDEX `defender_lesson_tag_fi_248b3e` (`new_lesson_id`),
-    INDEX `defender_lesson_tag_fi_f5ffad` (`tag_id`),
-    CONSTRAINT `defender_lesson_tag_fk_df0bc4`
-        FOREIGN KEY (`lesson_id`)
-        REFERENCES `defender_lesson` (`id`)
-        ON DELETE CASCADE,
-    CONSTRAINT `defender_lesson_tag_fk_248b3e`
-        FOREIGN KEY (`new_lesson_id`)
-        REFERENCES `defender_new_lesson` (`id`)
-        ON DELETE CASCADE,
-    CONSTRAINT `defender_lesson_tag_fk_f5ffad`
-        FOREIGN KEY (`tag_id`)
-        REFERENCES `defender_tag` (`id`)
-        ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- defender_note
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `defender_note`;
-
-CREATE TABLE `defender_note`
-(
-    `title` VARCHAR(255) NOT NULL,
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- defender_note_content
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `defender_note_content`;
-
-CREATE TABLE `defender_note_content`
-(
-    `note_id` INTEGER NOT NULL,
-    `value` BLOB NOT NULL,
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (`id`),
-    INDEX `defender_note_content_fi_777577` (`note_id`),
-    CONSTRAINT `defender_note_content_fk_777577`
-        FOREIGN KEY (`note_id`)
-        REFERENCES `defender_note` (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

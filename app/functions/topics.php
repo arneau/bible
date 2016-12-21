@@ -53,22 +53,36 @@ function getTopicData($topic_id) {
 
 	$topic_data = $topic_object->toArray();
 
-	$topic_ancestors_objects = $topic_object->getAncestors();
-	if ($topic_ancestors_objects) {
-		$topic_ancestors_datas = $topic_ancestors_objects->toArray();
-		unset($topic_ancestors_datas[0]);
+	$topics_parents_array = getTopicsParents();
+
+	$current_topic_object = $topic_object;
+	$found_first_ancestor = false;
+	$topic_ancestors_array = [];
+
+	while (!$found_first_ancestor) {
+
+		if ($current_topic_object->getIsRoot()) {
+			$found_first_ancestor = true;
+			continue;
+		}
+
+		$current_topic_object = getTopic($topics_parents_array[$current_topic_object->getId()][0]);
+		$topic_ancestors_array[] = $current_topic_object->getId();
+
 	}
 
-	$topic_data['name'] = [
-		'default' => $topic_data['Name'],
-		'formatted' => '',
-	];
-	if ($topic_ancestors_datas) {
-		foreach ($topic_ancestors_datas as $topic_ancestor_data) {
-			$topic_data['name']['formatted'] .= '<span>' . $topic_ancestor_data['Name'] . ' / </span>';
+	$topic_data['Ancestors'] = array_reverse($topic_ancestors_array);
+
+	if ($topic_data['Ancestors']) {
+
+		foreach ($topic_data['Ancestors'] as $topic_ancestor_id) {
+
+			$topic_ancestor_object = getTopic($topic_ancestor_id);
+			$topic_data['Breadcrumb'] .= '<span>' . $topic_ancestor_object->getTitle() . ' / </span>';
+
 		}
+
 	}
-	$topic_data['name']['formatted'] .= $topic_data['Name'];
 
 	return $topic_data;
 

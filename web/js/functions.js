@@ -121,38 +121,25 @@ function editTagHighlighter(tag_highlighter_id) {
 }
 
 function updateTagHighlighter(tag_highlighter_id) {
-
-	// Remove listeners from words
 	$('blockquote[data-tag-highlighter=' + tag_highlighter_id + '] .word').off('mousedown').off('mouseup');
-
-	// Make display changes
 	$('blockquote[data-tag-highlighter=' + tag_highlighter_id + ']').css('border-left-color', '#eee').find('.relevant_words .confirm').hide().prev().css('display', 'inline-block');
-
-	// Submit relevant words to API
-	$.get('api.php?update_tag_highlighter&tag_highlighter_id=' + tag_highlighter_id + '&tag_highlighter_relevant_words=' + relevant_words[tag_highlighter_id].join(','));
-
+	$.get('api.php?action=update_tag_highlighter&tag_highlighter_id=' + tag_highlighter_id + '&tag_highlighter_relevant_words=' + relevant_words[tag_highlighter_id].join(','));
 }
 
 function deleteLesson(lesson_id) {
-
-	// Send request to API and reload
-	$.get('api.php?delete_lesson&lesson_id=' + lesson_id, function() {
-		location = 'lessons.php';
+	$.get('api.php?action=delete_lesson&lesson_id=' + lesson_id, function() {
+		location = 'overview.php';
 	});
-
 }
 
 function moveLesson(lesson_id, parent_lesson_id) {
-
-	// Send request to API and reload
-	$.get('api.php?move_lesson&lesson_id=' + lesson_id + '&parent_lesson_id=' + parent_lesson_id, function() {
+	$.get('api.php?action=move_lesson&lesson_id=' + lesson_id + '&parent_lesson_id=' + parent_lesson_id, function() {
 		location.reload();
 	});
-
 }
 
 function moveTagToLesson(tag_id, lesson_id) {
-	$.get('api.php?move_tag_to_lesson&tag_id=' + tag_id + '&lesson_id=' + lesson_id, function() {
+	$.get('api.php?action=move_tag_to_lesson&tag_id=' + tag_id + '&lesson_id=' + lesson_id, function() {
 		location.reload();
 	});
 }
@@ -169,7 +156,7 @@ function addTopicLesson(topic_id, lesson_id) {
 function deleteTag(tag_id) {
 
 	// Send request to API and reload
-	$.get('api.php?delete_tag&tag_id=' + tag_id, function() {
+	$.get('api.php?action=delete_tag&tag_id=' + tag_id, function() {
 		location.reload();
 	});
 
@@ -194,28 +181,19 @@ $('form[data-type=api]').submit(function() {
 });
 
 function submitForm(form) {
-
-	// Submit form data to API and reload
-	$.get('api.php?' + $(form).attr('action') + '&' + $(form).serialize(), function() {
-
-		// Reload page as per action
-		if ($(form).attr('action') == 'edit_topic') {
+	form_action = $(form).attr('action');
+	$.get('api.php?action=' + form_action + '&' + $(form).serialize(), function() {
+		if (form_action == 'edit_topic') {
 			location.reload();
 		} else {
 			location = location + '&order_passages_by=date_tagged';
 		}
-
 	});
-
-	// Stop default form submission
 	return false;
 }
 
 function showPopup(popup_id) {
-
-	// Show popup by ID
 	$('#' + popup_id + '.popup').css('display', 'flex').find('input[type=text]').first().select();
-
 }
 
 // Add listeners to popups
@@ -232,17 +210,17 @@ $('.passage').draggable({
 	helper: 'clone',
 	revert: true,
 });
-$('.lesson_list_item').draggable({
+$('.tree_item .link').draggable({
 	helper: 'clone',
 	revert: true,
 }).droppable({
-	accept: '.passage, .lesson_list_item',
+	accept: '.passage, .tree_item .link',
 	hoverClass: 'below',
 	tolerance: 'pointer',
 	drop: function(event, ui) {
 		if (ui.draggable.is('.passage')) {
 			moveTagToLesson(ui.draggable.attr('data-tag-id'), $(this).attr('data-lesson-id'))
-		} else if (ui.draggable.is('.lesson_list_item')) {
+		} else if (ui.draggable.is('.tree_item .link')) {
 			moveLesson(ui.draggable.attr('data-lesson-id'), $(this).attr('data-lesson-id'));
 		}
 	}

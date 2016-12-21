@@ -2,15 +2,21 @@
 
 use Propel\Runtime\Propel;
 
-function addLesson($lesson_ancestor_id, $lesson_summary) {
-
-	$ancestor_object = LessonQuery::create()
-		->findOneById($lesson_ancestor_id);
+function addLesson($lesson_title, $lesson_parent_id = 0) {
 
 	$lesson_object = new Lesson();
-	$lesson_object->insertAsLastDescendantOf($ancestor_object)
-		->setSummary($lesson_summary)
+	$lesson_object->setTitle($lesson_title)
+		->setIsRoot(!($lesson_parent_id))
 		->save();
+
+	if ($lesson_parent_id) {
+
+		$lesson_parent_object = new LessonParent();
+		$lesson_parent_object->setLessonId($lesson_object->getId())
+			->setParentId($lesson_parent_id)
+			->save();
+
+	}
 
 	return $lesson_object->getId();
 
@@ -27,55 +33,41 @@ function getLesson($lesson_id) {
 
 function getLessonData($lesson_id) {
 
-	# Get lesson object
 	$lesson_object = getLesson($lesson_id);
 
-	# Get lesson data
 	$lesson_data = $lesson_object->toArray();
 
-	# Get lessons ancestors array
-	$lessons_ancestors_array = getLessonsAncestorsArray();
+	$lessons_parents_array = getLessonsParents();
 
-	# Get lesson ancestors
 	$current_lesson_object = $lesson_object;
 	$found_first_ancestor = false;
 	$lesson_ancestors_array = [];
+
 	while (!$found_first_ancestor) {
+
 		if ($current_lesson_object->getIsRoot()) {
 			$found_first_ancestor = true;
-		} else {
-			$current_lesson_object = getLesson($lessons_ancestors_array[$current_lesson_object->getId()][0]);
-			$lesson_ancestors_array[] = $current_lesson_object->getId();
+			continue;
 		}
+
+		$current_lesson_object = getLesson($lessons_parents_array[$current_lesson_object->getId()][0]);
+		$lesson_ancestors_array[] = $current_lesson_object->getId();
+
 	}
-	$lesson_ancestors_array = array_reverse($lesson_ancestors_array);
 
-	# Define lesson ancestors
-	$lesson_data['Ancestors'] = $lesson_ancestors_array;
+	$lesson_data['Ancestors'] = array_reverse($lesson_ancestors_array);
 
-	# Define lesson summary
-	$lesson_data['Breadcrumb'] = '';
 	if ($lesson_data['Ancestors']) {
+
 		foreach ($lesson_data['Ancestors'] as $lesson_ancestor_id) {
+
 			$lesson_ancestor_object = getLesson($lesson_ancestor_id);
 			$lesson_data['Breadcrumb'] .= '<span>' . $lesson_ancestor_object->getTitle() . ' / </span>';
+
 		}
+
 	}
 
-	# Define lesson counts
-	//	$lesson_data['counts']['lessons'] = $lesson_object->getDescendants()
-	//		->count();
-	$lesson_data['counts']['tags'] = $lesson_object->getLessonTags()
-		->count();
-
-	# Define expandable status
-	if ($lesson_data['counts']['lessons']) {
-		$lesson_data['expandable'] = 'expandable';
-	} else {
-		$lesson_data['expandable'] = '';
-	}
-
-	# Return lesson data
 	return $lesson_data;
 
 }
@@ -129,6 +121,7 @@ function getRootLessonsIds() {
 
 	$lessons_object = LessonQuery::create()
 		->filterByIsRoot(1)
+		->orderByTitle()
 		->find();
 
 	return $lessons_object->getPrimaryKeys();
@@ -194,20 +187,20 @@ function getLessonsTags() {
 
 }
 
-function moveLesson($lesson_id, $lesson_ancestor_id) {
+function moveLesson($lesson_id, $lesson_parent_id) {
 
-	# Get lesson object
 	$lesson_object = getLesson($lesson_id);
-
-	# Get ancestor lesson object
-	$ancestor_lesson_object = getLesson($lesson_ancestor_id);
-
-	# Rename lesson and save
-	$lesson_object->moveToLastDescendantOf($ancestor_lesson_object)
+	$lesson_object->setIsRoot(0)
 		->save();
 
-	# Return lesson object
-	return $lesson_object;
+//	LessonParentQuery::create()
+//		->findByLessonId($lesson_id)
+//		->delete();
+
+	$lesson_parent_object = new LessonParent();
+	$lesson_parent_object->setLessonId($lesson_id)
+		->setParentId($lesson_parent_id)
+		->save();
 
 }
 

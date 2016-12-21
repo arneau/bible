@@ -189,45 +189,45 @@ table {
   width: 100%; }
   .tree_item input[type=checkbox].toggler {
     display: none; }
-    .tree_item input[type=checkbox].toggler + .item .link {
+    .tree_item input[type=checkbox].toggler + .self .link {
       margin-left: 0; }
-    .tree_item input[type=checkbox].toggler:checked + .item label.toggler:before {
+    .tree_item input[type=checkbox].toggler:checked + .self label.toggler:before {
       content: "-"; }
     .tree_item input[type=checkbox].toggler:checked ~ .children {
       display: block; }
-  .tree_item .item {
+  .tree_item .self {
     display: flex;
     flex-flow: row nowrap;
     margin-bottom: 10px; }
-    .tree_item .item.topic .link {
-      border-left-color: #17b; }
-      .tree_item .item.topic .link:hover, .tree_item .item.topic .link.active, .tree_item .item.topic .link.below {
-        background: #17b; }
-    .tree_item .item.lesson .link {
-      border-left-color: #1a7; }
-      .tree_item .item.lesson .link:hover, .tree_item .item.lesson .link.active, .tree_item .item.lesson .link.below {
-        background: #1a7; }
-    .tree_item .item label.toggler {
+    .tree_item .self label.toggler {
       color: rgba(0, 0, 0, 0.38);
       cursor: pointer;
       display: flex;
       flex: 0 0 25px;
       align-items: center; }
-      .tree_item .item label.toggler:before {
+      .tree_item .self label.toggler:before {
         content: "+"; }
-      .tree_item .item label.toggler:hover {
+      .tree_item .self label.toggler:hover {
         color: rgba(0, 0, 0, 0.87); }
-    .tree_item .item .link {
+    .tree_item .self .link {
       border-left: 8px solid transparent;
       clear: both;
       flex: 0 0 auto;
       margin-left: 25px;
       padding: 10px 28px 10px 20px; }
-      .tree_item .item .link:hover, .tree_item .item .link.active, .tree_item .item .link.below {
+      .tree_item .self .link:hover, .tree_item .self .link.active, .tree_item .self .link.below {
         color: #fff; }
-        .tree_item .item .link:hover p, .tree_item .item .link.active p, .tree_item .item .link.below p {
+        .tree_item .self .link:hover p, .tree_item .self .link.active p, .tree_item .self .link.below p {
           color: rgba(255, 255, 255, 0.5); }
-      .tree_item .item .link p {
+      .tree_item .self .link.lesson {
+        border-left-color: #1a7; }
+        .tree_item .self .link.lesson:hover, .tree_item .self .link.lesson.active, .tree_item .self .link.lesson.below {
+          background: #1a7; }
+      .tree_item .self .link.topic {
+        border-left-color: #17b; }
+        .tree_item .self .link.topic:hover, .tree_item .self .link.topic.active, .tree_item .self .link.topic.below {
+          background: #17b; }
+      .tree_item .self .link p {
         clear: both;
         color: rgba(0, 0, 0, 0.38);
         font-size: 0.9em !important; }
@@ -319,7 +319,7 @@ body {
   font: bold 1.5em/1.3 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
 
-.tree_item .item label.toggler, .tree_item .item .link h4 {
+.tree_item .self label.toggler, .tree_item .self .link h4 {
   float: left;
   font: bold 1.25em/1.4 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
@@ -344,7 +344,7 @@ body {
   font: 1em/1.6 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
 
-.passage .text p, .passage .footer, .tree_item .item .link p, .popup .box .content p, #read_page section p, #topic_page #passages .content .actions p, #topic_page #topics_and_lessons .content .actions, #lesson_page #passages .content .actions p, #lesson_page #lessons .content p {
+.passage .text p, .passage .footer, .tree_item .self .link p, .popup .box .content p, #read_page section p, #topic_page #passages .content .actions p, #topic_page #topics_and_lessons .content .actions, #lesson_page #passages .content .actions p, #lesson_page #lessons .content p {
   float: left;
   font: 1em/1.6 Helvetica Neue, Helvetica, Arial, sans-serif;
   width: 100%; }
@@ -491,10 +491,6 @@ body {
       #topic_page #topics_and_lessons .content .actions a {
         color: #17b;
         cursor: pointer; }
-    #topic_page #topics_and_lessons .content .list {
-      margin-bottom: 0; }
-      #topic_page #topics_and_lessons .content .list :last-child {
-        margin-bottom: 0; }
 #topic_page #notes {
   border-bottom: 8px solid #fc4; }
   #topic_page #notes .heading {
