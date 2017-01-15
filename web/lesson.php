@@ -35,6 +35,9 @@ echo <<<s
 			<button class="icon-topics" onclick="showPopup('link_lesson_to_topic');"></button>
 			<button class="icon-close" onclick="deleteLesson('{$lesson_data['Id']}');"></button>
 		</section>
+		<script>
+			document.title = $('.page_heading h1').text();
+		</script>
 		<div class="columns">
 			<div class="column">
 				<section id="passages">

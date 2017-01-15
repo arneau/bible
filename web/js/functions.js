@@ -206,11 +206,13 @@ $('.popup').each(function() {
 });
 
 $('.passage').draggable({
+	delay: 300,
 	handle: '.handle',
 	helper: 'clone',
 	revert: true,
 });
 $('.tree_item .link').draggable({
+	delay: 300,
 	helper: 'clone',
 	revert: true,
 }).droppable({
