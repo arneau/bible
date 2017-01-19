@@ -1,6 +1,6 @@
 # The Defender App
 
-### Install Composer
+### Install Composer with Propel
 ###### 1) Create composer.json
 	{
 		"require": {
