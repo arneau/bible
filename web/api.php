@@ -28,7 +28,8 @@ if (isset($_GET['action'])) {
 
 	// Add lesson tag
 	if ($_GET['action'] == 'add_lesson_tag') {
-		addLessonTag($_GET['lesson_id'], $_GET['reference_string']);
+		$reference_string = trim($_GET['reference_string']);
+		addLessonTag($_GET['lesson_id'], $reference_string);
 	}
 
 	// Edit lesson title

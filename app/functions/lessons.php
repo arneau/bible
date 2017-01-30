@@ -193,9 +193,9 @@ function moveLesson($lesson_id, $lesson_parent_id) {
 	$lesson_object->setIsRoot(0)
 		->save();
 
-//	LessonParentQuery::create()
-//		->findByLessonId($lesson_id)
-//		->delete();
+	LessonParentQuery::create()
+		->findByLessonId($lesson_id)
+		->delete();
 
 	$lesson_parent_object = new LessonParent();
 	$lesson_parent_object->setLessonId($lesson_id)
